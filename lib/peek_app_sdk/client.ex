@@ -30,7 +30,7 @@ defmodule PeekAppSDK.Client do
 
     case Regex.run(regex, query) do
       [_, _, operation_name] ->
-        operation_name
+        Macro.underscore(operation_name)
 
       _ ->
         raise """
