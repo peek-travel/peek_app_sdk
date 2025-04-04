@@ -21,10 +21,11 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
   end
 
   defp do_set(conn, token) do
-    with {:ok, install_id} <- PeekAppSDK.Token.verify_peek_auth(token) do
+    with {:ok, install_id, claims} <- PeekAppSDK.Token.verify_peek_auth(token) do
       conn
       |> assign(:peek_install_token, token)
       |> assign(:peek_install_id, install_id)
+      |> assign(:peek_account_user, build_account_user(claims))
       |> fetch_session()
       |> put_session(:peek_install_id, install_id)
     else
@@ -32,6 +33,24 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
         conn
     end
   end
+
+  defp build_account_user(%{
+         "current_user_email" => current_user_email,
+         "current_user_id" => current_user_id,
+         "current_user_is_peek_admin" => current_user_is_peek_admin,
+         "current_user_name" => current_user_name,
+         "current_user_primary_role" => current_user_primary_role
+       }) do
+    %PeekAppSDK.AccountUser{
+      email: current_user_email,
+      id: current_user_id,
+      is_peek_admin: current_user_is_peek_admin,
+      name: current_user_name,
+      primary_role: current_user_primary_role
+    }
+  end
+
+  defp build_account_user(_), do: nil
 
   def on_mount(:set_install_id_for_live_view, _params, params, socket) do
     socket =
