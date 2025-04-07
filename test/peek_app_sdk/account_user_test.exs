@@ -6,7 +6,7 @@ defmodule PeekAppSDK.AccountUserTest do
   describe "hook/0" do
     test "returns a hook account user" do
       hook = AccountUser.hook()
-      
+
       assert %AccountUser{} = hook
       assert hook.name == "hook"
       assert hook.email == nil
