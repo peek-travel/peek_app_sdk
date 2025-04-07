@@ -11,26 +11,26 @@ writing apps.
 config :peek_app_sdk,
   peek_app_secret: "APP_SECRET",
   peek_app_id: "APP_ID",
-  peek_api_url: "https://api.peek.com",
+  peek_api_url: "https://apps.peekapis.com/backoffice-gql",
   peek_app_key: "APP_KEY"
 ```
 
 ### Multiple Application Configurations
 
-PeekAppSDK supports multiple configurations, allowing different applications to use their own credentials:
+PeekAppSDK supports multiple configurations, allowing different applications to use their own credentials through a centralized configuration structure:
 
 ```elixir
 # Default configuration
 config :peek_app_sdk,
   peek_app_secret: "DEFAULT_SECRET",
   peek_app_id: "DEFAULT_APP_ID",
-  peek_api_url: "https://api.peek.com",
-  peek_app_key: "DEFAULT_APP_KEY"
-
-# Application-specific configuration
-config :semnox,
-  peek_app_secret: "SEMNOX_SECRET",
-  peek_app_id: "SEMNOX_APP_ID"
+  peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+  peek_app_key: "DEFAULT_APP_KEY",
+  # Centralized app configurations
+  apps: [
+    semnox: [peek_app_id: "SEMNOX_APP_ID", peek_app_secret: "SEMNOX_APP_SECRET"],
+    another_app: [peek_app_id: "ANOTHER_APP_ID", peek_app_secret: "ANOTHER_APP_SECRET"]
+  ]
 ```
 
 Then use the application identifier when calling PeekAppSDK functions:

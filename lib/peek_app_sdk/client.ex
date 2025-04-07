@@ -82,10 +82,17 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  defp headers(install_id, nil) do
+    [x_peek_auth_header(install_id)]
+  end
+
   defp headers(install_id, peek_app_key) do
     [
-      {"X-Peek-Auth", "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id)}"},
+      x_peek_auth_header(install_id),
       {"pk-api-key", peek_app_key}
     ]
   end
+
+  defp x_peek_auth_header(install_id),
+    do: {"X-Peek-Auth", "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id)}"}
 end

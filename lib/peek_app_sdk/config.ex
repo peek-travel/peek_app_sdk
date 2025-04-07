@@ -3,17 +3,23 @@ defmodule PeekAppSDK.Config do
   Provides configuration for PeekAppSDK.
 
   This module allows different applications to use their own configurations
-  by reading from their respective application environment.
+  through a centralized configuration structure.
 
-  For example, if you have a `:semnox` application, you can configure it with:
+  ## Configuration
+
+  Configure multiple applications in a single place:
 
   ```elixir
-  config :semnox,
-    peek_app_secret: "semnox_secret",
-    peek_app_id: "semnox_app_id"
+  config :peek_app_sdk,
+    peek_app_secret: "DEFAULT_SECRET",
+    peek_app_id: "DEFAULT_APP_ID",
+    peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+    peek_app_key: "APP_KEY",
+    apps: [
+      semnox: [peek_app_id: "semnox_app_id", peek_app_secret: "semnox_secret"],
+      another_app: [peek_app_id: "another_app_id", peek_app_secret: "another_app_secret"]
+    ]
   ```
-
-  And then use `:semnox` as the config_id when calling PeekAppSDK functions.
 
   Note that `peek_api_url` and `peek_app_key` are always taken from the default
   `:peek_app_sdk` configuration, regardless of which application identifier is used.
@@ -27,13 +33,13 @@ defmodule PeekAppSDK.Config do
 
   ## Examples
 
-  Using an atom identifier:
+  Using an app identifier:
 
       iex> PeekAppSDK.Config.get_config(:semnox)
       %{
         peek_app_secret: "semnox_secret",
         peek_app_id: "semnox_app_id",
-        peek_api_url: "https://api.peek.com",
+        peek_api_url: "https://apps.peekapis.com/backoffice-gql",
         peek_app_key: "default_app_key"
       }
 
@@ -43,7 +49,7 @@ defmodule PeekAppSDK.Config do
       %{
         peek_app_secret: "default_secret",
         peek_app_id: "default_app_id",
-        peek_api_url: "https://api.peek.com",
+        peek_api_url: "https://apps.peekapis.com/backoffice-gql",
         peek_app_key: "default_app_key"
       }
 
@@ -64,19 +70,20 @@ defmodule PeekAppSDK.Config do
   end
 
   def get_config(identifier) when is_atom(identifier) do
-    # Try to get configuration from the specified application
-    peek_app_secret = Application.get_env(identifier, :peek_app_secret)
-    peek_app_id = Application.get_env(identifier, :peek_app_id)
+    # Get configuration from the centralized apps config
+    apps = Application.get_env(:peek_app_sdk, :apps, [])
+    app_config = Keyword.get(apps, identifier)
 
-    if peek_app_secret && peek_app_id do
+    if app_config && Keyword.has_key?(app_config, :peek_app_id) &&
+         Keyword.has_key?(app_config, :peek_app_secret) do
       %{
-        peek_app_secret: peek_app_secret,
-        peek_app_id: peek_app_id,
+        peek_app_secret: Keyword.get(app_config, :peek_app_secret),
+        peek_app_id: Keyword.get(app_config, :peek_app_id),
         peek_api_url: Application.get_env(:peek_app_sdk, :peek_api_url, @default_peek_url),
-        peek_app_key: Application.get_env(:peek_app_sdk, :peek_app_key)
+        peek_app_key: Keyword.get(app_config, :peek_app_key)
       }
     else
-      # Fall back to default configuration if the specified application doesn't have the required config
+      # Fall back to default configuration if the app is not configured
       get_config(nil)
     end
   end

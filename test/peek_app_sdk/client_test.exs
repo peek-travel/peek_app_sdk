@@ -17,7 +17,7 @@ defmodule PeekAppSDK.ClientTest do
         assert env.method == :post
 
         assert env.url ==
-                 "https://noreaga.peek.com/apps/backoffice-gql/test_app_id/test_operation_name"
+                 "https://apps.peekapis.com/backoffice-gql/test_app_id/test_operation_name"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -42,7 +42,9 @@ defmodule PeekAppSDK.ClientTest do
 
       expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
         assert env.method == :post
-        assert env.url == "https://noreaga.peek.com/apps/backoffice-gql/semnox_test_app_id/test"
+
+        assert env.url ==
+                 "https://apps.peekapis.com/backoffice-gql/semnox_app_id/test"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -53,10 +55,44 @@ defmodule PeekAppSDK.ClientTest do
                  k == "X-Peek-Auth" && String.starts_with?(v, "Bearer ")
                end)
 
+        assert Enum.any?(env.headers, fn {k, v} ->
+                 k == "pk-api-key" && v == "semnox_app_key"
+               end)
+
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
       end)
 
       assert {:ok, ^response_data} = Client.query_peek_pro(install_id, query, variables, :semnox)
+    end
+
+    test "pk-api-key only sent if peek_app_key is set" do
+      install_id = "test_install_id"
+      query = "query Test { test }"
+      variables = %{"foo" => "bar"}
+      response_data = %{test: "success"}
+
+      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+        assert env.method == :post
+        assert env.url == "https://apps.peekapis.com/backoffice-gql/other_app_id/test"
+
+        assert Jason.decode!(env.body) == %{
+                 "query" => query,
+                 "variables" => variables
+               }
+
+        assert Enum.any?(env.headers, fn {k, v} ->
+                 k == "X-Peek-Auth" && String.starts_with?(v, "Bearer ")
+               end)
+
+        assert Enum.filter(env.headers, fn {k, _v} ->
+                 k == "pk-api-key"
+               end) == []
+
+        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+      end)
+
+      assert {:ok, ^response_data} =
+               Client.query_peek_pro(install_id, query, variables, :other_app)
     end
 
     test "handles error response" do

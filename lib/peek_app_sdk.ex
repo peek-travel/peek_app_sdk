@@ -21,16 +21,16 @@ defmodule PeekAppSDK do
 
   ```elixir
   # In config/config.exs or similar
-  config :semnox,
-    peek_app_secret: "YOUR_APP_SECRET",
-    peek_app_id: "YOUR_APP_ID"
-
-  # The default configuration is set in :peek_app_sdk
   config :peek_app_sdk,
-    peek_api_url: "https://api.peek.com",
     peek_app_secret: "DEFAULT_SECRET",
     peek_app_id: "DEFAULT_APP_ID",
-    peek_app_key: "APP_KEY"
+    peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+    peek_app_key: "APP_KEY",
+    # Centralized app configurations
+    apps: [
+      semnox: [peek_app_id: "SEMNOX_APP_ID", peek_app_secret: "SEMNOX_APP_SECRET"],
+      another_app: [peek_app_id: "ANOTHER_APP_ID", peek_app_secret: "ANOTHER_APP_SECRET"]
+    ]
   ```
 
   Note that `peek_api_url` and `peek_app_key` are always taken from the default
@@ -49,7 +49,7 @@ defmodule PeekAppSDK do
       %{
         peek_app_secret: "semnox_secret",
         peek_app_id: "semnox_app_id",
-        peek_api_url: "https://api.peek.com",
+        peek_api_url: "https://apps.peekapis.com/backoffice-gql",
         peek_app_key: "default_app_key"
       }
 
@@ -59,7 +59,7 @@ defmodule PeekAppSDK do
       %{
         peek_app_secret: "default_secret",
         peek_app_id: "default_app_id",
-        peek_api_url: "https://api.peek.com",
+        peek_api_url: "https://apps.peekapis.com/backoffice-gql",
         peek_app_key: "default_app_key"
       }
   """

@@ -43,13 +43,22 @@ defmodule PeekAppSDKTest do
       assert config.peek_app_id == "test_app_id"
     end
 
-    test "get_config/1 returns configuration for atom identifier" do
+    test "get_config/1 returns configuration for semnox from apps config" do
       config = PeekAppSDK.get_config(:semnox)
       assert is_map(config)
       assert Map.has_key?(config, :peek_app_secret)
       assert Map.has_key?(config, :peek_app_id)
-      assert config.peek_app_secret == "semnox_test_secret"
-      assert config.peek_app_id == "semnox_test_app_id"
+      assert config.peek_app_secret == "semnox_app_secret"
+      assert config.peek_app_id == "semnox_app_id"
+    end
+
+    test "get_config/1 returns configuration for other app from apps config" do
+      config = PeekAppSDK.get_config(:other_app)
+      assert is_map(config)
+      assert Map.has_key?(config, :peek_app_secret)
+      assert Map.has_key?(config, :peek_app_id)
+      assert config.peek_app_secret == "other_app_secret"
+      assert config.peek_app_id == "other_app_id"
     end
   end
 end
