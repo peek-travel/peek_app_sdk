@@ -3,19 +3,46 @@ defmodule PeekAppSDK.Client do
 
   use Tesla
 
+  alias PeekAppSDK.Config
+
   plug Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]
 
-  def query_peek_pro(install_id, gql_query, gql_variables \\ %{}) do
+  @doc """
+  Queries the Peek Pro API.
+
+  ## Examples
+
+  Using the default configuration:
+
+      iex> PeekAppSDK.Client.query_peek_pro("install_id", "query { test }")
+      {:ok, %{test: "success"}}
+
+  Using a specific application's configuration:
+
+      iex> PeekAppSDK.Client.query_peek_pro("install_id", "query { test }", %{}, :semnox)
+      {:ok, %{test: "success"}}
+  """
+  @spec query_peek_pro(String.t(), String.t(), map(), atom() | nil) ::
+          {:ok, map()} | {:error, any()}
+  def query_peek_pro(install_id, gql_query, gql_variables \\ %{}, config_id \\ nil) do
     body_params = %{
       "query" => gql_query,
       "variables" => gql_variables
     }
 
-    peek_app_id = Application.fetch_env!(:peek_app_sdk, :peek_app_id)
-    operation_name = operation_name(gql_query)
-    url = "#{api_url()}/#{peek_app_id}/#{operation_name}"
+    config = Config.get_config(config_id)
+    peek_app_id = config.peek_app_id
+    peek_app_key = config.peek_app_key
 
-    case request(method: :post, url: url, body: body_params, headers: headers(install_id)) do
+    operation_name = operation_name(gql_query)
+    url = "#{config.peek_api_url |> String.trim()}/#{peek_app_id}/#{operation_name}"
+
+    case request(
+           method: :post,
+           url: url,
+           body: body_params,
+           headers: headers(install_id, peek_app_key)
+         ) do
       {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
         {:ok, data}
 
@@ -55,18 +82,17 @@ defmodule PeekAppSDK.Client do
     end
   end
 
-  defp headers(install_id) do
+  defp headers(install_id, nil) do
+    [x_peek_auth_header(install_id)]
+  end
+
+  defp headers(install_id, peek_app_key) do
     [
-      {"X-Peek-Auth", "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id)}"},
-      {"pk-api-key", Application.fetch_env!(:peek_app_sdk, :peek_app_key)}
+      x_peek_auth_header(install_id),
+      {"pk-api-key", peek_app_key}
     ]
   end
 
-  defp api_url,
-    do:
-      Application.get_env(
-        :peek_app_sdk,
-        :peek_api_url,
-        "https://apps.peekapis.com/backoffice-gql"
-      )
+  defp x_peek_auth_header(install_id),
+    do: {"X-Peek-Auth", "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id)}"}
 end
