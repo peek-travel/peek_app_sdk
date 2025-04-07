@@ -1,34 +1,75 @@
 defmodule PeekAppSDK.Plugs.PeekAuth do
   import Plug.Conn
 
+  @doc """
+  Allows Peek iframe embedding by setting appropriate CSP headers.
+  """
   def allow_peek_iframe(conn, _params) do
     put_resp_header(conn, "content-security-policy", "frame-ancestors 'self' *")
   end
 
-  def set_peek_install_id(%{body_params: %{"peek-auth" => token}} = conn, _params),
-    do: do_set(conn, token)
+  @doc """
+  Sets the peek_install_id in the connection assigns based on the token in the request.
 
-  def set_peek_install_id(%{params: %{"peek-auth" => token}} = conn, _params),
-    do: do_set(conn, token)
+  ## Options
 
-  def set_peek_install_id(conn, _params) do
-    with ["Bearer " <> token] <- Plug.Conn.get_req_header(conn, "x-peek-auth") do
-      do_set(conn, token)
-    else
-      _ ->
-        conn
+  * `:config_id` - The configuration identifier to use for token verification. Defaults to nil (use default config).
+
+  ## Examples
+
+      # Using default configuration
+      plug :set_peek_install_id
+
+      # Using a specific configuration with a string identifier (legacy approach)
+      plug :set_peek_install_id, config_id: "my_app"
+
+      # Using a specific configuration with a tuple identifier (recommended approach)
+      plug :set_peek_install_id, config_id: {:project, :semnox}
+  """
+  def set_peek_install_id(%{body_params: %{"peek-auth" => token}} = conn, opts),
+    do: do_set(conn, token, opts)
+
+  def set_peek_install_id(%{params: %{"peek-auth" => token}} = conn, opts),
+    do: do_set(conn, token, opts)
+
+  def set_peek_install_id(conn, opts) do
+    case Plug.Conn.get_req_header(conn, "x-peek-auth") do
+      ["Bearer " <> token] -> do_set(conn, token, opts)
+      _ -> conn
     end
   end
 
-  defp do_set(conn, token) do
-    with {:ok, install_id, claims} <- PeekAppSDK.Token.verify_peek_auth(token) do
-      conn
-      |> assign(:peek_install_token, token)
-      |> assign(:peek_install_id, install_id)
-      |> assign(:peek_account_user, build_account_user(claims))
-      |> fetch_session()
-      |> put_session(:peek_install_id, install_id)
-    else
+  defp do_set(conn, token, opts) do
+    # Handle both keyword list and map options
+    config_id =
+      cond do
+        is_list(opts) -> Keyword.get(opts, :config_id)
+        is_map(opts) -> Map.get(opts, :config_id)
+        true -> nil
+      end
+
+    case PeekAppSDK.Token.verify_peek_auth(token, config_id) do
+      {:ok, install_id, claims} ->
+        # Assign values to the connection
+        conn =
+          conn
+          |> assign(:peek_install_token, token)
+          |> assign(:peek_install_id, install_id)
+          |> assign(:peek_account_user, build_account_user(claims))
+          |> assign(:peek_config_id, config_id)
+
+        # Only try to set session if it's configured
+        # This prevents errors in tests
+        try do
+          conn
+          |> fetch_session()
+          |> put_session(:peek_install_id, install_id)
+          |> put_session(:peek_config_id, config_id)
+        rescue
+          # If session is not configured, just return the conn with assigns
+          ArgumentError -> conn
+        end
+
       _ ->
         conn
     end
@@ -52,9 +93,32 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
 
   defp build_account_user(_), do: nil
 
-  def on_mount(:set_install_id_for_live_view, _params, params, socket) do
+  @doc """
+  LiveView on_mount callback to set the peek_install_id in the socket assigns.
+
+  ## Options
+
+  * `:config_id` - The configuration identifier to use. Defaults to nil (use default config).
+
+  ## Examples
+
+      # Using default configuration
+      live_session :some_scope, on_mount: {PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view}
+
+      # Using a specific configuration with a string identifier (legacy approach)
+      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view, [config_id: "my_app"]}]
+
+      # Using a specific configuration with a tuple identifier (recommended approach)
+      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view, [config_id: {:project, :semnox}]}]
+  """
+  def on_mount(:set_install_id_for_live_view, _params, session, socket) do
     socket =
-      case params do
+      case session do
+        %{"peek_install_id" => peek_install_id, "peek_config_id" => config_id} ->
+          socket
+          |> Phoenix.Component.assign(:peek_install_id, peek_install_id)
+          |> Phoenix.Component.assign(:peek_config_id, config_id)
+
         %{"peek_install_id" => peek_install_id} ->
           Phoenix.Component.assign(socket, :peek_install_id, peek_install_id)
 

@@ -13,7 +13,20 @@ defmodule PeekAppSDK.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [
+        tool: ExCoveralls,
+        test_task: "test",
+        summary: [threshold: 90]
+      ],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.github": :test,
+        "coveralls.lcov": :test
+      ]
     ]
   end
 
@@ -39,7 +52,15 @@ defmodule PeekAppSDK.MixProject do
       {:joken, "~> 2.3"},
       {:tesla, "~> 1.4"},
       {:phoenix, "~> 1.7"},
-      {:phoenix_live_view, "~> 1.0.0-rc.1", override: true}
+      {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
+
+      # Test dependencies
+      {:mox, "~> 1.0", only: :test},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:bypass, "~> 2.1", only: :test},
+
+      # Development dependencies
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
