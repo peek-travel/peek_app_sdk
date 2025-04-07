@@ -51,24 +51,11 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
     case PeekAppSDK.Token.verify_peek_auth(token, config_id) do
       {:ok, install_id, claims} ->
         # Assign values to the connection
-        conn =
-          conn
-          |> assign(:peek_install_token, token)
-          |> assign(:peek_install_id, install_id)
-          |> assign(:peek_account_user, build_account_user(claims))
-          |> assign(:peek_config_id, config_id)
-
-        # Only try to set session if it's configured
-        # This prevents errors in tests
-        try do
-          conn
-          |> fetch_session()
-          |> put_session(:peek_install_id, install_id)
-          |> put_session(:peek_config_id, config_id)
-        rescue
-          # If session is not configured, just return the conn with assigns
-          ArgumentError -> conn
-        end
+        conn
+        |> assign(:peek_install_token, token)
+        |> assign(:peek_install_id, install_id)
+        |> assign(:peek_account_user, build_account_user(claims))
+        |> assign(:peek_config_id, config_id)
 
       _ ->
         conn

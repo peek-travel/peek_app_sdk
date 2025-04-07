@@ -48,6 +48,28 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       # Don't test session in tests since it's not properly initialized
     end
 
+    test "has the correct account_user infos" do
+      install_id = "test_install_id"
+
+      token =
+        Token.new_for_app_installation!(install_id, %{
+          email: "test@example.com",
+          id: "user123",
+          is_peek_admin: true,
+          name: "Test User",
+          primary_role: "admin"
+        })
+
+      conn = conn(:post, "/", %{"peek-auth" => token})
+
+      conn = PeekAuth.set_peek_install_id(conn, %{})
+      assert conn.assigns.peek_account_user.email == "test@example.com"
+      assert conn.assigns.peek_account_user.id == "user123"
+      assert conn.assigns.peek_account_user.is_peek_admin == true
+      assert conn.assigns.peek_account_user.name == "Test User"
+      assert conn.assigns.peek_account_user.primary_role == "admin"
+    end
+
     test "sets install ID from body params with map options" do
       install_id = "test_install_id"
       atom_id = :semnox
