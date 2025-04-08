@@ -34,7 +34,7 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
 
     test "sets install ID from body params with atom config_id" do
       install_id = "test_install_id"
-      atom_id = :semnox
+      atom_id = :project_name
 
       token = Token.new_for_app_installation!(install_id, nil, atom_id)
       conn = conn(:post, "/", %{"peek-auth" => token})
@@ -72,7 +72,7 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
 
     test "sets install ID from body params with map options" do
       install_id = "test_install_id"
-      atom_id = :semnox
+      atom_id = :project_name
 
       token = Token.new_for_app_installation!(install_id, nil, atom_id)
       conn = conn(:post, "/", %{"peek-auth" => token})
@@ -211,7 +211,7 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
 
     test "assigns peek_install_id and tuple peek_config_id to socket" do
       install_id = "test_install_id"
-      config_id = {:project, :semnox}
+      config_id = {:project, :project_name}
       socket = %Phoenix.LiveView.Socket{}
       session = %{"peek_install_id" => install_id, "peek_config_id" => config_id}
 
@@ -224,7 +224,7 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
 
     test "assigns peek_install_id and atom peek_config_id to socket" do
       install_id = "test_install_id"
-      config_id = :semnox
+      config_id = :project_name
       socket = %Phoenix.LiveView.Socket{}
       session = %{"peek_install_id" => install_id, "peek_config_id" => config_id}
 

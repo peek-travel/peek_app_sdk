@@ -18,7 +18,7 @@ defmodule PeekAppSDK.Token do
 
   Using a specific application's configuration:
 
-      iex> PeekAppSDK.Token.verify_peek_auth(token, :semnox)
+      iex> PeekAppSDK.Token.verify_peek_auth(token, :project_name)
       {:ok, "install_id"}
   """
   @spec verify_peek_auth(String.t(), atom() | nil) :: {:ok, String.t()} | {:error, :unauthorized}
@@ -51,7 +51,7 @@ defmodule PeekAppSDK.Token do
 
   Using a specific application's configuration:
 
-      iex> PeekAppSDK.Token.new_for_app_installation!("install_id", :semnox)
+      iex> PeekAppSDK.Token.new_for_app_installation!("install_id", :project_name)
       "token"
   """
   @spec new_for_app_installation!(String.t(), map() | nil, atom() | nil) :: String.t()

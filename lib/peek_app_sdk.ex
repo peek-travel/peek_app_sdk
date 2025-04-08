@@ -12,7 +12,7 @@ defmodule PeekAppSDK do
   PeekAppSDK.query_peek_pro("install_id", "query { test }")
 
   # Using a specific application's configuration
-  PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :semnox)
+  PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :project_name)
   ```
 
   ## Configuration
@@ -28,7 +28,7 @@ defmodule PeekAppSDK do
     peek_app_key: "APP_KEY",
     # Centralized app configurations
     apps: [
-      semnox: [peek_app_id: "SEMNOX_APP_ID", peek_app_secret: "SEMNOX_APP_SECRET"],
+      project_name: [peek_app_id: "project_name_APP_ID", peek_app_secret: "project_name_APP_SECRET"],
       another_app: [peek_app_id: "ANOTHER_APP_ID", peek_app_secret: "ANOTHER_APP_SECRET"]
     ]
   ```
@@ -45,10 +45,10 @@ defmodule PeekAppSDK do
 
   Using an application identifier:
 
-      iex> PeekAppSDK.get_config(:semnox)
+      iex> PeekAppSDK.get_config(:project_name)
       %{
-        peek_app_secret: "semnox_secret",
-        peek_app_id: "semnox_app_id",
+        peek_app_secret: "project_name_secret",
+        peek_app_id: "project_name_app_id",
         peek_api_url: "https://apps.peekapis.com/backoffice-gql",
         peek_app_key: "default_app_key"
       }
@@ -78,7 +78,7 @@ defmodule PeekAppSDK do
 
   Using a specific application's configuration:
 
-      iex> PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :semnox)
+      iex> PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :project_name)
       {:ok, %{test: "success"}}
   """
   @spec query_peek_pro(String.t(), String.t(), map(), atom() | nil) ::

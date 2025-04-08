@@ -29,7 +29,7 @@ defmodule PeekAppSDKTest do
       end)
 
       assert {:ok, ^response_data} =
-               PeekAppSDK.query_peek_pro(install_id, query, variables, :semnox)
+               PeekAppSDK.query_peek_pro(install_id, query, variables, :project_name)
     end
   end
 
@@ -43,13 +43,13 @@ defmodule PeekAppSDKTest do
       assert config.peek_app_id == "test_app_id"
     end
 
-    test "get_config/1 returns configuration for semnox from apps config" do
-      config = PeekAppSDK.get_config(:semnox)
+    test "get_config/1 returns configuration for project_name from apps config" do
+      config = PeekAppSDK.get_config(:project_name)
       assert is_map(config)
       assert Map.has_key?(config, :peek_app_secret)
       assert Map.has_key?(config, :peek_app_id)
-      assert config.peek_app_secret == "semnox_app_secret"
-      assert config.peek_app_id == "semnox_app_id"
+      assert config.peek_app_secret == "project_name_app_secret"
+      assert config.peek_app_id == "project_name_app_id"
     end
 
     test "get_config/1 returns configuration for other app from apps config" do

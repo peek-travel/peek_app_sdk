@@ -19,7 +19,7 @@ defmodule PeekAppSDK.Client do
 
   Using a specific application's configuration:
 
-      iex> PeekAppSDK.Client.query_peek_pro("install_id", "query { test }", %{}, :semnox)
+      iex> PeekAppSDK.Client.query_peek_pro("install_id", "query { test }", %{}, :project_name)
       {:ok, %{test: "success"}}
   """
   @spec query_peek_pro(String.t(), String.t(), map(), atom() | nil) ::
