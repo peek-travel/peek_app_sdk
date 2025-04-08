@@ -925,9 +925,9 @@ defmodule PeekAppSDK.UI.CoreComponents do
     # with our gettext backend as first argument. Translations are
     # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
-      Gettext.dngettext(AffiliateHubWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(PeekAppSDK.UI.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(AffiliateHubWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(PeekAppSDK.UI.Gettext, "errors", msg, opts)
     end
   end
 
