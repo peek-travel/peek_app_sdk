@@ -14,14 +14,14 @@ defmodule PeekAppSDK.ConfigTest do
       assert default_config.peek_app_id == "test_app_id"
     end
 
-    test "returns the configuration for semnox from apps config" do
-      config = Config.get_config(:semnox)
+    test "returns the configuration for project_name from apps config" do
+      config = Config.get_config(:project_name)
       assert is_map(config)
       assert Map.has_key?(config, :peek_app_secret)
       assert Map.has_key?(config, :peek_app_id)
-      assert config.peek_app_secret == "semnox_app_secret"
-      assert config.peek_app_id == "semnox_app_id"
-      assert config.peek_app_key == "semnox_app_key"
+      assert config.peek_app_secret == "project_name_app_secret"
+      assert config.peek_app_id == "project_name_app_id"
+      assert config.peek_app_key == "project_name_app_key"
     end
 
     test "returns the configuration for other_app from apps config" do

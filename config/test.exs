@@ -8,10 +8,10 @@ config :peek_app_sdk,
   peek_app_key: "test_app_key",
   # Centralized configuration structure
   apps: [
-    semnox: [
-      peek_app_id: "semnox_app_id",
-      peek_app_key: "semnox_app_key",
-      peek_app_secret: "semnox_app_secret"
+    project_name: [
+      peek_app_id: "project_name_app_id",
+      peek_app_key: "project_name_app_key",
+      peek_app_secret: "project_name_app_secret"
     ],
     other_app: [peek_app_id: "other_app_id", peek_app_secret: "other_app_secret"]
   ]

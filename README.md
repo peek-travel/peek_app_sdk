@@ -28,7 +28,7 @@ config :peek_app_sdk,
   peek_app_key: "DEFAULT_APP_KEY",
   # Centralized app configurations
   apps: [
-    semnox: [peek_app_id: "SEMNOX_APP_ID", peek_app_secret: "SEMNOX_APP_SECRET"],
+    project_name: [peek_app_id: "project_name_APP_ID", peek_app_secret: "project_name_APP_SECRET"],
     another_app: [peek_app_id: "ANOTHER_APP_ID", peek_app_secret: "ANOTHER_APP_SECRET"]
   ]
 ```
@@ -40,7 +40,7 @@ Then use the application identifier when calling PeekAppSDK functions:
 PeekAppSDK.query_peek_pro("install_id", "query { test }")
 
 # Using application-specific configuration
-PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :semnox)
+PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :project_name)
 ```
 
 Note that `peek_api_url` and `peek_app_key` are always taken from the default configuration.
@@ -52,3 +52,43 @@ Note that `peek_api_url` and `peek_app_key` are always taken from the default co
   request. This will set a `peek_install_id` prop in the `assigns` of the `conn`
 - `live_session :some_live_view_session_scope, on_mount: {PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view}` will set the
   `peek_install_id` on the Socket for live view usage.
+
+## Tailwind CSS Configuration
+
+To use PeekAppSDK's Tailwind styles in your application:
+
+1. make sure hero-icons is in your deps:
+
+```elixir
+  {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1}
+```
+
+2. In your application's `assets/tailwind.config.js`, extend the configuration:
+
+```javascript
+// Import PeekAppSDK's Tailwind config
+const path = require('path');
+
+const peekSDKConfig = require('../../../deps/peek_app_sdk/assets/tailwind.config.js');
+const sdkConfig = peekSDKConfig({
+  heroiconsPath: path.join(__dirname, '../deps/heroicons/optimized'),
+});
+
+module.exports = {
+  content: [
+    './js/**/*.js',
+    '../lib/project_name_web.ex',
+    '../lib/project_name_web/**/*.*ex',
+    '../lib/project_name_web/controllers/**/*.html.heex',
+    '../../../deps/peek_app_sdk/lib/peek_app_sdk/**/*.*ex', // this is if you are in an umbrella app, adjust to your needs
+  ],
+  theme: {
+    extend: {
+      ...sdkConfig.theme.extend,
+    },
+  },
+  plugins: [...sdkConfig.plugins],
+};
+```
+
+This will ensure your application includes all the necessary styles for PeekAppSDK components.

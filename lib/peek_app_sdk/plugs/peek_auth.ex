@@ -24,7 +24,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
       plug :set_peek_install_id, config_id: "my_app"
 
       # Using a specific configuration with a tuple identifier (recommended approach)
-      plug :set_peek_install_id, config_id: {:project, :semnox}
+      plug :set_peek_install_id, config_id: {:project, :project_name}
   """
   def set_peek_install_id(%{body_params: %{"peek-auth" => token}} = conn, opts),
     do: do_set(conn, token, opts)
@@ -96,7 +96,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
       live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view, [config_id: "my_app"]}]
 
       # Using a specific configuration with a tuple identifier (recommended approach)
-      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view, [config_id: {:project, :semnox}]}]
+      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view, [config_id: {:project, :project_name}]}]
   """
   def on_mount(:set_install_id_for_live_view, _params, session, socket) do
     socket =

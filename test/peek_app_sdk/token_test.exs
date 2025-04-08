@@ -13,9 +13,9 @@ defmodule PeekAppSDK.TokenTest do
 
     test "successfully verifies a valid token with atom config_id" do
       install_id = "test_install_id"
-      token = Token.new_for_app_installation!(install_id, nil, :semnox)
+      token = Token.new_for_app_installation!(install_id, nil, :project_name)
 
-      assert {:ok, ^install_id, _claims} = Token.verify_peek_auth(token, :semnox)
+      assert {:ok, ^install_id, _claims} = Token.verify_peek_auth(token, :project_name)
     end
 
     test "returns error for invalid token" do
@@ -40,12 +40,12 @@ defmodule PeekAppSDK.TokenTest do
     end
 
     test "returns error when verifying with wrong config" do
-      # The default config and semnox config have different secrets
+      # The default config and project_name config have different secrets
       install_id = "test_install_id"
       token = Token.new_for_app_installation!(install_id)
 
       # Verify with wrong config should fail
-      assert {:error, :unauthorized} = Token.verify_peek_auth(token, :semnox)
+      assert {:error, :unauthorized} = Token.verify_peek_auth(token, :project_name)
     end
   end
 
@@ -68,10 +68,10 @@ defmodule PeekAppSDK.TokenTest do
 
     test "generates a valid token with atom config_id" do
       install_id = "test_install_id"
-      token = Token.new_for_app_installation!(install_id, nil, :semnox)
+      token = Token.new_for_app_installation!(install_id, nil, :project_name)
 
       assert is_binary(token)
-      assert {:ok, ^install_id, _claims} = Token.verify_peek_auth(token, :semnox)
+      assert {:ok, ^install_id, _claims} = Token.verify_peek_auth(token, :project_name)
     end
 
     test "token expires in 60 seconds" do

@@ -44,7 +44,7 @@ defmodule PeekAppSDK.ClientTest do
         assert env.method == :post
 
         assert env.url ==
-                 "https://apps.peekapis.com/backoffice-gql/semnox_app_id/test"
+                 "https://apps.peekapis.com/backoffice-gql/project_name_app_id/test"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -56,13 +56,14 @@ defmodule PeekAppSDK.ClientTest do
                end)
 
         assert Enum.any?(env.headers, fn {k, v} ->
-                 k == "pk-api-key" && v == "semnox_app_key"
+                 k == "pk-api-key" && v == "project_name_app_key"
                end)
 
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
       end)
 
-      assert {:ok, ^response_data} = Client.query_peek_pro(install_id, query, variables, :semnox)
+      assert {:ok, ^response_data} =
+               Client.query_peek_pro(install_id, query, variables, :project_name)
     end
 
     test "token is signed with the right peek_app_secret" do
@@ -75,7 +76,7 @@ defmodule PeekAppSDK.ClientTest do
         assert env.method == :post
 
         assert env.url ==
-                 "https://apps.peekapis.com/backoffice-gql/semnox_app_id/test"
+                 "https://apps.peekapis.com/backoffice-gql/project_name_app_id/test"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -93,13 +94,17 @@ defmodule PeekAppSDK.ClientTest do
         assert String.length(bearer_token) > 10
 
         token = String.replace_prefix(bearer_token, "Bearer ", "")
-        assert {:ok, ^install_id, _claims} = PeekAppSDK.Token.verify_peek_auth(token, :semnox)
+
+        assert {:ok, ^install_id, _claims} =
+                 PeekAppSDK.Token.verify_peek_auth(token, :project_name)
+
         assert PeekAppSDK.Token.verify_peek_auth(token) == {:error, :unauthorized}
 
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
       end)
 
-      assert {:ok, ^response_data} = Client.query_peek_pro(install_id, query, variables, :semnox)
+      assert {:ok, ^response_data} =
+               Client.query_peek_pro(install_id, query, variables, :project_name)
     end
 
     test "pk-api-key only sent if peek_app_key is set" do

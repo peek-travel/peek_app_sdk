@@ -16,7 +16,7 @@ defmodule PeekAppSDK.Config do
     peek_api_url: "https://apps.peekapis.com/backoffice-gql",
     peek_app_key: "APP_KEY",
     apps: [
-      semnox: [peek_app_id: "semnox_app_id", peek_app_secret: "semnox_secret"],
+      project_name: [peek_app_id: "project_name_app_id", peek_app_secret: "project_name_secret"],
       another_app: [peek_app_id: "another_app_id", peek_app_secret: "another_app_secret"]
     ]
   ```
@@ -35,10 +35,10 @@ defmodule PeekAppSDK.Config do
 
   Using an app identifier:
 
-      iex> PeekAppSDK.Config.get_config(:semnox)
+      iex> PeekAppSDK.Config.get_config(:project_name)
       %{
-        peek_app_secret: "semnox_secret",
-        peek_app_id: "semnox_app_id",
+        peek_app_secret: "project_name_secret",
+        peek_app_id: "project_name_app_id",
         peek_api_url: "https://apps.peekapis.com/backoffice-gql",
         peek_app_key: "default_app_key"
       }
