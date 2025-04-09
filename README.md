@@ -80,7 +80,9 @@ module.exports = {
     '../lib/project_name_web.ex',
     '../lib/project_name_web/**/*.*ex',
     '../lib/project_name_web/controllers/**/*.html.heex',
-    '../../../deps/peek_app_sdk/lib/peek_app_sdk/**/*.*ex', // this is if you are in an umbrella app, adjust to your needs
+    // add one of the following line, adjust to your needs
+    '../deps/peek_app_sdk/lib/peek_app_sdk/**/*.*ex', // this is if you are in a single elixir app
+    '../../../deps/peek_app_sdk/lib/peek_app_sdk/**/*.*ex', // this is if you are in an umbrella app
   ],
   theme: {
     extend: {
