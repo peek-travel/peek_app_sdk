@@ -69,7 +69,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
               phx-key="escape"
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
               class={[
-                "shadow-zinc-700/10 ring-zinc-700/10 relative hidden bg-white transition",
+                "shadow-zinc-800/10 ring-zinc-800/10 relative hidden bg-white transition",
                 if(@full_width, do: "py-2.5 px-4", else: "rounded-xl p-10 shadow-lg ring-1 transition")
               ]}
             >
