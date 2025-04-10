@@ -956,7 +956,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
     ]}>
       <%= if @top_caret do %>
         <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-black"></div>
-        <% else %>
+      <% else %>
         <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-black"></div>
       <% end %>
 
