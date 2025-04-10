@@ -1,5 +1,4 @@
 // Import CSS
-import "../css/app.css"
 
 // Import Phoenix dependencies
 import "phoenix_html"

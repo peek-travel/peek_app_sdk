@@ -38,8 +38,16 @@ config :peek_app_sdk, PeekAppSDK.Demo.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   server: true,
   check_origin: false,
-  code_reloader: true,
   debug_errors: true,
+  live_reload: [
+    patterns: [
+      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"lib/peek_app_sdk/demo/(live|components)/.*(ex|heex)$",
+      ~r"lib/peek_app_sdk/ui/.*(ex|heex)$",
+      ~r"assets/css/.*(css)$",
+      ~r"assets/js/.*(js)$"
+    ]
+  ],
   secret_key_base:
     "Ij9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9OeIj9Nt9Oe"
 

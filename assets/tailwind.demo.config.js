@@ -12,7 +12,6 @@ module.exports = {
     "./assets/**/*.js",
     "../lib/peek_app_sdk/**/*.*ex",
     "../lib/peek_app_sdk/demo/**/*.*ex",
-    "../lib/peek_app_sdk/demo/**/*.html.heex"
   ],
   theme: {
     extend: {

@@ -48,14 +48,17 @@ defmodule PeekAppSDK.Demo.DemoLive do
       <section class="mb-12">
         <h2 class="text-2xl font-semibold mb-4" id="table">Table</h2>
         <div class="p-6 bg-white rounded-lg shadow-md">
-          <.table id="users-table" rows={[
-            %{id: 1, name: "Alice", email: "alice@example.com"},
-            %{id: 2, name: "Bob", email: "bob@example.com"},
-            %{id: 3, name: "Charlie", email: "charlie@example.com"}
-          ]}>
-            <:col :let={user} label="ID"><%= user.id %></:col>
-            <:col :let={user} label="Name"><%= user.name %></:col>
-            <:col :let={user} label="Email"><%= user.email %></:col>
+          <.table
+            id="users-table"
+            rows={[
+              %{id: 1, name: "Alice", email: "alice@example.com"},
+              %{id: 2, name: "Bob", email: "bob@example.com"},
+              %{id: 3, name: "Charlie", email: "charlie@example.com"}
+            ]}
+          >
+            <:col :let={user} label="ID">{user.id}</:col>
+            <:col :let={user} label="Name">{user.name}</:col>
+            <:col :let={user} label="Email">{user.email}</:col>
             <:action :let={_user}>
               <.button button_type="info" class="text-sm">View</.button>
             </:action>

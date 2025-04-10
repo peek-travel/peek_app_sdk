@@ -17,6 +17,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   use Phoenix.Component
   use Gettext, backend: PeekAppSDK.UI.Gettext
 
+  alias Phoenix.HTML.Form
   alias Phoenix.LiveView.JS
 
   @doc """
@@ -52,7 +53,12 @@ defmodule PeekAppSDK.UI.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div :if={!@full_width} id={"#{@id}-bg"} class="bg-gray-900/50 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        :if={!@full_width}
+        id={"#{@id}-bg"}
+        class="bg-gray-900/50 fixed inset-0 transition-opacity"
+        aria-hidden="true"
+      />
       <div
         class={["fixed inset-0 overflow-y-auto", @full_width && "top-14"]}
         aria-labelledby={"#{@id}-title"}
@@ -61,8 +67,14 @@ defmodule PeekAppSDK.UI.CoreComponents do
         aria-modal="true"
         tabindex="0"
       >
-        <div class={["flex items-center justify-center", if(@full_width, do: "min-h-screen", else: "min-h-full")]}>
-          <div class={["w-full", if(@full_width, do: "h-screen", else: "max-w-3xl p-4 sm:p-6 lg:py-8")]}>
+        <div class={[
+          "flex items-center justify-center",
+          if(@full_width, do: "min-h-screen", else: "min-h-full")
+        ]}>
+          <div class={[
+            "w-full",
+            if(@full_width, do: "h-screen", else: "max-w-3xl p-4 sm:p-6 lg:py-8")
+          ]}>
             <.focus_wrap
               id={"#{@id}-container"}
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
@@ -70,7 +82,10 @@ defmodule PeekAppSDK.UI.CoreComponents do
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
               class={[
                 "shadow-zinc-700/10 ring-zinc-700/10 relative hidden bg-white transition",
-                if(@full_width, do: "py-2.5 px-4", else: "rounded-xl p-10 shadow-lg ring-1 transition")
+                if(@full_width,
+                  do: "py-2.5 px-4",
+                  else: "rounded-xl p-10 shadow-lg ring-1 transition"
+                )
               ]}
             >
               <div class={["absolute", if(@full_width, do: "top-0 left-0", else: "top-6 right-5")]}>
@@ -80,7 +95,10 @@ defmodule PeekAppSDK.UI.CoreComponents do
                   class={["flex-none p-3", if(!@full_width, do: "-m-3")]}
                   aria-label={gettext("close")}
                 >
-                  <.icon name={if(@full_width, do: "hero-arrow-left", else: "hero-x-mark-solid")} class="h-6 w-6 text-brand" />
+                  <.icon
+                    name={if(@full_width, do: "hero-arrow-left", else: "hero-x-mark-solid")}
+                    class="h-6 w-6 text-brand"
+                  />
                 </button>
               </div>
               <div id={"#{@id}-content"}>
@@ -338,7 +356,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   def input(%{type: "checkbox"} = assigns) do
     assigns =
       assign_new(assigns, :checked, fn ->
-        Phoenix.HTML.Form.normalize_value("checkbox", assigns[:value])
+        Form.normalize_value("checkbox", assigns[:value])
       end)
 
     ~H"""
@@ -390,7 +408,8 @@ defmodule PeekAppSDK.UI.CoreComponents do
           name={@name}
           class={[
             "mt-2 block w-full rounded-md text-zinc-900 bg-background-primary focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand sm:text-sm sm:leading-6 min-h-[6rem]",
-            @errors == [] && "border-zinc-300 focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand",
+            @errors == [] &&
+              "border-zinc-300 focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand",
             @errors != [] && "border-warning focus:border-warning"
           ]}
           {@rest}
@@ -413,7 +432,8 @@ defmodule PeekAppSDK.UI.CoreComponents do
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
           class={[
             "block w-full rounded-md text-zinc-900 bg-background-primary focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand sm:text-sm sm:leading-6 border px-3 py-2",
-            @errors == [] && "border-zinc-300 focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand",
+            @errors == [] &&
+              "border-zinc-300 focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand",
             @errors != [] && "border-warning focus:border-warning"
           ]}
           {@rest}
@@ -448,7 +468,8 @@ defmodule PeekAppSDK.UI.CoreComponents do
           class={[
             "block w-full rounded-md bg-background-primary focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand sm:text-sm sm:leading-6",
             @disabled && "bg-white text-gray-500 cursor-not-allowed pointer-events-none",
-            @errors == [] && "border-zinc-300 focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand",
+            @errors == [] &&
+              "border-zinc-300 focus:bg-white focus:ring-4 focus:ring-focus-shadow focus:border-brand",
             @errors != [] && "border-warning focus:border-warning"
           ]}
           disabled={@disabled}
@@ -487,7 +508,10 @@ defmodule PeekAppSDK.UI.CoreComponents do
     <label for={@for} class="flex items-center text-sm leading-6 text-gray-primary">
       <span class="block capitalize">{render_slot(@inner_block)}</span>
       <span :if={@tooltip} class="group relative ml-1">
-        <.icon name="hero-information-circle" class="h-4 w-4 mb-0.5 text-gray-primary group-hover:text-gray-700" />
+        <.icon
+          name="hero-information-circle"
+          class="h-4 w-4 mb-0.5 text-gray-primary group-hover:text-gray-700"
+        />
         <.tooltip top_caret={@top_caret}>{@tooltip}</.tooltip>
       </span>
     </label>
@@ -533,7 +557,11 @@ defmodule PeekAppSDK.UI.CoreComponents do
       <div class="flex items-center gap-4">
         <.back :if={@backlink} navigate={@backlink}></.back>
 
-        <h1 class={["font-medium leading-8 text-zinc-800", header_text_size(@text_size), @full_width && "ml-8"]}>
+        <h1 class={[
+          "font-medium leading-8 text-zinc-800",
+          header_text_size(@text_size),
+          @full_width && "ml-8"
+        ]}>
           {render_slot(@inner_block)}
         </h1>
         <div class="flex-none ml-auto">{render_slot(@actions)}</div>
@@ -542,7 +570,13 @@ defmodule PeekAppSDK.UI.CoreComponents do
       <div :if={@show_divider} class="py-4">
         <.divider />
       </div>
-      <p :if={@subtitle != []} class={["text-sm leading-6 text-gray-primary bg-background-secondary p-2 rounded-md", !@show_divider && "mt-4"]}>
+      <p
+        :if={@subtitle != []}
+        class={[
+          "text-sm leading-6 text-gray-primary bg-background-secondary p-2 rounded-md",
+          !@show_divider && "mt-4"
+        ]}
+      >
         {render_slot(@subtitle)}
       </p>
     </header>
@@ -592,7 +626,10 @@ defmodule PeekAppSDK.UI.CoreComponents do
         <div class={@tooltip && "flex items-center gap-2"}>
           <p>{render_slot(@inner_block)}</p>
           <div :if={@tooltip} class="group relative">
-            <.icon name="hero-information-circle" class="h-4 w-4 mb-1 text-gray-primary group-hover:text-gray-700" />
+            <.icon
+              name="hero-information-circle"
+              class="h-4 w-4 mb-1 text-gray-primary group-hover:text-gray-700"
+            />
             <.tooltip top_caret={@top_caret}>{@tooltip}</.tooltip>
           </div>
         </div>
@@ -705,7 +742,9 @@ defmodule PeekAppSDK.UI.CoreComponents do
       <table class="w-[40rem] sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500 bg-background-secondary">
           <tr>
-            <th :for={col <- @col} class="p-4 font-medium capitalize whitespace-nowrap">{col[:label]}</th>
+            <th :for={col <- @col} class="p-4 font-medium capitalize whitespace-nowrap">
+              {col[:label]}
+            </th>
             <th :if={@action != []} class="relative p-0 pb-4">
               <span class="sr-only">{gettext("Actions")}</span>
             </th>
@@ -729,10 +768,17 @@ defmodule PeekAppSDK.UI.CoreComponents do
                 </span>
               </div>
             </td>
-            <td :if={@action != []} phx-click={@row_click && @row_click.(row)} class={["relative p-0", @row_click && "hover:cursor-pointer"]}>
+            <td
+              :if={@action != []}
+              phx-click={@row_click && @row_click.(row)}
+              class={["relative p-0", @row_click && "hover:cursor-pointer"]}
+            >
               <div class="flex h-full w-full items-center justify-end p-4">
                 <span class="absolute -inset-y-px left-0 sm:rounded-r-xl" />
-                <span :for={action <- @action} class="relative font-semibold leading-6 text-zinc-900 hover:text-gray-primary">
+                <span
+                  :for={action <- @action}
+                  class="relative font-semibold leading-6 text-zinc-900 hover:text-gray-primary"
+                >
                   {render_slot(action, @row_item.(row))}
                 </span>
               </div>
@@ -827,7 +873,10 @@ defmodule PeekAppSDK.UI.CoreComponents do
 
   def back(assigns) do
     ~H"""
-    <.link navigate={@navigate} class="text-sm font-semibold leading-6 text-zinc-900 hover:text-gray-primary">
+    <.link
+      navigate={@navigate}
+      class="text-sm font-semibold leading-6 text-zinc-900 hover:text-gray-primary"
+    >
       <.icon name="hero-arrow-left" class="text-brand h-6 w-6" />
       {render_slot(@inner_block)}
     </.link>
@@ -955,7 +1004,8 @@ defmodule PeekAppSDK.UI.CoreComponents do
       if(@top_caret, do: "top-full mt-2", else: "bottom-4 mb-2")
     ]}>
       <%= if @top_caret do %>
-        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-black"></div>
+        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-black">
+        </div>
       <% end %>
 
       <div class="bg-black text-white text-xs rounded-md p-3 shadow-md">
@@ -963,7 +1013,8 @@ defmodule PeekAppSDK.UI.CoreComponents do
       </div>
 
       <%= unless @top_caret do %>
-        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-black"></div>
+        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-black">
+        </div>
       <% end %>
     </div>
     """

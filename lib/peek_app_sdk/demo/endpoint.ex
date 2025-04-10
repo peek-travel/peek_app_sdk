@@ -23,12 +23,6 @@ defmodule PeekAppSDK.Demo.Endpoint do
     gzip: false,
     only: PeekAppSDK.Demo.static_paths()
 
-  # Code reloading can be explicitly enabled under the
-  # :code_reloader configuration of your endpoint.
-  if code_reloading? do
-    plug Phoenix.CodeReloader
-  end
-
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
