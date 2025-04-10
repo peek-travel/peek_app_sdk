@@ -54,6 +54,22 @@ defmodule PeekAppSDK.MixProject do
       {:tesla, "~> 1.4"},
       {:phoenix, "~> 1.7"},
       {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
+      {:phoenix_html, "~> 4.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
+      {:phoenix_view, "~> 2.0"},
+      {:plug_cowboy, "~> 2.6"},
+      {:heroicons,
+       github: "tailwindlabs/heroicons",
+       tag: "v2.1.1",
+       sparse: "optimized",
+       app: false,
+       compile: false,
+       depth: 1},
+
+      # Demo dependencies (only used in dev)
+      {:phoenix_live_reload, "~> 1.4", only: :dev},
+      {:esbuild, "~> 0.8", only: :dev},
+      {:tailwind, "~> 0.2", only: :dev},
 
       # Test dependencies
       {:mox, "~> 1.0", only: :test},
@@ -73,7 +89,10 @@ defmodule PeekAppSDK.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get"]
+      setup: ["deps.get"],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.build": ["tailwind demo", "esbuild demo"],
+      "assets.deploy": ["tailwind demo --minify", "esbuild demo --minify", "phx.digest"]
     ]
   end
 end
