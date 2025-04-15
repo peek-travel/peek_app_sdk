@@ -938,9 +938,11 @@ defmodule PeekAppSDK.UI.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
+  attr(:margins, :boolean, default: true)
+
   def divider(assigns) do
     ~H"""
-    <div class="border-t border-gray-200"></div>
+    <div class={["border-t border-gray-200", @margins && "my-4"]}></div>
     """
   end
 
