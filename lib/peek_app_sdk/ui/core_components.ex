@@ -539,7 +539,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
         <div class="flex-none ml-auto">{render_slot(@actions)}</div>
       </div>
 
-      <div :if={@show_divider} class="py-4">
+      <div :if={@show_divider}>
         <.divider />
       </div>
       <p :if={@subtitle != []} class={["text-sm leading-6 text-gray-primary bg-background-secondary p-2 rounded-md", !@show_divider && "mt-4"]}>
@@ -938,11 +938,9 @@ defmodule PeekAppSDK.UI.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-  attr(:margins, :boolean, default: true)
-
   def divider(assigns) do
     ~H"""
-    <div class={["border-t border-gray-200", @margins && "my-4"]}></div>
+    <div class="border-t border-gray-200 my-4"></div>
     """
   end
 
