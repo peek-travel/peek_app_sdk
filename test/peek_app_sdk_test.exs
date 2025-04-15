@@ -2,6 +2,8 @@ defmodule PeekAppSDKTest do
   use ExUnit.Case, async: true
   import Mox
 
+  alias PeekAppSDK.Health.Models.EventPayload
+
   setup :verify_on_exit!
 
   describe "query_peek_pro/4" do
@@ -59,6 +61,99 @@ defmodule PeekAppSDKTest do
       assert Map.has_key?(config, :peek_app_id)
       assert config.peek_app_secret == "other_app_secret"
       assert config.peek_app_id == "other_app_id"
+    end
+  end
+
+  describe "track_event/3" do
+    test "delegates to Health.track_event/3 with default config" do
+      monitored_app_id = "test-app-123"
+
+      payload = %EventPayload{
+        event_id: "app.install",
+        level: :info,
+        anonymous_id: "anon-123456"
+      }
+
+      response_data = %{
+        "success" => true,
+        "message" => "Event tracked successfully",
+        "eventId" => "1625097600000_abc123"
+      }
+
+      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: response_data}}
+      end)
+
+      assert {:ok, result} = PeekAppSDK.track_event(monitored_app_id, payload)
+      assert result.success == true
+      assert result.message == "Event tracked successfully"
+      assert result.event_id == "1625097600000_abc123"
+    end
+
+    test "delegates to Health.track_event/3 with atom config_id" do
+      monitored_app_id = "test-app-123"
+
+      payload = %EventPayload{
+        event_id: "app.install",
+        level: :info,
+        anonymous_id: "anon-123456"
+      }
+
+      response_data = %{
+        "success" => true,
+        "message" => "Event tracked successfully",
+        "eventId" => "1625097600000_abc123"
+      }
+
+      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: response_data}}
+      end)
+
+      assert {:ok, _result} = PeekAppSDK.track_event(monitored_app_id, payload, :project_name)
+    end
+  end
+
+  describe "track_info_event/5" do
+    test "delegates to Health.track_info_event/5" do
+      monitored_app_id = "test-app-123"
+      event_id = "app.install"
+      anonymous_id = "anon-123456"
+      opts = %{user_id: "user-789012"}
+
+      response_data = %{
+        "success" => true,
+        "message" => "Event tracked successfully",
+        "eventId" => "1625097600000_abc123"
+      }
+
+      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: response_data}}
+      end)
+
+      assert {:ok, _result} =
+               PeekAppSDK.track_info_event(monitored_app_id, event_id, anonymous_id, opts)
+    end
+  end
+
+  describe "track_error_event/5" do
+    test "delegates to Health.track_error_event/5" do
+      monitored_app_id = "test-app-123"
+      event_id = "app.error"
+      anonymous_id = "anon-123456"
+      opts = %{user_id: "user-789012"}
+
+      response_data = %{
+        "success" => true,
+        "message" => "Event tracked successfully",
+        "eventId" => "1625097600000_abc123"
+      }
+
+      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: response_data}}
+      end)
+
+      assert {:ok, _result} =
+               PeekAppSDK.track_error_event(monitored_app_id, event_id, anonymous_id, opts)
     end
   end
 end
