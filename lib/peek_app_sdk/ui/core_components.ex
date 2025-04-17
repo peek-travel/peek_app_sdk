@@ -956,13 +956,14 @@ defmodule PeekAppSDK.UI.CoreComponents do
     ]}>
       <%= if @top_caret do %>
         <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-black"></div>
-      <% else %>
-        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-black"></div>
       <% end %>
 
       <div class="bg-black text-white text-xs rounded-md p-3 shadow-md">
         {render_slot(@inner_block)}
       </div>
+      <%= unless @top_caret do %>
+         <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-black"></div>
+       <% end %>
     </div>
     """
   end
@@ -1004,7 +1005,6 @@ defmodule PeekAppSDK.UI.CoreComponents do
 
   attr(:color, :string, default: "success", values: ["success", "warning", "danger", "info"])
   attr(:padded, :boolean, default: false, doc: "whether to pad the alert message for flash X")
-  attr(:bold, :boolean, default: false)
 
   slot(:inner_block, required: true)
   slot(:subtitle)
@@ -1014,7 +1014,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   def alert(assigns) do
     ~H"""
     <div class={["leading-8 border rounded-md border-l-[5px] p-4", alert_color(@color)]}>
-      <div class={["text-gray-primary", @padded && "pr-4", @bold && "font-medium"]}>
+      <div class={["text-gray-primary font-medium", @padded && "pr-4"]}>
         {render_slot(@inner_block)}
       </div>
 
