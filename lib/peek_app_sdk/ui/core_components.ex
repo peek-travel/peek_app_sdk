@@ -1013,7 +1013,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   def alert(assigns) do
     ~H"""
     <div class={["leading-8 border rounded-md border-l-[5px] p-4", alert_color(@color)]}>
-      <div class={["text-gray-primary", @padded && "pr-4", @bold && "font-semibold"]}>
+      <div class={["text-gray-primary", @padded && "pr-4", @bold && "font-medium"]}>
         {render_slot(@inner_block)}
       </div>
 
