@@ -226,7 +226,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   attr(:type, :string, default: nil)
   attr(:class, :string, default: nil)
   attr(:rest, :global, include: ~w(disabled form name value))
-  attr(:button_type, :string, default: "primary", values: ["primary", "secondary", "info"])
+  attr(:button_type, :string, default: "primary", values: ["primary", "secondary", "info", "danger"])
   attr(:disabled, :boolean, default: false)
   attr(:id, :string, default: nil)
 
@@ -264,6 +264,9 @@ defmodule PeekAppSDK.UI.CoreComponents do
 
       "info" ->
         "bg-white text-gray-primary border border-gray-200 hover:bg-gray-100/20 hover:shadow-md"
+
+      "danger" ->
+        "bg-white hover:bg-gray-100/20 hover:shadow-md text-danger"
     end
   end
 
