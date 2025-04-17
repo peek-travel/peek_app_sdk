@@ -1009,6 +1009,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   slot(:inner_block, required: true)
   slot(:subtitle)
   slot(:subtext)
+  slot(:actions)
 
   def alert(assigns) do
     ~H"""
@@ -1017,13 +1018,20 @@ defmodule PeekAppSDK.UI.CoreComponents do
         {render_slot(@inner_block)}
       </div>
 
-      <div :if={@subtitle != []} class="text-sm leading-6 text-gray-primary py-2">
-        {render_slot(@subtitle)}
+      <div class={[if(@subtitle != [] || @actions != [], do: "flex flex-col sm:flex-row sm:items-center gap-4")]}>
+        <div :if={@subtitle != []} class="text-sm leading-6 text-gray-primary py-2">
+          {render_slot(@subtitle)}
+        </div>
+
+        <div :if={@actions != []} class="flex gap-2 mt-4">
+          {render_slot(@actions)}
+        </div>
       </div>
 
       <div :if={@subtext != []} class="text-sm leading-6 text-gray-primary py-2 font-semibold">
         {render_slot(@subtext)}
       </div>
+
     </div>
     """
   end
