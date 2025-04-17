@@ -266,7 +266,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
         "bg-white text-gray-primary border border-gray-200 hover:bg-gray-100/20 hover:shadow-md"
 
       "danger" ->
-        "bg-white hover:bg-gray-100/20 hover:shadow-md text-danger"
+        "bg-white hover:bg-gray-100/20 hover:shadow-md text-danger border border-danger"
     end
   end
 
