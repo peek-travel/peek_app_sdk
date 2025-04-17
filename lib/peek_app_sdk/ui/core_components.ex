@@ -1004,6 +1004,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
 
   attr(:color, :string, default: "success", values: ["success", "warning", "danger", "info"])
   attr(:padded, :boolean, default: false, doc: "whether to pad the alert message for flash X")
+  attr(:bold, :boolean, default: false)
 
   slot(:inner_block, required: true)
   slot(:subtitle)
@@ -1012,7 +1013,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   def alert(assigns) do
     ~H"""
     <div class={["leading-8 border rounded-md border-l-[5px] p-4", alert_color(@color)]}>
-      <div class={["text-gray-primary", @padded && "pr-4"]}>
+      <div class={["text-gray-primary", @padded && "pr-4", @bold && "font-semibold"]}>
         {render_slot(@inner_block)}
       </div>
 
