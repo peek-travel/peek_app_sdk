@@ -226,7 +226,12 @@ defmodule PeekAppSDK.UI.CoreComponents do
   attr(:type, :string, default: nil)
   attr(:class, :string, default: nil)
   attr(:rest, :global, include: ~w(disabled form name value))
-  attr(:button_type, :string, default: "primary", values: ["primary", "secondary", "info", "danger"])
+
+  attr(:button_type, :string,
+    default: "primary",
+    values: ["primary", "secondary", "info", "danger"]
+  )
+
   attr(:disabled, :boolean, default: false)
   attr(:id, :string, default: nil)
 
