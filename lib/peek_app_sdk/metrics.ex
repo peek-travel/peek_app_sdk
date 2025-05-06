@@ -1,4 +1,4 @@
-defmodule PeekAppSdk.Metrics do
+defmodule PeekAppSDK.Metrics do
   @moduledoc """
   This module provides functions for tracking metrics to Ahem.
   """
