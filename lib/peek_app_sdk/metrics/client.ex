@@ -9,23 +9,6 @@ defmodule PeekAppSDK.Metrics.Client do
   plug Tesla.Middleware.Headers, [{"Content-Type", "application/json"}]
   plug Tesla.Middleware.Retry, delay: 500, max_retries: 10
 
-  defp event_url,
-    do: "https://ahem.peeklabs.com/events/#{Application.fetch_env!(:peek_app_sdk, :peek_app_id)}"
-
-  defp do_post!(body, _opts \\ []) do
-    response = post!(event_url(), body)
-
-    case response do
-      %Tesla.Env{status: 202} ->
-        :ok
-
-      %Tesla.Env{status: status, body: _body} ->
-        {:error, status}
-    end
-
-    {:ok, body}
-  end
-
   @doc """
   Tracks an app installation event.
 
@@ -124,5 +107,22 @@ defmodule PeekAppSDK.Metrics.Client do
       "partnerExternalRefid" => external_refid,
       "partnerIsTest" => is_test
     }
+  end
+
+  defp event_url,
+    do: "https://ahem.peeklabs.com/events/#{Application.fetch_env!(:peek_app_sdk, :peek_app_id)}"
+
+  defp do_post!(body, _opts \\ []) do
+    response = post!(event_url(), body)
+
+    case response do
+      %Tesla.Env{status: 202} ->
+        :ok
+
+      %Tesla.Env{status: status, body: _body} ->
+        {:error, status}
+    end
+
+    {:ok, body}
   end
 end
