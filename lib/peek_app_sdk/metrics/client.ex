@@ -10,6 +10,35 @@ defmodule PeekAppSDK.Metrics.Client do
   plug Tesla.Middleware.Retry, delay: 500, max_retries: 10
 
   @doc """
+  Tracks an event with the given event ID and payload.
+
+  This function takes an event ID and a map of options and sends them directly to the API
+  without any validation or transformation. The only required field in the options map is
+  `eventId`, which is automatically added based on the first parameter.
+
+  ## Parameters
+
+    * `event_id` - The ID of the event to track
+    * `payload` - A map of fields to include in the event payload
+
+  ## Examples
+
+      iex> PeekAppSDK.Metrics.Client.track("app.install", %{
+      ...>   anonymousId: "partner-123",
+      ...>   level: "info",
+      ...>   usageDisplay: "New App Installs",
+      ...>   usageDetails: "Partner Name",
+      ...>   postMessage: "Partner Name installed"
+      ...> })
+      {:ok, %{...}}
+  """
+  def track(event_id, payload) do
+    # Simply merge the event_id into the payload and send it
+    payload = Map.put(payload, :eventId, event_id)
+    do_post!(payload)
+  end
+
+  @doc """
   Tracks an app installation event.
 
   ## Parameters
@@ -63,40 +92,6 @@ defmodule PeekAppSDK.Metrics.Client do
       usageDisplay: usage_display,
       usageDetails: name,
       postMessage: "#{name} uninstalled",
-      customFields: base_custom_fields(name, external_refid, is_test)
-    })
-  end
-
-  @doc """
-  Tracks a custom event.
-
-  ## Parameters
-
-    * `external_refid` - The external reference ID for the partner
-    * `name` - The name of the partner
-    * `is_test` - Boolean indicating if this is a test installation
-    * `event_id` - The ID of the event to track
-    * `level` - The level of the event (default: "info")
-    * `anonymous_id` - Optional anonymous ID to use instead of external_refid
-
-  ## Examples
-
-      iex> PeekAppSDK.Metrics.Client.track_event("partner-123", "Partner Name", false, "custom.event")
-      {:ok, %{...}}
-
-  """
-  def track_event(
-        external_refid,
-        name,
-        is_test,
-        event_id,
-        level \\ "info",
-        anonymous_id \\ nil
-      ) do
-    do_post!(%{
-      eventId: event_id,
-      level: level,
-      anonymousId: anonymous_id || external_refid,
       customFields: base_custom_fields(name, external_refid, is_test)
     })
   end
