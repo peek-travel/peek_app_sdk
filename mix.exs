@@ -58,6 +58,7 @@ defmodule PeekAppSDK.MixProject do
 
       # Test dependencies
       {:mox, "~> 1.0", only: :test},
+      {:meck, "~> 0.9.2", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
       {:bypass, "~> 2.1", only: :test},
 
