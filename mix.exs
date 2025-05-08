@@ -54,6 +54,7 @@ defmodule PeekAppSDK.MixProject do
       {:tesla, "~> 1.4"},
       {:phoenix, "~> 1.7"},
       {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
+      {:finch, "~> 0.13"},
 
       # Test dependencies
       {:mox, "~> 1.0", only: :test},
