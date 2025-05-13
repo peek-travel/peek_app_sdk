@@ -40,6 +40,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   attr(:show, :boolean, default: false)
   attr(:on_cancel, JS, default: %JS{})
   attr(:full_width, :boolean, default: true)
+  attr(:full_width_offset, :string, default: "top-0")
 
   slot(:inner_block, required: true)
 
@@ -54,7 +55,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
     >
       <div :if={!@full_width} id={"#{@id}-bg"} class="bg-gray-900/50 fixed inset-0 transition-opacity" aria-hidden="true" />
       <div
-        class={["fixed inset-0 overflow-y-auto", @full_width && "top-14"]}
+        class={["fixed inset-0 overflow-y-auto", @full_width && @full_width_offset]}
         aria-labelledby={"#{@id}-title"}
         aria-describedby={"#{@id}-description"}
         role="dialog"
