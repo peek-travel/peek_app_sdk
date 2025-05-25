@@ -40,6 +40,46 @@ defmodule PeekAppSDK.Token do
   end
 
   @doc """
+  Verifies a client request token using the client_secret_token.
+
+  ## Examples
+
+  Using the default configuration:
+
+      iex> PeekAppSDK.Token.verify_client_request(token)
+      {:ok, "install_id"}
+
+  Using a specific application's configuration:
+
+      iex> PeekAppSDK.Token.verify_client_request(token, :project_name)
+      {:ok, "install_id"}
+  """
+  @spec verify_client_request(String.t(), atom() | nil) ::
+          {:ok, String.t()} | {:error, :unauthorized}
+  def verify_client_request(token, config_id \\ nil) do
+    config = Config.get_config(config_id)
+    client_secret_key = config.client_secret_token
+
+    # Return error if client_secret_token is not configured
+    if client_secret_key do
+      signer = Joken.Signer.create("HS256", client_secret_key)
+
+      case verify_and_validate(token, signer) do
+        {:ok, %{"sub" => sub} = claims} ->
+          {:ok, sub, claims}
+
+        {:error, _reason} ->
+          {:error, :unauthorized}
+
+        _ ->
+          {:error, :unauthorized}
+      end
+    else
+      {:error, :unauthorized}
+    end
+  end
+
+  @doc """
   Generates a new token for an app installation.
 
   ## Examples

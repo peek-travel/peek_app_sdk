@@ -88,4 +88,44 @@ defmodule PeekAppSDK.TokenTest do
       assert_in_delta claims["exp"], now + 60, 2
     end
   end
+
+  describe "verify_client_request/2" do
+    test "returns error for invalid token" do
+      assert {:error, :unauthorized} = Token.verify_client_request("invalid_token")
+    end
+
+    test "returns error when client_secret_token is not configured" do
+      install_id = "test_install_id"
+      # Use other_app which doesn't have client_secret_token configured
+      token = Token.new_for_app_installation!(install_id, nil, :other_app)
+
+      assert {:error, :unauthorized} = Token.verify_client_request(token, :other_app)
+    end
+
+    test "returns error for expired token" do
+      install_id = "test_install_id"
+      config = PeekAppSDK.Config.get_config()
+      client_secret_key = config.client_secret_token
+      signer = Joken.Signer.create("HS256", client_secret_key)
+
+      params = %{
+        "iss" => "peek_app_sdk",
+        "sub" => install_id,
+        "exp" => DateTime.utc_now() |> DateTime.add(-60) |> DateTime.to_unix()
+      }
+
+      {:ok, token, _claims} = Token.generate_and_sign(params, signer)
+
+      assert {:error, :unauthorized} = Token.verify_client_request(token)
+    end
+
+    test "returns error for token signed with wrong secret" do
+      install_id = "test_install_id"
+      # Create token with peek_app_secret
+      token = Token.new_for_app_installation!(install_id)
+
+      # Try to verify with client_secret_token
+      assert {:error, :unauthorized} = Token.verify_client_request(token)
+    end
+  end
 end

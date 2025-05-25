@@ -15,8 +15,9 @@ defmodule PeekAppSDK.Config do
     peek_app_id: "DEFAULT_APP_ID",
     peek_api_url: "https://apps.peekapis.com/backoffice-gql",
     peek_app_key: "APP_KEY",
+    client_secret_token: "CLIENT_SECRET_TOKEN",
     apps: [
-      project_name: [peek_app_id: "project_name_app_id", peek_app_secret: "project_name_secret"],
+      project_name: [peek_app_id: "project_name_app_id", peek_app_secret: "project_name_secret", client_secret_token: "base64_key"],
       another_app: [peek_app_id: "another_app_id", peek_app_secret: "another_app_secret"]
     ]
   ```
@@ -65,7 +66,8 @@ defmodule PeekAppSDK.Config do
       peek_app_secret: Application.get_env(:peek_app_sdk, :peek_app_secret),
       peek_app_id: Application.get_env(:peek_app_sdk, :peek_app_id),
       peek_api_url: Application.get_env(:peek_app_sdk, :peek_api_url, @default_peek_url),
-      peek_app_key: Application.get_env(:peek_app_sdk, :peek_app_key)
+      peek_app_key: Application.get_env(:peek_app_sdk, :peek_app_key),
+      client_secret_token: Application.get_env(:peek_app_sdk, :client_secret_token)
     }
   end
 
@@ -80,7 +82,8 @@ defmodule PeekAppSDK.Config do
         peek_app_secret: Keyword.get(app_config, :peek_app_secret),
         peek_app_id: Keyword.get(app_config, :peek_app_id),
         peek_api_url: Application.get_env(:peek_app_sdk, :peek_api_url, @default_peek_url),
-        peek_app_key: Keyword.get(app_config, :peek_app_key)
+        peek_app_key: Keyword.get(app_config, :peek_app_key),
+        client_secret_token: Keyword.get(app_config, :client_secret_token)
       }
     else
       # Fall back to default configuration if the app is not configured
