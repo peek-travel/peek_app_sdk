@@ -43,6 +43,10 @@ defmodule PeekAppSDK.Client do
            body: body_params,
            headers: headers(install_id, config_id, peek_app_key)
          ) do
+      # If we get back an error, fail the whole thing and return the error for now.
+      {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
+        {:error, errors}
+
       {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
         {:ok, data}
 

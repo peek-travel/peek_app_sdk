@@ -159,6 +159,22 @@ defmodule PeekAppSDK.ClientTest do
 
       assert {:error, 400} = Client.query_peek_pro(install_id, query)
     end
+
+    test "bubbles up errors from PeekPro when status is 200 but errors key is present" do
+      install_id = "test_install_id"
+      query = "query Test { test }"
+
+      errors = [
+        %{message: "Field 'test' is required"},
+        %{message: "Invalid input provided"}
+      ]
+
+      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: %{errors: errors}}}
+      end)
+
+      assert {:error, ^errors} = Client.query_peek_pro(install_id, query)
+    end
   end
 
   describe "operation_name/1" do
