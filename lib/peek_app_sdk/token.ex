@@ -117,4 +117,26 @@ defmodule PeekAppSDK.Token do
 
     token
   end
+
+  @spec new_for_app_installation_client(String.t(), atom() | nil) :: binary()
+  def new_for_app_installation_client(install_id, config_id \\ nil) do
+    config = Config.get_config(config_id)
+    client_secret_key = config.client_secret_token
+
+    signer = Joken.Signer.create("HS256", client_secret_key)
+
+    params = %{
+      "iss" => "app_registry_client",
+      "sub" => install_id,
+      "exp" => DateTime.utc_now() |> DateTime.add(60) |> DateTime.to_unix(),
+      "current_user_email" => nil,
+      "current_user_id" => nil,
+      "current_user_is_peek_admin" => nil,
+      "current_user_name" => nil,
+      "current_user_primary_role" => nil
+    }
+
+    {:ok, token, _claims} = generate_and_sign(params, signer)
+    token
+  end
 end
