@@ -8,8 +8,8 @@ defmodule PeekAppSDK.Plugs.ClientAuthTest do
   alias PeekAppSDK.Token
 
   # Helper function to create client tokens for testing
-  defp new_client_token(install_id, _account_user \\ nil, config_id \\ nil), do:
-    PeekAppSDK.Token.new_for_app_installation_client(install_id, config_id)
+  defp new_client_token(install_id, _account_user \\ nil, config_id \\ nil),
+    do: PeekAppSDK.Token.new_for_app_installation_client(install_id, config_id)
 
   describe "set_peek_install_id_from_client/2" do
     test "sets install ID from header with default config" do
