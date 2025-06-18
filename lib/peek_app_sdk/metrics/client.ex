@@ -34,7 +34,16 @@ defmodule PeekAppSDK.Metrics.Client do
   """
   def track(event_id, payload) do
     # Simply merge the event_id into the payload and send it
-    payload = Map.put(payload, :eventId, event_id)
+    payload =
+      Map.merge(
+        %{
+          "eventId" => event_id,
+          "level" => "info",
+          "anonymousId" => "unknown"
+        },
+        payload
+      )
+
     do_post!(payload)
   end
 
@@ -112,12 +121,10 @@ defmodule PeekAppSDK.Metrics.Client do
 
     case response do
       %Tesla.Env{status: 202} ->
-        :ok
+        {:ok, body}
 
-      %Tesla.Env{status: status, body: _body} ->
-        {:error, status}
+      %Tesla.Env{status: status, body: body} ->
+        {:error, {status, body}}
     end
-
-    {:ok, body}
   end
 end
