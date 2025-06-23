@@ -494,7 +494,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
   def label(assigns) do
     ~H"""
     <label for={@for} class="flex items-center text-sm leading-6 text-gray-primary">
-      <span class="block capitalize">{render_slot(@inner_block)}</span>
+      <span class="block">{render_slot(@inner_block)}</span>
       <span :if={@tooltip} class="group relative ml-1">
         <.icon name="hero-information-circle" class="h-4 w-4 mb-0.5 text-gray-primary group-hover:text-gray-700" />
         <.tooltip top_caret={@top_caret}>{@tooltip}</.tooltip>
@@ -683,8 +683,8 @@ defmodule PeekAppSDK.UI.CoreComponents do
   ## Examples
 
       <.table id="users" rows={@users}>
-        <:col :let={user} label="id"><%= user.id %></:col>
-        <:col :let={user} label="username"><%= user.username %></:col>
+        <:col :let={user} label="ID"><%= user.id %></:col>
+        <:col :let={user} label="Username"><%= user.username %></:col>
       </.table>
   """
   attr(:id, :string, required: true)
@@ -714,7 +714,7 @@ defmodule PeekAppSDK.UI.CoreComponents do
       <table class="w-[40rem] sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500 bg-background-secondary">
           <tr>
-            <th :for={col <- @col} class="p-4 font-medium capitalize whitespace-nowrap">{col[:label]}</th>
+            <th :for={col <- @col} class="p-4 font-medium whitespace-nowrap">{col[:label]}</th>
             <th :if={@action != []} class="relative p-0 pb-4">
               <span class="sr-only">{gettext("Actions")}</span>
             </th>
