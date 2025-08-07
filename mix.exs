@@ -53,7 +53,7 @@ defmodule PeekAppSDK.MixProject do
       {:joken, "~> 2.3"},
       {:tesla, "~> 1.4"},
       {:phoenix, "~> 1.7"},
-      {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
+      {:phoenix_live_view, "~> 1.0"},
       {:finch, "~> 0.13"},
 
       # Test dependencies
