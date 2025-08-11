@@ -102,7 +102,7 @@ defmodule PeekAppSDK.Metrics.ClientTest do
         {:ok, %Tesla.Env{status: 202}}
       end)
 
-      assert {:ok, _} = Client.track_install(external_refid, name, is_test)
+      assert {:ok, _} = Client.track_install(external_refid, name, is_test, post_message: true)
     end
 
     test "sends correct payload for test installation" do
@@ -151,7 +151,7 @@ defmodule PeekAppSDK.Metrics.ClientTest do
         {:ok, %Tesla.Env{status: 202}}
       end)
 
-      assert {:ok, _} = Client.track_uninstall(external_refid, name, is_test)
+      assert {:ok, _} = Client.track_uninstall(external_refid, name, is_test, post_message: true)
     end
 
     test "sends correct payload for test uninstallation" do
