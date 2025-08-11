@@ -62,7 +62,8 @@ defmodule PeekAppSDK.Metrics.Client do
       {:ok, %{...}}
 
   """
-  def track_install(external_refid, name, is_test) do
+  def track_install(external_refid, name, is_test, opts \\ []) do
+    post_message = if(Keyword.get(opts, :post_message, false), do: "#{name} installed")
     usage_display = if is_test, do: "New TEST App Installs", else: "New App Installs"
 
     do_post!(%{
@@ -71,7 +72,7 @@ defmodule PeekAppSDK.Metrics.Client do
       anonymousId: external_refid,
       usageDisplay: usage_display,
       usageDetails: name,
-      postMessage: "#{name} installed",
+      postMessage: post_message,
       customFields: base_custom_fields(name, external_refid, is_test)
     })
   end
@@ -91,7 +92,8 @@ defmodule PeekAppSDK.Metrics.Client do
       {:ok, %{...}}
 
   """
-  def track_uninstall(external_refid, name, is_test) do
+  def track_uninstall(external_refid, name, is_test, opts \\ []) do
+    post_message = if(Keyword.get(opts, :post_message, false), do: "#{name} uninstalled")
     usage_display = if is_test, do: "New TEST App Uninstalls", else: "New App Uninstalls"
 
     do_post!(%{
@@ -100,7 +102,7 @@ defmodule PeekAppSDK.Metrics.Client do
       anonymousId: external_refid,
       usageDisplay: usage_display,
       usageDetails: name,
-      postMessage: "#{name} uninstalled",
+      postMessage: post_message,
       customFields: base_custom_fields(name, external_refid, is_test)
     })
   end

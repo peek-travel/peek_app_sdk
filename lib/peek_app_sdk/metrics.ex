@@ -3,8 +3,11 @@ defmodule PeekAppSDK.Metrics do
   This module provides functions for tracking metrics to Ahem.
   """
 
-  defdelegate track_install(external_refid, name, is_test), to: PeekAppSDK.Metrics.Client
-  defdelegate track_uninstall(external_refid, name, is_test), to: PeekAppSDK.Metrics.Client
+  defdelegate track_install(external_refid, name, is_test, opts \\ []),
+    to: PeekAppSDK.Metrics.Client
+
+  defdelegate track_uninstall(external_refid, name, is_test, opts \\ []),
+    to: PeekAppSDK.Metrics.Client
 
   @doc """
   Tracks an event with the given event ID and payload.
