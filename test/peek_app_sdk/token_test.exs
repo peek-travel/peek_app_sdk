@@ -127,5 +127,73 @@ defmodule PeekAppSDK.TokenTest do
       # Try to verify with client_secret_token
       assert {:error, :unauthorized} = Token.verify_client_request(token)
     end
+
+    test "returns error for malformed token in verify_peek_auth" do
+      # Test the default case in verify_peek_auth
+      assert {:error, :unauthorized} = Token.verify_peek_auth("malformed.token.here")
+    end
+
+    test "returns error for malformed token in verify_client_request" do
+      # Test the default case in verify_client_request
+      assert {:error, :unauthorized} = Token.verify_client_request("malformed.token.here")
+    end
+
+    test "returns error for token without sub claim in verify_peek_auth" do
+      # Create a token without the "sub" claim to trigger the default case
+      config = PeekAppSDK.Config.get_config()
+      shared_secret_key = config.peek_app_secret
+      signer = Joken.Signer.create("HS256", shared_secret_key)
+
+      params = %{
+        "iss" => "peek_app_sdk",
+        "exp" => DateTime.utc_now() |> DateTime.add(60) |> DateTime.to_unix()
+        # Missing "sub" claim
+      }
+
+      {:ok, token, _claims} = Token.generate_and_sign(params, signer)
+      assert {:error, :unauthorized} = Token.verify_peek_auth(token)
+    end
+
+    test "returns error for token without sub claim in verify_client_request" do
+      # Create a token without the "sub" claim to trigger the default case
+      config = PeekAppSDK.Config.get_config()
+      client_secret_key = config.client_secret_token
+      signer = Joken.Signer.create("HS256", client_secret_key)
+
+      params = %{
+        "iss" => "peek_app_sdk",
+        "exp" => DateTime.utc_now() |> DateTime.add(60) |> DateTime.to_unix()
+        # Missing "sub" claim
+      }
+
+      {:ok, token, _claims} = Token.generate_and_sign(params, signer)
+      assert {:error, :unauthorized} = Token.verify_client_request(token)
+    end
+  end
+
+  describe "new_for_app_installation_client/2" do
+    test "generates a valid client token with default config" do
+      install_id = "test_install_id"
+      token = Token.new_for_app_installation_client(install_id)
+
+      assert is_binary(token)
+      assert {:ok, ^install_id, claims} = Token.verify_client_request(token)
+      assert claims["iss"] == "app_registry_client"
+      assert claims["sub"] == install_id
+      assert claims["exp"]
+      assert claims["current_user_email"] == nil
+      assert claims["current_user_id"] == nil
+      assert claims["current_user_is_peek_admin"] == nil
+      assert claims["current_user_name"] == nil
+      assert claims["current_user_primary_role"] == nil
+    end
+
+    test "generates a valid client token with atom config_id" do
+      install_id = "test_install_id"
+      token = Token.new_for_app_installation_client(install_id, :project_name)
+
+      assert is_binary(token)
+      assert {:ok, ^install_id, _claims} = Token.verify_client_request(token, :project_name)
+    end
   end
 end

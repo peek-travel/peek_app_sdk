@@ -1,10 +1,7 @@
 defmodule PeekAppSDK.ClientTest do
-  use ExUnit.Case, async: true
-  import Mox
+  use ExUnit.Case, async: false
 
   alias PeekAppSDK.Client
-
-  setup :verify_on_exit!
 
   describe "query_peek_pro/4" do
     test "successfully queries Peek Pro with default config" do
@@ -13,7 +10,8 @@ defmodule PeekAppSDK.ClientTest do
       variables = %{"foo" => "bar"}
       response_data = %{test: "success"}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         assert env.url ==
@@ -40,7 +38,8 @@ defmodule PeekAppSDK.ClientTest do
       variables = %{"foo" => "bar"}
       response_data = %{test: "success"}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         assert env.url ==
@@ -72,7 +71,8 @@ defmodule PeekAppSDK.ClientTest do
       variables = %{"foo" => "bar"}
       response_data = %{test: "success"}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         assert env.url ==
@@ -113,7 +113,8 @@ defmodule PeekAppSDK.ClientTest do
       variables = %{"foo" => "bar"}
       response_data = %{test: "success"}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
         assert env.url == "https://apps.peekapis.com/backoffice-gql/other_app_id/test"
 
@@ -141,7 +142,8 @@ defmodule PeekAppSDK.ClientTest do
       install_id = "test_install_id"
       query = "query Test { test }"
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
         {:ok, %Tesla.Env{status: 400}}
       end)
 
@@ -153,7 +155,8 @@ defmodule PeekAppSDK.ClientTest do
       query = "query Test { test }"
       error_body = %{errors: [%{message: "Something went wrong"}]}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
         {:ok, %Tesla.Env{status: 400, body: error_body}}
       end)
 
@@ -169,7 +172,8 @@ defmodule PeekAppSDK.ClientTest do
         %{message: "Invalid input provided"}
       ]
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
         {:ok, %Tesla.Env{status: 200, body: %{errors: errors}}}
       end)
 

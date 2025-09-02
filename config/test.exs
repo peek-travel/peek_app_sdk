@@ -24,4 +24,4 @@ config :peek_app_sdk,
   ]
 
 # Configure Tesla adapter for tests
-config :tesla, adapter: PeekAppSDK.MockTeslaClient
+config :tesla, adapter: Tesla.Adapter.Finch

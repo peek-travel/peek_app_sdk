@@ -1,34 +1,33 @@
 defmodule PeekAppSDKTest do
-  use ExUnit.Case, async: true
-  import Mox
-
-  setup :verify_on_exit!
+  use ExUnit.Case, async: false
 
   describe "query_peek_pro/4" do
     test "delegates to Client.query_peek_pro/4 with default config" do
       install_id = "test_install_id"
       query = "query Test { test }"
       variables = %{foo: "bar"}
-      response_data = %{test: "success"}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
-        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+      # Mock the HTTP response for this test
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: %{data: %{test: "success"}}}}
       end)
 
-      assert {:ok, ^response_data} = PeekAppSDK.query_peek_pro(install_id, query, variables)
+      assert {:ok, %{test: "success"}} = PeekAppSDK.query_peek_pro(install_id, query, variables)
     end
 
     test "delegates to Client.query_peek_pro/4 with atom config_id" do
       install_id = "test_install_id"
       query = "query Test { test }"
       variables = %{foo: "bar"}
-      response_data = %{test: "success"}
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn _env, _opts ->
-        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+      # Mock the HTTP response for this test
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: %{data: %{test: "success"}}}}
       end)
 
-      assert {:ok, ^response_data} =
+      assert {:ok, %{test: "success"}} =
                PeekAppSDK.query_peek_pro(install_id, query, variables, :project_name)
     end
   end
