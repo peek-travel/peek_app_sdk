@@ -1,10 +1,7 @@
 defmodule PeekAppSDK.Metrics.ClientTest do
-  use ExUnit.Case, async: true
-  import Mox
+  use ExUnit.Case, async: false
 
   alias PeekAppSDK.Metrics.Client
-
-  setup :verify_on_exit!
 
   describe "track/2" do
     test "sends payload directly without validation or transformation" do
@@ -22,7 +19,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
         }
       }
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         sent_payload = Jason.decode!(env.body)
@@ -57,7 +55,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
         arrayData: [1, 2, 3]
       }
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         sent_payload = Jason.decode!(env.body)
@@ -81,7 +80,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
       name = "Partner Name"
       is_test = false
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
         assert String.contains?(env.url, "ahem.peeklabs.com/events/")
 
@@ -110,7 +110,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
       name = "Test Partner"
       is_test = true
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         payload = Jason.decode!(env.body)
@@ -131,7 +132,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
       name = "Partner Name"
       is_test = false
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         payload = Jason.decode!(env.body)
@@ -151,7 +153,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
         {:ok, %Tesla.Env{status: 202}}
       end)
 
-      assert {:ok, _} = Client.track_uninstall(external_refid, name, is_test, post_message: true)
+      assert {:ok, _} =
+               Client.track_uninstall(external_refid, name, is_test, post_message: true)
     end
 
     test "sends correct payload for test uninstallation" do
@@ -159,7 +162,8 @@ defmodule PeekAppSDK.Metrics.ClientTest do
       name = "Test Partner"
       is_test = true
 
-      expect(PeekAppSDK.MockTeslaClient, :call, fn env, _opts ->
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
 
         payload = Jason.decode!(env.body)
@@ -171,6 +175,21 @@ defmodule PeekAppSDK.Metrics.ClientTest do
       end)
 
       assert {:ok, _} = Client.track_uninstall(external_refid, name, is_test)
+    end
+
+    test "handles error response from metrics API" do
+      external_refid = "partner-123"
+      name = "Partner Name"
+      is_test = false
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :post
+        {:ok, %Tesla.Env{status: 500, body: %{error: "Internal server error"}}}
+      end)
+
+      assert {:error, {500, %{error: "Internal server error"}}} =
+               Client.track_install(external_refid, name, is_test)
     end
   end
 end

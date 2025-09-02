@@ -182,6 +182,20 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       assert conn.assigns.peek_install_id == install_id
       assert conn.assigns.peek_account_user == nil
     end
+
+    test "handles non-keyword list and non-map options" do
+      install_id = "test_install_id"
+      token = Token.new_for_app_installation!(install_id)
+
+      conn =
+        conn(:get, "/")
+        |> put_req_header("x-peek-auth", "Bearer #{token}")
+
+      # Pass a string instead of keyword list or map to test the default case
+      conn = PeekAuth.set_peek_install_id(conn, "invalid_opts")
+
+      assert conn.assigns.peek_install_id == install_id
+    end
   end
 
   describe "on_mount/4" do

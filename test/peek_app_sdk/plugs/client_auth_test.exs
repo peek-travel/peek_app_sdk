@@ -174,6 +174,32 @@ defmodule PeekAppSDK.Plugs.ClientAuthTest do
       assert conn.assigns.peek_install_id == install_id
       assert conn.assigns.peek_account_user == nil
     end
+
+    test "handles non-keyword list and non-map options" do
+      install_id = "test_install_id"
+
+      # Create a token with client_secret_token
+      config = PeekAppSDK.Config.get_config()
+      client_secret_key = config.client_secret_token
+      signer = Joken.Signer.create("HS256", client_secret_key)
+
+      params = %{
+        "iss" => "peek_app_sdk",
+        "sub" => install_id,
+        "exp" => DateTime.utc_now() |> DateTime.add(60) |> DateTime.to_unix()
+      }
+
+      {:ok, token, _claims} = Token.generate_and_sign(params, signer)
+
+      conn =
+        conn(:get, "/")
+        |> put_req_header("x-peek-auth", "Bearer #{token}")
+
+      # Pass a string instead of keyword list or map to test the default case
+      conn = ClientAuth.set_peek_install_id_from_client(conn, "invalid_opts")
+
+      assert conn.assigns.peek_install_id == install_id
+    end
   end
 
   describe "on_mount/4" do
