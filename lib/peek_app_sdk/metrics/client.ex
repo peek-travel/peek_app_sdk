@@ -1,13 +1,20 @@
 defmodule PeekAppSDK.Metrics.Client do
-  use Tesla
-
   @moduledoc """
   Client for sending metrics to the Peek Pro metrics service.
   """
 
-  plug Tesla.Middleware.JSON
-  plug Tesla.Middleware.Headers, [{"Content-Type", "application/json"}]
-  plug Tesla.Middleware.Retry, delay: 500, max_retries: 10
+  @doc """
+  Creates a Tesla client with the appropriate middleware configuration.
+  """
+  def client do
+    middleware = [
+      Tesla.Middleware.JSON,
+      {Tesla.Middleware.Headers, [{"Content-Type", "application/json"}]},
+      {Tesla.Middleware.Retry, delay: 500, max_retries: 10}
+    ]
+
+    Tesla.client(middleware)
+  end
 
   @doc """
   Tracks an event with the given event ID and payload.
@@ -119,7 +126,7 @@ defmodule PeekAppSDK.Metrics.Client do
     do: "https://ahem.peeklabs.com/events/#{Application.fetch_env!(:peek_app_sdk, :peek_app_id)}"
 
   defp do_post!(body, _opts \\ []) do
-    response = post!(event_url(), body)
+    response = Tesla.post!(client(), event_url(), body)
 
     case response do
       %Tesla.Env{status: 202} ->

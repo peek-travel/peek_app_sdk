@@ -1,11 +1,18 @@
 defmodule PeekAppSDK.Client do
   require Logger
 
-  use Tesla
-
   alias PeekAppSDK.Config
 
-  plug Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]
+  @doc """
+  Creates a Tesla client with the appropriate middleware configuration.
+  """
+  def client do
+    middleware = [
+      {Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]}
+    ]
+
+    Tesla.client(middleware)
+  end
 
   @doc """
   Queries the Peek Pro API.
@@ -37,7 +44,7 @@ defmodule PeekAppSDK.Client do
     operation_name = operation_name(gql_query)
     url = "#{config.peek_api_url |> String.trim()}/#{peek_app_id}/#{operation_name}"
 
-    case request(
+    case Tesla.request(client(),
            method: :post,
            url: url,
            body: body_params,
