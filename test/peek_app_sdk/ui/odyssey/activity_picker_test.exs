@@ -90,6 +90,40 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPickerTest do
       assert html =~ ~r/<input[^>]*type="hidden"[^>]*name="my_form\[activity_id\]"[^>]*>/
     end
 
+    test "renders with correct form when a multi-select" do
+      # Mock the GraphQL query response
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        response_data = %{
+          activities: [
+            %{id: "activity_1", name: "Test Activity", colorHex: "#000000"},
+            %{id: "activity_2", name: "Test Activity 2", colorHex: "#000000"}
+          ]
+        }
+
+        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+      end)
+
+      # Create a form with a pre-selected activity
+      form_data = %{"activity_ids" => ["activity_1", "activity_2"]}
+      form = to_form(form_data, as: :my_form)
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.form for={@form}>
+              <.odyssey_activity_picker field={@form[:activity_ids]} install_id="test_install_id" />
+            </.form>
+            """
+          end,
+          %{form: form}
+        )
+
+      # Verify the hidden input has the correct name (value starts as nil and gets updated by JS)
+      assert html =~ "ids=\"activity_1,activity_2\""
+    end
+
     test "generates unique component IDs based on form field" do
       # Mock the GraphQL query response
       Tesla.Adapter.Finch

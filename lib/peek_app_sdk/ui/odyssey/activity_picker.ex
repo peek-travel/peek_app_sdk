@@ -13,14 +13,8 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
   use Phoenix.LiveComponent
   use Phoenix.Component
 
-  @required_assigns ~w(field install_id)a
-
   @impl true
   def mount(socket) do
-    socket =
-      socket
-      |> assign(selection: nil)
-
     {:ok, socket}
   end
 
@@ -59,7 +53,7 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
     ~H"""
     <div phx-hook="OdysseyActivityPicker" id={"#{@id}_hook"}>
       <!-- Hidden input for form value -->
-      <input type="hidden" name={@field.name} value={@selection} />
+      <input type="hidden" name={@field.name} value={process_ids_for_multi_select(@field.value)} />
 
       <!-- Odyssey product picker will be rendered here -->
       <div>
@@ -68,13 +62,18 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
           phx-update="ignore"
           title="Activity Picker"
           phx-target={@myself}
-          ids={@selection}
+          multiple={if(@multiple, do: "true", else: "false")}
+          ids={process_ids_for_multi_select(@field.value)}
           products={Jason.encode!(@products)}
         >
         </odyssey-product-picker>
       </div>
     </div>
     """
+  end
+
+  defp process_ids_for_multi_select(ids) do
+    ids |> List.wrap() |> Enum.join(",")
   end
 
   @doc """
@@ -85,6 +84,7 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
   """
   attr(:field, :any, required: true, doc: "a Phoenix.HTML.FormField struct")
   attr(:id, :string, doc: "component id, defaults to form_field_activity_picker")
+  attr(:multiple, :boolean, default: false, doc: "whether to allow multiple selections")
   attr(:install_id, :string, required: true, doc: "the install id for the current partner")
 
   def odyssey_activity_picker(assigns) do
