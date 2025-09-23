@@ -60,8 +60,8 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
         <odyssey-product-picker
           id={"#{@id}_picker"}
           phx-update="ignore"
-          title="Activity Picker"
           phx-target={@myself}
+          title={@title}
           multiple={if(@multiple, do: "true", else: "false")}
           ids={process_ids_for_multi_select(@field.value)}
           products={Jason.encode!(@products)}
@@ -86,6 +86,7 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
   attr(:id, :string, doc: "component id, defaults to form_field_activity_picker")
   attr(:multiple, :boolean, default: false, doc: "whether to allow multiple selections")
   attr(:install_id, :string, required: true, doc: "the install id for the current partner")
+  attr(:title, :string, default: "Activity Picker", doc: "the title for the picker")
 
   def odyssey_activity_picker(assigns) do
     assigns =
