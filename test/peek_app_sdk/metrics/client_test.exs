@@ -192,4 +192,30 @@ defmodule PeekAppSDK.Metrics.ClientTest do
                Client.track_install(external_refid, name, is_test)
     end
   end
+
+  describe "update_configuration_status/4" do
+    test "raises error when deprecated peek_api_url is configured" do
+      # Temporarily set the deprecated config
+      original_value = Application.get_env(:peek_app_sdk, :peek_api_url)
+
+      Application.put_env(
+        :peek_app_sdk,
+        :peek_api_url,
+        "https://apps.peekapis.com/backoffice-gql"
+      )
+
+      try do
+        assert_raise RuntimeError, ~r/Configuration error: peek_api_url is deprecated/, fn ->
+          Client.update_configuration_status("install_id", "configured")
+        end
+      after
+        # Restore original value (should be nil in tests)
+        if original_value do
+          Application.put_env(:peek_app_sdk, :peek_api_url, original_value)
+        else
+          Application.delete_env(:peek_app_sdk, :peek_api_url)
+        end
+      end
+    end
+  end
 end

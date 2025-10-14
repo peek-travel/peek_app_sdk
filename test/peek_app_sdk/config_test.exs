@@ -9,11 +9,35 @@ defmodule PeekAppSDK.ConfigTest do
       assert is_map(default_config)
       assert Map.has_key?(default_config, :peek_app_secret)
       assert Map.has_key?(default_config, :peek_app_id)
-      assert Map.has_key?(default_config, :peek_api_url)
+      assert Map.has_key?(default_config, :peek_api_base_url)
       assert Map.has_key?(default_config, :client_secret_token)
       assert default_config.peek_app_secret == "test_secret"
       assert default_config.peek_app_id == "test_app_id"
       assert default_config.client_secret_token == "test_client_secret"
+    end
+
+    test "raises error when deprecated peek_api_url is configured and check_deprecated_config! is called" do
+      # Temporarily set the deprecated config
+      original_value = Application.get_env(:peek_app_sdk, :peek_api_url)
+
+      Application.put_env(
+        :peek_app_sdk,
+        :peek_api_url,
+        "https://apps.peekapis.com/backoffice-gql"
+      )
+
+      try do
+        assert_raise RuntimeError, ~r/Configuration error: peek_api_url is deprecated/, fn ->
+          Config.check_deprecated_config!()
+        end
+      after
+        # Restore original value (should be nil in tests)
+        if original_value do
+          Application.put_env(:peek_app_sdk, :peek_api_url, original_value)
+        else
+          Application.delete_env(:peek_app_sdk, :peek_api_url)
+        end
+      end
     end
 
     test "returns the configuration for project_name from apps config" do

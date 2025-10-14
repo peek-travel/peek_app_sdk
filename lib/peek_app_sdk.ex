@@ -33,7 +33,7 @@ defmodule PeekAppSDK do
     ]
   ```
 
-  Note that `peek_api_url` and `peek_app_key` are always taken from the default
+  Note that `peek_api_base_url` and `peek_app_key` are always taken from the default
   `:peek_app_sdk` configuration, regardless of which application identifier is used.
   """
 
@@ -49,7 +49,7 @@ defmodule PeekAppSDK do
       %{
         peek_app_secret: "project_name_secret",
         peek_app_id: "project_name_app_id",
-        peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+        peek_api_base_url: "https://apps.peekapis.com",
         peek_app_key: "default_app_key"
       }
 
@@ -59,7 +59,7 @@ defmodule PeekAppSDK do
       %{
         peek_app_secret: "default_secret",
         peek_app_id: "default_app_id",
-        peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+        peek_api_base_url: "https://apps.peekapis.com",
         peek_app_key: "default_app_key"
       }
   """
