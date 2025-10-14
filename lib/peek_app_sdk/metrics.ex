@@ -9,6 +9,9 @@ defmodule PeekAppSDK.Metrics do
   defdelegate track_uninstall(external_refid, name, is_test, opts \\ []),
     to: PeekAppSDK.Metrics.Client
 
+  defdelegate update_configuration_status(install_id, status, notes \\ nil),
+    to: PeekAppSDK.Metrics.Client
+
   @doc """
   Tracks an event with the given event ID and payload.
 
