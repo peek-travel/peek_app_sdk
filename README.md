@@ -95,6 +95,122 @@ module.exports = {
 
 This will ensure your application includes all the necessary styles for PeekAppSDK components.
 
+## JavaScript Integration
+
+To use PeekAppSDK's JavaScript hooks in your Phoenix LiveView application, add this to your `assets/js/app.js` file:
+
+```javascript
+// Import PeekAppSDK hooks
+import PeekAppSDKHooks from "peek_app_sdk"
+
+// If you don't have any other hooks:
+let liveSocket = new LiveSocket("/live", Socket, {
+  longPollFallbackMs: 2500,
+  params: {_csrf_token: csrfToken},
+  hooks: PeekAppSDKHooks
+})
+
+// If you have other hooks, merge them:
+let Hooks = {
+  ...PeekAppSDKHooks,
+  // your other hooks here
+}
+
+let liveSocket = new LiveSocket("/live", Socket, {
+  longPollFallbackMs: 2500,
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
+})
+```
+
+The import works because PeekAppSDK includes a `package.json` file that tells Node.js where to find the JavaScript hooks.
+
+## Odyssey UI Components Integration
+
+PeekAppSDK includes Odyssey UI components that provide rich interactive elements for your Phoenix LiveView applications. To integrate these components:
+
+### 1. Add the Odyssey UI Components Import
+
+In your Phoenix web module (e.g., `lib/your_app_web.ex`), add the import to both the `html` and `live_view` functions:
+
+```elixir
+def html do
+  quote do
+    use Phoenix.Component
+    import PeekAppSDK.UI.Odyssey  # Add this line
+    import YourAppWeb.CoreComponents
+    # ... other imports
+  end
+end
+
+def live_view do
+  quote do
+    use Phoenix.LiveView,
+      layout: {YourAppWeb.Layouts, :app}
+
+    import PeekAppSDK.UI.Odyssey  # Add this line
+    import YourAppWeb.CoreComponents
+    # ... other imports
+  end
+end
+```
+
+### 2. Include Odyssey Web Components JavaScript
+
+In your `assets/js/app.js` file, add the Odyssey web components:
+
+```javascript
+// Import Odyssey web components (required for UI components to work)
+require('../../deps/peek_app_sdk/priv/static/odyssey_web_components.min.js');
+
+// Import PeekAppSDK hooks
+import peekAppSDK from "peek_app_sdk"
+
+const Hooks = {
+  ...peekAppSDK
+}
+
+let liveSocket = new LiveSocket("/live", Socket, {
+  longPollFallbackMs: 2500,
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
+})
+```
+
+### 3. Include Odyssey Styles
+
+In your `assets/css/app.css` file, add the Odyssey assets to your Tailwind sources:
+
+```css
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@source "../css";
+@source "../js";
+@source "../../lib/your_app_web";
+@source "../../deps/peek_app_sdk/assets";  /* Add this line */
+```
+
+### 4. Using Odyssey Components
+
+Once integrated, you can use Odyssey components in your LiveView templates:
+
+```heex
+<.form for={@form} phx-change="activity_changed">
+  <.odyssey_activity_picker
+    install_id={@app_installation_id}
+    field={@form[:activity_id]}
+  />
+</.form>
+```
+
+The activity picker component will automatically handle activity selection and update the form field when activities are chosen.
+
+### Updating Odyssey Components
+
+Simply update odyssey_web_components.js and odyssey_web_components.css in your assets folder and run `mix assets.deploy` and get merged into main. When upstream apps run a mix deps.update peek_app_sdk they'll get the updated odyssey assets.
+
 # PeekAppSDK Metrics
 
 This document describes how to use the metrics functionality in the PeekAppSDK.
