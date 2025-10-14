@@ -49,7 +49,7 @@ defmodule PeekAppSDK.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:gettext, "~> 0.20"},
+      {:gettext, "~> 1.0"},
       {:joken, "~> 2.3"},
       {:tesla, "~> 1.4"},
       {:phoenix, "~> 1.7"},
