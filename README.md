@@ -11,7 +11,7 @@ writing apps.
 config :peek_app_sdk,
   peek_app_secret: "APP_SECRET",
   peek_app_id: "APP_ID",
-  peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+  peek_api_base_url: "https://apps.peekapis.com/",
   peek_api_key: "API_KEY"
 ```
 
@@ -24,7 +24,7 @@ PeekAppSDK supports multiple configurations, allowing different applications to 
 config :peek_app_sdk,
   peek_app_secret: "DEFAULT_SECRET",
   peek_app_id: "DEFAULT_APP_ID",
-  peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+  peek_api_base_url: "https://apps.peekapis.com/",
   peek_api_key: "DEFAULT_API_KEY",
   # Centralized app configurations
   apps: [
@@ -43,7 +43,7 @@ PeekAppSDK.query_peek_pro("install_id", "query { test }")
 PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :project_name)
 ```
 
-Note that `peek_api_url` and `peek_api_key` are always taken from the default configuration.
+Note that `peek_api_base_url` and `peek_api_key` are always taken from the default configuration.
 
 ## Some setup tips:
 

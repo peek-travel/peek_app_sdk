@@ -24,7 +24,7 @@ defmodule PeekAppSDK do
   config :peek_app_sdk,
     peek_app_secret: "DEFAULT_SECRET",
     peek_app_id: "DEFAULT_APP_ID",
-    peek_api_url: "https://apps.peekapis.com/backoffice-gql",
+    peek_api_base_url: "https://apps.peekapis.com/",
     peek_api_key: "API_KEY",
     # Centralized app configurations
     apps: [
