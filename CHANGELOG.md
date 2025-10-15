@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2025-10-15]
 
 ### Changed
+- **BREAKING**: Configuration key `peek_app_key` has been renamed to `peek_api_key`
 - **BREAKING**: Configuration key `peek_api_url` has been deprecated in favor of `peek_api_base_url`
   - The new `peek_api_base_url` should contain only the base URL (e.g., `"https://apps.peekapis.com"`)
   - The SDK automatically appends appropriate paths (e.g., `/backoffice-gql`) for different API endpoints

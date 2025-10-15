@@ -14,7 +14,7 @@ defmodule PeekAppSDK.Config do
     peek_app_secret: "DEFAULT_SECRET",
     peek_app_id: "DEFAULT_APP_ID",
     peek_api_base_url: "https://apps.peekapis.com",
-    peek_api_key: "APP_KEY",
+    peek_api_key: "API_KEY",
     client_secret_token: "CLIENT_SECRET_TOKEN",
     apps: [
       project_name: [peek_app_id: "project_name_app_id", peek_app_secret: "project_name_secret", client_secret_token: "base64_key"],

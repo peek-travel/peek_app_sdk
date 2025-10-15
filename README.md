@@ -12,7 +12,7 @@ config :peek_app_sdk,
   peek_app_secret: "APP_SECRET",
   peek_app_id: "APP_ID",
   peek_api_url: "https://apps.peekapis.com/backoffice-gql",
-  peek_api_key: "APP_KEY"
+  peek_api_key: "API_KEY"
 ```
 
 ### Multiple Application Configurations
@@ -25,7 +25,7 @@ config :peek_app_sdk,
   peek_app_secret: "DEFAULT_SECRET",
   peek_app_id: "DEFAULT_APP_ID",
   peek_api_url: "https://apps.peekapis.com/backoffice-gql",
-  peek_api_key: "DEFAULT_APP_KEY",
+  peek_api_key: "DEFAULT_API_KEY",
   # Centralized app configurations
   apps: [
     project_name: [peek_app_id: "project_name_APP_ID", peek_app_secret: "project_name_APP_SECRET"],
