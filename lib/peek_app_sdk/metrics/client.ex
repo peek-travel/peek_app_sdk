@@ -28,14 +28,14 @@ defmodule PeekAppSDK.Metrics.Client do
     }
 
     config = Config.get_config(config_id)
-    peek_app_key = config.peek_app_key
+    peek_api_key = config.peek_api_key
     peek_app_id = config.peek_app_id
     peek_api_base_url = config.peek_api_base_url
 
     url =
       "#{peek_api_base_url}/registry/installations/#{peek_app_id}/#{install_id}/configuration_status"
 
-    case Tesla.put!(client(), url, body, headers: headers(install_id, config_id, peek_app_key)) do
+    case Tesla.put!(client(), url, body, headers: headers(install_id, config_id, peek_api_key)) do
       %Tesla.Env{status: 200} ->
         :ok
 
@@ -169,10 +169,10 @@ defmodule PeekAppSDK.Metrics.Client do
     [x_peek_auth_header(install_id, config_id)]
   end
 
-  defp headers(install_id, config_id, peek_app_key) do
+  defp headers(install_id, config_id, peek_api_key) do
     [
       x_peek_auth_header(install_id, config_id),
-      {"pk-api-key", peek_app_key}
+      {"pk-api-key", peek_api_key}
     ]
   end
 

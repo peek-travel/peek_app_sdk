@@ -48,7 +48,7 @@ defmodule PeekAppSDK.ConfigTest do
       assert Map.has_key?(config, :client_secret_token)
       assert config.peek_app_secret == "project_name_app_secret"
       assert config.peek_app_id == "project_name_app_id"
-      assert config.peek_app_key == "project_name_app_key"
+      assert config.peek_api_key == "project_name_api_key"
       assert config.client_secret_token == "project_name_client_secret"
     end
 
@@ -60,7 +60,7 @@ defmodule PeekAppSDK.ConfigTest do
       assert Map.has_key?(config, :client_secret_token)
       assert config.peek_app_secret == "other_app_secret"
       assert config.peek_app_id == "other_app_id"
-      assert config.peek_app_key == nil
+      assert config.peek_api_key == nil
       assert config.client_secret_token == nil
     end
 

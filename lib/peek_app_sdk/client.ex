@@ -39,7 +39,7 @@ defmodule PeekAppSDK.Client do
 
     config = Config.get_config(config_id)
     peek_app_id = config.peek_app_id
-    peek_app_key = config.peek_app_key
+    peek_api_key = config.peek_api_key
 
     operation_name = operation_name(gql_query)
 
@@ -49,7 +49,7 @@ defmodule PeekAppSDK.Client do
            method: :post,
            url: url,
            body: body_params,
-           headers: headers(install_id, config_id, peek_app_key)
+           headers: headers(install_id, config_id, peek_api_key)
          ) do
       # If we get back an error, fail the whole thing and return the error for now.
       {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
@@ -98,10 +98,10 @@ defmodule PeekAppSDK.Client do
     [x_peek_auth_header(install_id, config_id)]
   end
 
-  defp headers(install_id, config_id, peek_app_key) do
+  defp headers(install_id, config_id, peek_api_key) do
     [
       x_peek_auth_header(install_id, config_id),
-      {"pk-api-key", peek_app_key}
+      {"pk-api-key", peek_api_key}
     ]
   end
 

@@ -56,7 +56,7 @@ defmodule PeekAppSDK.ClientTest do
                end)
 
         assert Enum.any?(env.headers, fn {k, v} ->
-                 k == "pk-api-key" && v == "project_name_app_key"
+                 k == "pk-api-key" && v == "project_name_api_key"
                end)
 
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
@@ -108,7 +108,7 @@ defmodule PeekAppSDK.ClientTest do
                Client.query_peek_pro(install_id, query, variables, :project_name)
     end
 
-    test "pk-api-key only sent if peek_app_key is set" do
+    test "pk-api-key only sent if peek_api_key is set" do
       install_id = "test_install_id"
       query = "query Test { test }"
       variables = %{"foo" => "bar"}

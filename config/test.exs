@@ -5,13 +5,13 @@ config :peek_app_sdk,
   peek_app_secret: "test_secret",
   peek_app_id: "test_app_id",
   peek_api_base_url: "https://apps.peekapis.com",
-  peek_app_key: "test_app_key",
+  peek_api_key: "test_api_key",
   client_secret_token: "test_client_secret",
   # Centralized configuration structure
   apps: [
     project_name: [
       peek_app_id: "project_name_app_id",
-      peek_app_key: "project_name_app_key",
+      peek_api_key: "project_name_api_key",
       peek_app_secret: "project_name_app_secret",
       client_secret_token: "project_name_client_secret"
     ],

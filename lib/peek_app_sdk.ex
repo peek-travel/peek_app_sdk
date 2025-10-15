@@ -24,8 +24,8 @@ defmodule PeekAppSDK do
   config :peek_app_sdk,
     peek_app_secret: "DEFAULT_SECRET",
     peek_app_id: "DEFAULT_APP_ID",
-    peek_api_url: "https://apps.peekapis.com/backoffice-gql",
-    peek_app_key: "APP_KEY",
+    peek_api_base_url: "https://apps.peekapis.com/",
+    peek_api_key: "API_KEY",
     # Centralized app configurations
     apps: [
       project_name: [peek_app_id: "project_name_APP_ID", peek_app_secret: "project_name_APP_SECRET"],
@@ -33,7 +33,7 @@ defmodule PeekAppSDK do
     ]
   ```
 
-  Note that `peek_api_base_url` and `peek_app_key` are always taken from the default
+  Note that `peek_api_base_url` and `peek_api_key` are always taken from the default
   `:peek_app_sdk` configuration, regardless of which application identifier is used.
   """
 
@@ -50,7 +50,7 @@ defmodule PeekAppSDK do
         peek_app_secret: "project_name_secret",
         peek_app_id: "project_name_app_id",
         peek_api_base_url: "https://apps.peekapis.com",
-        peek_app_key: "default_app_key"
+        peek_api_key: "default_api_key"
       }
 
   Using the default configuration:
@@ -60,7 +60,7 @@ defmodule PeekAppSDK do
         peek_app_secret: "default_secret",
         peek_app_id: "default_app_id",
         peek_api_base_url: "https://apps.peekapis.com",
-        peek_app_key: "default_app_key"
+        peek_api_key: "default_api_key"
       }
   """
   @spec get_config(atom() | nil) :: map()
