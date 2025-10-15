@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       ```
 
 ### Added
+- Support for passing `x-peek-auth` token in request body parameters for scenarios where custom headers cannot be controlled (e.g., form submissions, third-party integrations)
+  - Body parameters take precedence over headers when both are present
+  - Enables authentication in form submission scenarios and legacy systems
 - Configuration validation that prevents use of deprecated `peek_api_url` with new features
 - Deprecation warnings when using legacy `peek_api_url` configuration for backoffice calls
 - Clear error messages with migration instructions for deprecated configuration
