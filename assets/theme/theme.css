@@ -1,0 +1,89 @@
+@theme interactions {
+  --color-interaction-100: #e9edfd;
+  --color-interaction-200: #90a1ee;
+  --color-interaction-300: #3957ea;
+  --color-interaction-400: #1f37ad;
+}
+
+@theme neutral {
+  --color-neutrals-0: #fff;
+  --color-neutrals-50: #fafaff;
+  --color-neutrals-100: #f2f3fa;
+  --color-neutrals-200: #dadce7;
+  --color-neutrals-250: #9ca1b9;
+  --color-neutrals-300: #656a81;
+  --color-neutrals-350: #414159;
+  --color-neutrals-400: #202024;
+}
+
+@theme status {
+  --color-danger-100: #ffd8d8;
+  --color-danger-200: #ff837b;
+  --color-danger-300: #e5243c;
+  --color-danger-400: #b5122b;
+  --color-warning-100: #fef5cb;
+  --color-warning-200: #fdd665;
+  --color-warning-300: #f9aa00;
+  --color-warning-400: #bd5b00;
+  --color-success-100: #e0fbdb;
+  --color-success-200: #8fe98f;
+  --color-success-300: #41b658;
+  --color-success-400: #208346;
+  --color-info-100: #ccf3fe;
+  --color-info-200: #67c9fc;
+  --color-info-300: #048af7;
+  --color-info-400: #024fb1;
+}
+
+@theme extra_colors {
+  --color-interesting-pink: #dd63ca;
+}
+
+@theme fonts {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@theme typography {
+  --text-display: 3rem; /* 48px  */
+  --text-h1: 1.75rem; /* 28px  */
+  --text-h2: 1.5rem; /* 24px  */
+  --text-h3: 1.25rem; /* 20px  */
+  --text-p1: 1rem; /* 16px  */
+  --text-p2: 0.875rem; /* 14px  */
+  --text-p3: 0.75rem; /* 12px  */
+  --text-foot: 0.625rem; /* 10px  */
+
+  --leading-display: 1.25; /* 125% */
+  --leading-h1: 1.25;
+  --leading-h2: 1.25;
+  --leading-h3: 1.25;
+  --leading-p1: 1.5; /* 150% */
+  --leading-p2: 1.5;
+  --leading-p3: 1.25;
+  --leading-foot: 1.25;
+}
+
+@layer components {
+  html {
+    @apply font-sans text-p1 leading-p1;
+  }
+  html body h1 {
+    @apply !text-h1 !leading-h1 !font-normal;
+  }
+  html body h2 {
+    @apply !text-h2 !leading-h2 !font-normal;
+  }
+  html body h3 {
+    @apply !text-h3 !leading-h3 !font-normal;
+  }
+  html p {
+    @apply !text-p1 !leading-p1;
+  }
+  html small {
+    @apply text-foot leading-foot;
+  }
+  a {
+    @apply text-interaction-300 underline;
+  }
+}
