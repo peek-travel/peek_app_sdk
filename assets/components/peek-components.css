@@ -1,0 +1,50 @@
+@layer utilities {
+  /* peek alert */
+
+  .alert-peek {
+    @apply max-w-4xl mx-auto px-6 mt-8 bg-white rounded-lg px-4 py-3 shadow-sm border-l-4 border;
+  }
+
+  .alert-peek.border-success {
+    @apply border-success-300;
+  }
+
+  .alert-peek.border-warning {
+    @apply border-warning-300;
+  }
+
+  .alert-peek.border-danger {
+    @apply border-danger-300;
+  }
+
+  .alert-peek.border-info {
+    @apply border-info-300;
+  }
+
+  .alert-peek-content {
+    @apply flex items-start;
+  }
+
+  .alert-peek-icon {
+    @apply flex-shrink-0 mt-0.5 mr-3;
+  }
+
+  .alert-peek-body {
+    @apply flex-1;
+  }
+
+  .alert-peek-title {
+    @apply font-medium text-base mb-1 text-neutrals-350;
+  }
+
+  .alert-peek-message {
+    @apply text-sm leading-relaxed text-neutrals-300;
+  }
+
+  .alert-peek-action {
+    @apply mt-2 flex justify-end;
+  }
+}
+
+  }
+}
