@@ -1,0 +1,168 @@
+@layer utilities {
+  .fieldset .label {
+    @apply text-sm font-normal text-neutrals-300 mb-2 block;
+  }
+
+  .fieldset .input,
+  .fieldset .textarea {
+    @apply w-full border border-neutrals-200 bg-neutrals-100 hover:border-neutrals-250 rounded-md px-3 py-2 text-neutrals-400;
+    @apply focus:outline-none focus:ring-5 focus:ring-interaction-100 focus:border-interaction-300 focus:bg-neutrals-0;
+  }
+
+  .fieldset .input .disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+  }
+
+  .fieldset .input-error {
+    @apply border-warning-300;
+    @apply focus:outline-none focus:ring-4 focus:ring-warning-100 focus:border-warning-300 focus:bg-neutrals-0;
+  }
+
+  .fieldset .textarea-error {
+    @apply border-warning-300;
+    @apply focus:outline-none focus:ring-4 focus:ring-warning-100 focus:border-warning-300 focus:bg-neutrals-0;
+  }
+}
+
+@layer utilities {
+  .checkbox {
+    @apply bg-neutrals-100 border-neutrals-200;
+    @apply hover:bg-neutrals-100 hover:border-neutrals-250;
+    @apply focus:outline-none focus:ring-4 focus:ring-interaction-100 focus:border-interaction-300;
+    @apply text-interaction-300;
+  }
+}
+
+@layer utilities {
+  .select {
+    @apply bg-neutrals-100 border-neutrals-200 text-neutrals-300 appearance-none;
+    @apply hover:bg-neutrals-100 hover:border-neutrals-250;
+    @apply focus:outline-none focus:ring-4 focus:ring-neutrals-100 focus:border-neutrals-200;
+    @apply active:bg-white active:border-interaction-300 active:ring-4 active:ring-interaction-100;
+
+    /* boilerplate chevron */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%233957EA' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+}
+
+@layer utilities {
+  .btn {
+    @apply focus:outline-none focus:ring-4 focus:ring-interaction-100 border-none;
+    @apply bg-interaction-300 text-neutrals-0 hover:bg-interaction-400 rounded-lg;
+    @apply shadow-none;
+    border-radius: 6px;
+  }
+
+  .btn.disabled {
+    @apply opacity-50 cursor-not-allowed hover:bg-interaction-300;
+    @apply pointer-events-none; /* Prevent hover, a little hacky but work */
+  }
+
+  .btn.btn-secondary {
+    @apply bg-neutrals-100 text-interaction-300;
+    @apply hover:text-interaction-400;
+    @apply focus:text-interaction-300;
+  }
+
+  .btn.btn-tertiary {
+    @apply bg-neutrals-0 border border-solid border-neutrals-200;
+    @apply text-neutrals-300;
+    @apply hover:border-neutrals-250 hover:text-neutrals-350;
+  }
+
+  .btn.btn-danger {
+    @apply bg-neutrals-0 border border-solid border-danger-300;
+    @apply text-danger-300;
+    @apply hover:text-danger-400;
+    @apply focus:ring-danger-100;
+  }
+}
+
+/* Error message component with warning icon */
+p.mt-1\.5.flex.gap-2.items-center.text-sm.text-error {
+  @apply text-neutrals-300;
+}
+
+p.mt-1\.5.flex.gap-2.items-center.text-sm.text-error .hero-exclamation-circle {
+  -webkit-mask: none !important;
+  mask: none !important;
+  background-color: transparent !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%23f9aa00'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+header h1.text-lg.font-semibold.leading-8 {
+  @apply text-neutrals-350;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
+}
+
+/* Force table-zebra to use simple-table styling */
+table.table.table-zebra {
+  @apply w-full border-collapse;
+}
+
+table.table.table-zebra th {
+  @apply text-neutrals-300 font-semibold p-3 bg-neutrals-50 border-b border-neutrals-300;
+}
+
+table.table.table-zebra td {
+  @apply p-3 border-b border-gray-200 bg-neutrals-0;
+}
+
+@layer utilities {
+  /* tables */
+  .simple-table {
+    @apply w-full border-collapse;
+  }
+
+  .simple-table th {
+    @apply text-neutrals-300 font-semibold p-3 bg-neutrals-50 border-b border-neutrals-300;
+  }
+
+  .simple-table td {
+    @apply p-3 border-b border-gray-200 bg-neutrals-0;
+  }
+
+  /* Checkbox fieldset styling - only for labels containing checkboxes */
+  .fieldset label:has(input[type='checkbox']) {
+    @apply inline-flex items-center w-fit text-neutrals-300 hover:text-neutrals-400 focus:text-neutrals-400;
+  }
+
+  .fieldset label:has(input[type='checkbox']) input[type='checkbox'] {
+    @apply flex-shrink-0;
+  }
+
+  .fieldset label:has(input[type='checkbox']) span.label {
+    @apply text-base;
+    position: relative;
+    padding-left: 2rem; /* Space for checkbox */
+  }
+
+  .fieldset
+    label:has(input[type='checkbox'])
+    span.label
+    input[type='checkbox'] {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .fieldset label:has(input[type='checkbox']) span.label::before {
+    content: '';
+    @apply w-1 h-5 bg-interesting-pink rounded-full;
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
