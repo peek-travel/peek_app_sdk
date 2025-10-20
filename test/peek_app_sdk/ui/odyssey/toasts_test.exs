@@ -22,8 +22,8 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
 
       assert html =~ "Success"
       assert html =~ "Done"
-      assert html =~ "border-success"
-      assert html =~ "toast-peek"
+      assert html =~ "border-l-success-300"
+      assert html =~ "fixed"
       assert html =~ "id=\"success-toast\""
       assert html =~ "phx-hook=\"ToastHook\""
     end
@@ -44,7 +44,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
 
       assert html =~ "Error"
       assert html =~ "Failed"
-      assert html =~ "border-danger"
+      assert html =~ "border-l-danger-300"
     end
 
     test "renders toast with warning type" do
@@ -63,7 +63,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
 
       assert html =~ "Warning"
       assert html =~ "Careful"
-      assert html =~ "border-warning"
+      assert html =~ "border-l-warning-300"
     end
 
     test "renders toast with info type" do
@@ -82,7 +82,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
 
       assert html =~ "Info"
       assert html =~ "Note"
-      assert html =~ "border-info"
+      assert html =~ "border-l-interaction-300"
     end
 
     test "renders toast with default info type" do
@@ -100,7 +100,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
         )
 
       assert html =~ "Default"
-      assert html =~ "border-info"
+      assert html =~ "border-l-interaction-300"
     end
 
     test "renders toast with positioning classes" do
@@ -117,11 +117,11 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
           %{}
         )
 
-      assert html =~ "toast-peek"
-      assert html =~ "border-success"
-      assert html =~ "toast-peek-content"
-      assert html =~ "toast-peek-body"
-      assert html =~ "toast-peek-header"
+      assert html =~ "fixed"
+      assert html =~ "top-4"
+      assert html =~ "right-4"
+      assert html =~ "z-50"
+      assert html =~ "w-96"
     end
 
     test "renders toast with styling classes" do
@@ -138,11 +138,11 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
           %{}
         )
 
-      assert html =~ "toast-peek"
-      assert html =~ "toast-peek-icon"
-      assert html =~ "toast-peek-title"
-      assert html =~ "toast-peek-text"
-      assert html =~ "toast-peek-close"
+      assert html =~ "bg-white"
+      assert html =~ "rounded-lg"
+      assert html =~ "shadow-lg"
+      assert html =~ "border-l-4"
+      assert html =~ "p-4"
     end
 
     test "renders close button with data-close-toast" do
@@ -177,7 +177,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToastsTest do
           %{}
         )
 
-      assert html =~ "border-info"
+      assert html =~ "border-l-interaction-300"
     end
   end
 end

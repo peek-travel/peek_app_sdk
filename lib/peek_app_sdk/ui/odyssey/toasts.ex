@@ -39,11 +39,11 @@ defmodule PeekAppSDK.UI.Odyssey.Toasts do
   def toast(assigns) do
     border_class =
       case assigns.type do
-        "success" -> "border-success"
-        "error" -> "border-danger"
-        "warning" -> "border-warning"
-        "info" -> "border-info"
-        _ -> "border-info"
+        "success" -> "border-l-success-300"
+        "error" -> "border-l-danger-300"
+        "warning" -> "border-l-warning-300"
+        "info" -> "border-l-interaction-300"
+        _ -> "border-l-interaction-300"
       end
 
     assigns = assign(assigns, :border_class, border_class)
@@ -52,28 +52,28 @@ defmodule PeekAppSDK.UI.Odyssey.Toasts do
     <div
       id={@id}
       phx-hook="ToastHook"
-      class={["toast-peek", @border_class]}
+      class={["fixed top-4 right-4 z-50 w-96 bg-white rounded-lg shadow-lg border-l-4 p-4", @border_class]}
     >
-      <div class="toast-peek-content">
-        <div class="toast-peek-body">
-          <div :if={@title != []} class="toast-peek-header">
-            <div class="toast-peek-icon">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div :if={@title != []} class="flex items-start space-x-3 mb-1">
+            <div class="flex-shrink-0 mt-0.5">
               <.toast_icon type={@type} />
             </div>
-            <div class="toast-peek-title">
+            <div class="font-bold text-neutrals-350">
               {render_slot(@title)}
             </div>
           </div>
 
-          <div :if={@text != []} class="toast-peek-text">
+          <div :if={@text != []} class="text-sm text-neutrals-300 ml-1">
             {render_slot(@text)}
           </div>
         </div>
-        <div class="toast-peek-close">
+        <div class="ml-4 flex-shrink-0">
           <button
             type="button"
             data-close-toast
-            class="toast-peek-close-button"
+            class="text-neutrals-300 hover:text-gray-600 transition-colors duration-200"
           >
             <.cancel_icon class="w-4 h-4" />
           </button>

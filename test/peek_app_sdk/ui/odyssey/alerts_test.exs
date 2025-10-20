@@ -138,10 +138,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
       assert html =~ "rounded-lg"
       assert html =~ "shadow-sm"
       assert html =~ "border-l-4"
+      assert html =~ "text-sm leading-relaxed text-neutrals-300"
       assert html =~ "flex items-start"
+      assert html =~ "flex-shrink-0 mt-0.5 mr-3"
       assert html =~ "flex-1"
-      assert html =~ "font-medium"
-      assert html =~ "text-base"
     end
 
     test "renders with unknown type defaults to info" do

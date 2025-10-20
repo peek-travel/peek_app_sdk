@@ -65,29 +65,29 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   def alert(assigns) do
     border_class =
       case assigns.type do
-        "success" -> "border-success"
-        "error" -> "border-danger"
-        "warning" -> "border-warning"
-        "info" -> "border-info"
-        _ -> "border-info"
+        "success" -> "border-success-300"
+        "error" -> "border-danger-300"
+        "warning" -> "border-warning-300"
+        "info" -> "border-info-300"
+        _ -> "border-info-300"
       end
 
     assigns = assign(assigns, :border_class, border_class)
 
     ~H"""
-    <div class={["alert-peek", @border_class]}>
-      <div class="alert-peek-content">
-        <div class="alert-peek-icon">
+    <div class={["max-w-4xl mx-auto px-6 mt-8 bg-white rounded-lg px-4 py-3 shadow-sm border-l-4 border", @border_class]}>
+      <div class="flex items-start">
+        <div class="flex-shrink-0 mt-0.5 mr-3">
           <.alert_type_icon type={@type} />
         </div>
-        <div class="alert-peek-body">
-          <div :if={@title != []} class="alert-peek-title">
+        <div class="flex-1">
+          <div :if={@title != []} class="font-medium text-base mb-1 text-neutrals-350">
             {render_slot(@title)}
           </div>
-          <div class="alert-peek-message">
+          <div class="text-sm leading-relaxed text-neutrals-300">
             {render_slot(@message)}
           </div>
-          <div :if={@action_text && @action_url} class="alert-peek-action">
+          <div :if={@action_text && @action_url} class="mt-2 flex justify-end">
             <a
               href={@action_url}
               target="_blank"
