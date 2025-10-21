@@ -1,5 +1,6 @@
 defmodule PeekAppSDK.ClientTest do
   use ExUnit.Case, async: false
+  import ExUnit.CaptureLog
 
   alias PeekAppSDK.Client
 
@@ -55,7 +56,7 @@ defmodule PeekAppSDK.ClientTest do
                end)
 
         assert Enum.any?(env.headers, fn {k, v} ->
-                 k == "pk-api-key" && v == "project_name_app_key"
+                 k == "pk-api-key" && v == "project_name_api_key"
                end)
 
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
@@ -107,7 +108,7 @@ defmodule PeekAppSDK.ClientTest do
                Client.query_peek_pro(install_id, query, variables, :project_name)
     end
 
-    test "pk-api-key only sent if peek_app_key is set" do
+    test "pk-api-key only sent if peek_api_key is set" do
       install_id = "test_install_id"
       query = "query Test { test }"
       variables = %{"foo" => "bar"}
@@ -178,6 +179,48 @@ defmodule PeekAppSDK.ClientTest do
       end)
 
       assert {:error, ^errors} = Client.query_peek_pro(install_id, query)
+    end
+
+    test "uses legacy peek_api_url when configured and logs warning" do
+      install_id = "test_install_id"
+      query = "query TestOperationName { test }"
+      response_data = %{test: "success"}
+
+      # Temporarily set the legacy config
+      original_value = Application.get_env(:peek_app_sdk, :peek_api_url)
+
+      Application.put_env(
+        :peek_app_sdk,
+        :peek_api_url,
+        "https://legacy.peekapis.com/backoffice-gql"
+      )
+
+      try do
+        # Capture log output
+        log_output =
+          capture_log(fn ->
+            Tesla.Adapter.Finch
+            |> Mimic.stub(:call, fn env, _opts ->
+              assert env.method == :post
+              # Should use legacy URL directly without appending /backoffice-gql
+              assert env.url ==
+                       "https://legacy.peekapis.com/backoffice-gql/test_app_id/test_operation_name"
+
+              {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+            end)
+
+            assert {:ok, ^response_data} = Client.query_peek_pro(install_id, query)
+          end)
+
+        assert log_output =~ "DEPRECATION WARNING: peek_api_url configuration is deprecated"
+      after
+        # Restore original value
+        if original_value do
+          Application.put_env(:peek_app_sdk, :peek_api_url, original_value)
+        else
+          Application.delete_env(:peek_app_sdk, :peek_api_url)
+        end
+      end
     end
   end
 

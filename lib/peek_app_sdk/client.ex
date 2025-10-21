@@ -39,16 +39,17 @@ defmodule PeekAppSDK.Client do
 
     config = Config.get_config(config_id)
     peek_app_id = config.peek_app_id
-    peek_app_key = config.peek_app_key
+    peek_api_key = config.peek_api_key
 
     operation_name = operation_name(gql_query)
-    url = "#{config.peek_api_url |> String.trim()}/#{peek_app_id}/#{operation_name}"
+
+    url = build_backoffice_url(config, peek_app_id, operation_name)
 
     case Tesla.request(client(),
            method: :post,
            url: url,
            body: body_params,
-           headers: headers(install_id, config_id, peek_app_key)
+           headers: headers(install_id, config_id, peek_api_key)
          ) do
       # If we get back an error, fail the whole thing and return the error for now.
       {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
@@ -97,10 +98,10 @@ defmodule PeekAppSDK.Client do
     [x_peek_auth_header(install_id, config_id)]
   end
 
-  defp headers(install_id, config_id, peek_app_key) do
+  defp headers(install_id, config_id, peek_api_key) do
     [
       x_peek_auth_header(install_id, config_id),
-      {"pk-api-key", peek_app_key}
+      {"pk-api-key", peek_api_key}
     ]
   end
 
@@ -108,4 +109,28 @@ defmodule PeekAppSDK.Client do
     do:
       {"X-Peek-Auth",
        "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id, nil, config_id)}"}
+
+  # Migration helper for building backoffice URLs
+  defp build_backoffice_url(config, peek_app_id, operation_name) do
+    # Check if legacy peek_api_url is configured
+    legacy_url = Application.get_env(:peek_app_sdk, :peek_api_url)
+
+    if legacy_url do
+      Logger.warning("""
+      DEPRECATION WARNING: peek_api_url configuration is deprecated.
+      Please update your configuration to use peek_api_base_url instead.
+
+      Current (deprecated): peek_api_url: "#{legacy_url}"
+      Recommended: peek_api_base_url: "https://apps.peekapis.com"
+
+      Using legacy URL for backoffice calls: #{legacy_url}
+      """)
+
+      # Use the legacy URL directly without appending /backoffice-gql
+      "#{String.trim(legacy_url)}/#{peek_app_id}/#{operation_name}"
+    else
+      # Use the new base URL and append /backoffice-gql
+      "#{String.trim(config.peek_api_base_url)}/backoffice-gql/#{peek_app_id}/#{operation_name}"
+    end
+  end
 end

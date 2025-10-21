@@ -12,6 +12,22 @@ defmodule PeekAppSDK.Plugs.ClientAuthTest do
     do: PeekAppSDK.Token.new_for_app_installation_client(install_id, config_id)
 
   describe "set_peek_install_id_from_client/2" do
+    test "if  peek-auth is in body params, it takes precedence over header" do
+      install_id = "test_install_id"
+      token = new_client_token(install_id)
+      other_install_id = "other_install_id"
+      other_token = new_client_token(other_install_id)
+
+      conn =
+        :post
+        |> conn("/", %{"x-peek-auth" => token})
+        |> put_req_header("x-peek-auth", "Bearer #{other_token}")
+
+      conn = ClientAuth.set_peek_install_id_from_client(conn, %{})
+
+      assert conn.assigns.peek_install_id == install_id
+    end
+
     test "sets install ID from header with default config" do
       install_id = "test_install_id"
       token = new_client_token(install_id)

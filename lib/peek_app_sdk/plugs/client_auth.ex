@@ -20,9 +20,15 @@ defmodule PeekAppSDK.Plugs.ClientAuth do
       plug :set_peek_install_id_from_client, config_id: {:project, :project_name}
   """
   def set_peek_install_id_from_client(conn, opts) do
-    case Plug.Conn.get_req_header(conn, "x-peek-auth") do
-      ["Bearer " <> token] -> do_set(conn, token, opts)
-      _ -> conn
+    case conn.body_params do
+      %{"x-peek-auth" => token} ->
+        do_set(conn, token, opts)
+
+      _ ->
+        case Plug.Conn.get_req_header(conn, "x-peek-auth") do
+          ["Bearer " <> token] -> do_set(conn, token, opts)
+          _ -> conn
+        end
     end
   end
 
