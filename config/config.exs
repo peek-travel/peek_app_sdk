@@ -11,14 +11,12 @@ import Config
 config :esbuild,
   version: "0.17.11",
   odyssey_hooks: [
-    args:
-      ~w(js/odyssey.js --bundle --target=es2022 --format=cjs --minify --outfile=../priv/static/odyssey_hooks.min.js),
+    args: ~w(js/odyssey.js --bundle --target=es2022 --format=cjs --minify --outfile=../priv/static/odyssey_hooks.min.js),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ],
   odyssey_web_components: [
-    args:
-      ~w(odyssey/odyssey_web_components.js --bundle --target=es2022 --minify --outfile=../priv/static/odyssey_web_components.min.js),
+    args: ~w(odyssey/odyssey_web_components.js --bundle --target=es2022 --minify --outfile=../priv/static/odyssey_web_components.min.js),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]

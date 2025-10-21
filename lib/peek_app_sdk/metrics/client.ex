@@ -177,7 +177,5 @@ defmodule PeekAppSDK.Metrics.Client do
   end
 
   defp x_peek_auth_header(install_id, config_id),
-    do:
-      {"X-Peek-Auth",
-       "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id, nil, config_id)}"}
+    do: {"X-Peek-Auth", "Bearer #{PeekAppSDK.Token.new_for_app_installation!(install_id, nil, config_id)}"}
 end

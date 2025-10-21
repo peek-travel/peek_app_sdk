@@ -54,8 +54,8 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
     <div phx-hook="OdysseyActivityPicker" id={"#{@id}_hook"}>
       <!-- Hidden input for form value -->
       <input type="hidden" name={@field.name} value={process_ids_for_multi_select(@field.value)} />
-
-      <!-- Odyssey product picker will be rendered here -->
+      
+    <!-- Odyssey product picker will be rendered here -->
       <div>
         <odyssey-product-picker
           id={"#{@id}_picker"}

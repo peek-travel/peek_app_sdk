@@ -93,8 +93,7 @@ defmodule PeekAppSDK.MixProject do
       links: %{
         "GitHub" => "https://github.com/peek-travel/peek_app_sdk"
       },
-      files:
-        ~w(mix.exs lib/** assets/** package.json priv/static/odyssey_hooks.min.js priv/static/odyssey_web_components.min.js)
+      files: ~w(mix.exs lib/** assets/** package.json priv/static/odyssey_hooks.min.js priv/static/odyssey_web_components.min.js)
     ]
   end
 end
