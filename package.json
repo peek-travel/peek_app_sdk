@@ -1,0 +1,9 @@
+{
+  "name": "peek_app_sdk",
+  "version": "0.0.1",
+  "description": "JS hooks for PeekAppSDK",
+  "main": "./priv/static/odyssey_hooks.min.js",
+  "repository": "git@github.com:peek-travel/peek_app_sdk.git",
+  "author": "Peek Travel",
+  "license": "MIT"
+}

@@ -19,6 +19,7 @@ defmodule PeekAppSDK.MixProject do
         test_task: "test",
         summary: [threshold: 90]
       ],
+      package: package(),
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -55,6 +56,7 @@ defmodule PeekAppSDK.MixProject do
       {:phoenix, "~> 1.7"},
       {:phoenix_live_view, "~> 1.0"},
       {:finch, "~> 0.13"},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
 
       # Test dependencies
       {:mimic, "~> 1.7", only: :test},
@@ -74,7 +76,25 @@ defmodule PeekAppSDK.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get"]
+      setup: ["deps.get"],
+      "assets.setup": ["esbuild.install --if-missing"],
+      "assets.build": ["esbuild odyssey_hooks", "esbuild odyssey_web_components"],
+      "assets.deploy": [
+        "esbuild odyssey_hooks --minify",
+        "esbuild odyssey_web_components --minify",
+        "phx.digest"
+      ]
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/peek-travel/peek_app_sdk"
+      },
+      files:
+        ~w(mix.exs lib/** package.json priv/static/odyssey_hooks.min.js priv/static/odyssey_web_components.min.js)
     ]
   end
 end
