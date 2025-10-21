@@ -32,6 +32,7 @@ defmodule PeekAppSDK.UI.Odyssey.Toasts do
   """
   attr :type, :string, default: "info", values: ["success", "error", "info", "warning"]
   attr :id, :string, required: true
+  attr :auto_clear, :boolean, default: true
 
   slot :title
   slot :text
@@ -51,7 +52,7 @@ defmodule PeekAppSDK.UI.Odyssey.Toasts do
     ~H"""
     <div
       id={@id}
-      phx-hook="ToastHook"
+      phx-hook={if @auto_clear, do: "ToastHook", else: nil}
       class={["fixed top-4 right-4 z-50 w-96 bg-white rounded-lg shadow-lg border-l-4 p-4", @border_class]}
     >
       <div class="flex items-start justify-between">
