@@ -203,7 +203,6 @@ table.table.table-zebra td {
 #flash-info .alert p:last-of-type,
 #flash-error .alert p:last-of-type {
   @apply text-sm text-neutrals-300;
-  margin-left: -1.75rem; /* Negative margin to pull message left - message is nested in wrapper with icon, can't modify HTML */
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -222,4 +221,14 @@ table.table.table-zebra td {
 #flash-info .alert button svg,
 #flash-error .alert button svg {
   @apply w-5 h-5;
+}
+
+#flash-info .alert span.hero-information-circle,
+#flash-error .alert span.hero-exclamation-circle {
+  display: none !important;
+}
+
+#flash-info .alert button span,
+#flash-error .alert button span {
+  display: inline !important;
 }
