@@ -246,10 +246,3 @@ table.table.table-zebra td {
 #flash-server-error .alert span.hero-exclamation-circle {
   display: none !important;
 }
-
-#flash-info .alert button span,
-#flash-error .alert button span,
-#flash-client-error .alert button span,
-#flash-server-error .alert button span {
-  display: inline !important;
-}
