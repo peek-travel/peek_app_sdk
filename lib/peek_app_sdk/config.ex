@@ -72,8 +72,7 @@ defmodule PeekAppSDK.Config do
     %{
       peek_app_secret: Application.get_env(:peek_app_sdk, :peek_app_secret),
       peek_app_id: Application.get_env(:peek_app_sdk, :peek_app_id),
-      peek_api_base_url:
-        Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
+      peek_api_base_url: Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
       peek_api_key: Application.get_env(:peek_app_sdk, :peek_api_key),
       client_secret_token: Application.get_env(:peek_app_sdk, :client_secret_token)
     }
@@ -89,8 +88,7 @@ defmodule PeekAppSDK.Config do
       %{
         peek_app_secret: Keyword.get(app_config, :peek_app_secret),
         peek_app_id: Keyword.get(app_config, :peek_app_id),
-        peek_api_base_url:
-          Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
+        peek_api_base_url: Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
         peek_api_key: Keyword.get(app_config, :peek_api_key),
         client_secret_token: Keyword.get(app_config, :client_secret_token)
       }
