@@ -1,4 +1,23 @@
 :root {
+  color-scheme: light;
+  /* Custom brand colors from old config */
+  --color-primary: #3957ea;
+  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-secondary: #1f37ad;
+  --color-secondary-content: oklch(98% 0.002 247.839);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(44% 0.017 285.786);
+  --color-neutral-content: oklch(98% 0 0);
+  /* Custom semantic colors from old config */
+  --color-info: #048af7;
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: #41b658;
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: #f9aa00;
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: #e5243c;
+  --color-error-content: oklch(96% 0.015 12.422);
   /* Custom background colors from old config */
   --color-base-100: #fafaff; /* background-secondary */
   --color-base-200: #f2f3fa; /* background-primary */
@@ -12,7 +31,234 @@
   --border: 1.5px;
   --depth: 1;
   --noise: 0;
-  color-scheme: light;
+  /* Custom brand colors from old config */
+  --color-primary: #3957ea;
+  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-secondary: #1f37ad;
+  --color-secondary-content: oklch(98% 0.002 247.839);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(44% 0.017 285.786);
+  --color-neutral-content: oklch(98% 0 0);
+  /* Custom semantic colors from old config */
+  --color-info: #048af7;
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: #41b658;
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: #f9aa00;
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: #e5243c;
+  --color-error-content: oklch(96% 0.015 12.422);
+  /* Custom background colors from old config */
+  --color-base-100: #fafaff; /* background-secondary */
+  --color-base-200: #f2f3fa; /* background-primary */
+  --color-base-300: oklch(92% 0.004 286.32);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+  /* Custom brand colors from old config */
+  --color-primary: #3957ea;
+  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-secondary: #1f37ad;
+  --color-secondary-content: oklch(98% 0.002 247.839);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(44% 0.017 285.786);
+  --color-neutral-content: oklch(98% 0 0);
+  /* Custom semantic colors from old config */
+  --color-info: #048af7;
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: #41b658;
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: #f9aa00;
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: #e5243c;
+  --color-error-content: oklch(96% 0.015 12.422);
+  /* Custom background colors from old config */
+  --color-base-100: #fafaff; /* background-secondary */
+  --color-base-200: #f2f3fa; /* background-primary */
+  --color-base-300: oklch(92% 0.004 286.32);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+  /* Brand colors */
+  --brand: #3957ea;
+  --brand-secondary: #1f37ad;
+  --brand-teal: #007494;
+  --brand-green: #8fe98f;
+  --background-primary: #f2f3fa;
+  --background-secondary: #fafaff;
+  --focus-shadow: #e9edfd;
+  --gray-primary: #656a81;
+  --pale-green: #effff5;
+  --pale-blue: #e7fffe;
+  --danger: #e5243c;
+  /* Custom gray scale from old config */
+  --gray-100: #fafaff;
+  --gray-200: #dadce7;
+  --gray-300: #dee2e6;
+  --gray-400: #ced4da;
+  --gray-500: #adb5bd;
+  --gray-600: #868e96;
+  --gray-700: #455460;
+  --gray-800: #414159;
+  --gray-900: #212529;
+}
+
+/* Utility classes for custom colors */
+.bg-brand {
+  background-color: var(--brand);
+}
+.bg-brand-secondary {
+  background-color: var(--brand-secondary);
+}
+.bg-brand-teal {
+  background-color: var(--brand-teal);
+}
+.bg-brand-green {
+  background-color: var(--brand-green);
+}
+.bg-background-primary {
+  background-color: var(--background-primary);
+}
+.bg-background-secondary {
+  background-color: var(--background-secondary);
+}
+.bg-pale-green {
+  background-color: var(--pale-green);
+}
+.bg-pale-blue {
+  background-color: var(--pale-blue);
+}
+.bg-danger {
+  background-color: var(--danger);
+}
+
+.text-brand {
+  color: var(--brand);
+}
+.text-brand-secondary {
+  color: var(--brand-secondary);
+}
+.text-brand-teal {
+  color: var(--brand-teal);
+}
+.text-brand-green {
+  color: var(--brand-green);
+}
+.text-gray-primary {
+  color: var(--gray-primary);
+}
+.text-danger {
+  color: var(--danger);
+}
+
+.border-brand {
+  border-color: var(--brand);
+}
+.border-brand-secondary {
+  border-color: var(--brand-secondary);
+}
+.border-focus-shadow {
+  border-color: var(--focus-shadow);
+}
+.border-danger {
+  border-color: var(--danger);
+}
+
+.shadow-focus {
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+/* Hover states for custom colors */
+.hover\:bg-brand:hover {
+  background-color: var(--brand);
+}
+.hover\:bg-brand-secondary:hover {
+  background-color: var(--brand-secondary);
+}
+.hover\:text-brand:hover {
+  color: var(--brand);
+}
+.hover\:text-brand-secondary:hover {
+  color: var(--brand-secondary);
+}
+
+/* Focus states for custom colors */
+.focus\:border-brand:focus {
+  border-color: var(--brand);
+}
+.focus\:shadow-focus:focus {
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+/* Custom gray utilities to match old config */
+.bg-gray-100 {
+  background-color: var(--gray-100);
+}
+.bg-gray-200 {
+  background-color: var(--gray-200);
+}
+.bg-gray-300 {
+  background-color: var(--gray-300);
+}
+.bg-gray-400 {
+  background-color: var(--gray-400);
+}
+.bg-gray-500 {
+  background-color: var(--gray-500);
+}
+.bg-gray-600 {
+  background-color: var(--gray-600);
+}
+.bg-gray-700 {
+  background-color: var(--gray-700);
+}
+.bg-gray-800 {
+  background-color: var(--gray-800);
+}
+.bg-gray-900 {
+  background-color: var(--gray-900);
+}
+
+.text-gray-100 {
+  color: var(--gray-100);
+}
+.text-gray-200 {
+  color: var(--gray-200);
+}
+.text-gray-300 {
+  color: var(--gray-300);
+}
+.text-gray-400 {
+  color: var(--gray-400);
+}
+.text-gray-500 {
+  color: var(--gray-500);
+}
+.text-gray-600 {
+  color: var(--gray-600);
+}
+.text-gray-700 {
+  color: var(--gray-700);
+}
+.text-gray-800 {
+  color: var(--gray-800);
+}
+.text-gray-900 {
+  color: var(--gray-900);
 }
 
 :root,
