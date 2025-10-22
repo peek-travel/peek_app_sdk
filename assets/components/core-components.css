@@ -167,82 +167,56 @@ table.table.table-zebra td {
   }
 }
 
-#flash-info,
-#flash-error,
-#client-error,
-#server-error {
+.toast.toast-top.toast-end {
   @apply fixed top-4 right-4 z-50 w-96;
 }
 
-#flash-info .alert,
-#flash-error .alert,
-#client-error .alert,
-#server-error .alert {
+.toast .alert {
   @apply bg-white rounded-lg shadow-lg border-l-4 p-4 w-full;
   @apply flex items-start justify-between gap-4;
   border: none;
   border-left: 4px solid;
 }
 
-#flash-info .alert {
+.toast .alert-info {
   @apply border-l-success-300;
 }
 
-#flash-error .alert,
-#client-error .alert,
-#server-error .alert {
+.toast .alert-error {
   @apply border-l-danger-300;
 }
 
-#flash-error .alert svg,
-#client-error .alert svg,
-#server-error .alert svg {
+.toast .alert-error svg {
   @apply text-danger-300;
 }
 
-#flash-info .alert p:first-of-type,
-#flash-error .alert p:first-of-type,
-#client-error .alert p:first-of-type,
-#server-error .alert p:first-of-type {
+.toast .alert p:first-of-type {
   @apply font-bold text-neutrals-350 mb-1;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
 }
-#flash-info .alert p:last-of-type,
-#flash-error .alert p:last-of-type,
-#client-error .alert p:last-of-type,
-#server-error .alert p:last-of-type {
+
+.toast .alert p:last-of-type {
   @apply text-sm text-neutrals-300;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
-#flash-info .alert svg,
-#flash-error .alert svg,
-#client-error .alert svg,
-#server-error .alert svg {
+.toast .alert svg {
   @apply w-5 h-5 flex-shrink-0 mt-0.5;
 }
 
-#flash-info .alert button,
-#flash-error .alert button,
-#client-error .alert button,
-#server-error .alert button {
+.toast .alert button {
   @apply text-gray-400 hover:text-gray-600 transition-colors duration-200 flex-shrink-0;
 }
 
-#flash-info .alert button svg,
-#flash-error .alert button svg,
-#client-error .alert button svg,
-#server-error .alert button svg {
+.toast .alert button svg {
   @apply w-5 h-5;
 }
 
-#flash-info .alert span.hero-information-circle,
-#flash-error .alert span.hero-exclamation-circle,
-#client-error .alert span.hero-exclamation-circle,
-#server-error .alert span.hero-exclamation-circle {
+.toast .alert span.hero-information-circle,
+.toast .alert span.hero-exclamation-circle {
   display: none !important;
 }
