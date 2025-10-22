@@ -20,6 +20,43 @@
   background-color: var(--color-neutrals-0, white) !important;
 }
 
+/* Standalone app margins - only apply when not in iframe */
+body.standalone {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Ensure iframe content has no extra padding */
+body.in-iframe {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+
+/* Additional responsive margins for standalone mode */
+@media (min-width: 768px) {
+  body.standalone {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  body.standalone {
+    padding: 3rem;
+  }
+}
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session] {
+  display: contents;
+}
+
 @theme interactions {
   --color-interaction-100: #e9edfd;
   --color-interaction-200: #90a1ee;
