@@ -214,6 +214,6 @@ table.table.table-zebra td {
 }
 
 #flash-info .alert button svg,
-N #flash-error .alert button svg {
+#flash-error .alert button svg {
   @apply w-5 h-5;
 }
