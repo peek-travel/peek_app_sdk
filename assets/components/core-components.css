@@ -195,12 +195,18 @@ table.table.table-zebra td {
 #flash-info .alert p:first-of-type,
 #flash-error .alert p:first-of-type {
   @apply font-bold text-neutrals-350 mb-1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 #flash-info .alert p:last-of-type,
 #flash-error .alert p:last-of-type {
   @apply text-sm text-neutrals-300;
   margin-left: -1.75rem; /* Negative margin to pull message left - message is nested in wrapper with icon, can't modify HTML */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 #flash-info .alert svg,
