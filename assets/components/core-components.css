@@ -166,3 +166,54 @@ table.table.table-zebra td {
     transform: translateY(-50%);
   }
 }
+
+#flash-info,
+#flash-error {
+  @apply fixed top-4 right-4 z-50 w-96;
+}
+
+#flash-info .alert,
+#flash-error .alert {
+  @apply bg-white rounded-lg shadow-lg border-l-4 p-4 w-full;
+  @apply flex items-start justify-between gap-4;
+  border: none;
+  border-left: 4px solid;
+}
+
+#flash-info .alert {
+  @apply border-l-success-300;
+}
+
+#flash-error .alert {
+  @apply border-l-danger-300;
+}
+
+#flash-error .alert svg {
+  @apply text-danger-300;
+}
+
+#flash-info .alert p:first-of-type,
+#flash-error .alert p:first-of-type {
+  @apply font-bold text-neutrals-350 mb-1;
+}
+
+#flash-info .alert p:last-of-type,
+#flash-error .alert p:last-of-type {
+  @apply text-sm text-neutrals-300;
+  margin-left: -1.75rem; /* Negative margin to pull message left - message is nested in wrapper with icon, can't modify HTML */
+}
+
+#flash-info .alert svg,
+#flash-error .alert svg {
+  @apply w-5 h-5 flex-shrink-0 mt-0.5;
+}
+
+#flash-info .alert button,
+#flash-error .alert button {
+  @apply text-gray-400 hover:text-gray-600 transition-colors duration-200 flex-shrink-0;
+}
+
+#flash-info .alert button svg,
+N #flash-error .alert button svg {
+  @apply w-5 h-5;
+}
