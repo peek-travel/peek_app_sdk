@@ -1,3 +1,25 @@
+:root {
+  /* Custom background colors from old config */
+  --color-base-100: #fafaff; /* background-secondary */
+  --color-base-200: #f2f3fa; /* background-primary */
+  --color-base-300: oklch(92% 0.004 286.32);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+  color-scheme: light;
+}
+
+:root,
+[data-theme] {
+  background-color: var(--color-neutrals-0, white) !important;
+}
+
 @theme interactions {
   --color-interaction-100: #e9edfd;
   --color-interaction-200: #90a1ee;
