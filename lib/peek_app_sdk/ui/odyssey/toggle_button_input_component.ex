@@ -23,8 +23,8 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButtonInputComponent do
   end
 
   @impl true
-  def handle_event("odyssey_toggle_button_change", %{"unit" => unit}, socket) do
-    selected_value = find_option_value(socket.assigns.options, unit)
+  def handle_event("odyssey_toggle_button_change", %{"value" => value}, socket) do
+    selected_value = find_option_value(socket.assigns.options, value)
 
     socket =
       socket

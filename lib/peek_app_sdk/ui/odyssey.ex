@@ -5,6 +5,7 @@ defmodule PeekAppSDK.UI.Odyssey do
   use Phoenix.Component
 
   defdelegate odyssey_activity_picker(assigns), to: PeekAppSDK.UI.Odyssey.OdysseyActivityPicker
+  defdelegate odyssey_toggle_button(assigns), to: PeekAppSDK.UI.Odyssey.ToggleButton
 
   attr(:current_path, :string, required: true)
   attr(:tabs, :list, required: true)
@@ -34,8 +35,6 @@ defmodule PeekAppSDK.UI.Odyssey do
     </div>
     """
   end
-
-  defdelegate odyssey_toggle_button(assigns), to: PeekAppSDK.UI.Odyssey.ToggleButton
 
   @doc """
   Renders a back navigation link.

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2025-11-04]
 
 ### Added
-- Added `toggle_button` and `toggle_button_input` components from Odyssey
+- Added `odyssey_toggle_button` component from Odyssey
 - Created the beginning of a demo project
 
 ### Removed

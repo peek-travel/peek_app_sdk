@@ -70,7 +70,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
       assert html =~ "Phone Call"
       assert html =~ "hero-phone"
       # Should have the selected button highlighted (email)
-      assert html =~ ~r/phx-click="change_channel"[^>]*phx-value-unit="email"/
+      assert html =~ ~r/value="email"[^>]*phx-click="change_channel"/
     end
 
     test "automatically integrates with form fields when field is provided" do
