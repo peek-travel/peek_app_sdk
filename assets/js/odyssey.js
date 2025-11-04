@@ -1,5 +1,19 @@
-const Hooks = {
-  OdysseyActivityPicker: {
+// Function to add global event listeners
+function addOdysseyGlobalEvents(windowObj) {
+  // Global event listener for triggering input events on form fields, this is
+  // needed for input fields that maintain a hidden input field behind the scenes
+  // and need to tell the parent form when a change has been made.
+  windowObj.addEventListener("phx:trigger-input", (event) => {
+    const { field_id } = event.detail
+    const input = windowObj.document.getElementById(field_id)
+    if (input) {
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+  })
+}
+
+const OdysseyHooks = {
+    OdysseyActivityPicker: {
     mounted () {
       const picker = this.el.querySelector('odyssey-product-picker')
 
@@ -24,4 +38,5 @@ const Hooks = {
   }
 }
 
-export default Hooks
+export { OdysseyHooks, addOdysseyGlobalEvents }
+export default OdysseyHooks
