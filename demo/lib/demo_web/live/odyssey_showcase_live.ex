@@ -9,13 +9,21 @@ defmodule DemoWeb.OdysseyShowcaseLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    form_data = %{"activity_id" => "", "channel" => "email", "time_unit" => "Minutes"}
+    form_data = %{
+      "activity_id" => "",
+      "channel" => :email,
+      "time_unit" => "Minutes",
+      "view_mode" => "List"
+    }
 
     socket =
       socket
       |> assign(:page_title, "Odyssey Components Showcase")
       |> assign(:current_tab, "components")
       |> assign(:toggle_selection, "Minutes")
+      |> assign(:icon_toggle_selection, "Minutes")
+      |> assign(:status_selection, "Active")
+      |> assign(:channel_selection, :email)
       |> assign(:form_data, form_data)
       |> assign(:form, to_form(form_data, as: "form"))
       |> assign(:sample_activities, sample_activities())
@@ -31,6 +39,11 @@ defmodule DemoWeb.OdysseyShowcaseLive do
   @impl true
   def handle_event("change_time_unit", %{"unit" => unit}, socket) do
     {:noreply, assign(socket, :toggle_selection, unit)}
+  end
+
+  @impl true
+  def handle_event("change_icon_time_unit", %{"unit" => unit}, socket) do
+    {:noreply, assign(socket, :icon_toggle_selection, unit)}
   end
 
   @impl true
@@ -54,7 +67,14 @@ defmodule DemoWeb.OdysseyShowcaseLive do
   end
 
   @impl true
-  def handle_event("change_status", %{"value" => _value}, socket) do
+  def handle_event("change_status", %{"unit" => unit}, socket) do
+    socket = assign(socket, :status_selection, unit)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("change_channel", %{"unit" => unit}, socket) do
+    socket = assign(socket, :channel_selection, unit)
     {:noreply, socket}
   end
 
@@ -78,8 +98,8 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           A comprehensive demonstration of all available Odyssey UI components with examples and usage patterns.
         </p>
       </div>
-
-      <!-- Navigation Tabs -->
+      
+    <!-- Navigation Tabs -->
       <div class="my-4 border-b-2 border-gray-300">
         <div class="flex gap-6">
           <button
@@ -120,8 +140,8 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </button>
         </div>
       </div>
-
-      <!-- Components Section -->
+      
+    <!-- Components Section -->
       <div :if={@current_tab == "components"} class="space-y-12">
         <!-- Alerts Section -->
         <section>
@@ -129,7 +149,9 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           <div class="space-y-4">
             <.alert type="success">
               <:title>Success Alert</:title>
-              <:message>This is a success message indicating that an operation completed successfully.</:message>
+              <:message>
+                This is a success message indicating that an operation completed successfully.
+              </:message>
             </.alert>
 
             <.alert type="error">
@@ -139,7 +161,9 @@ defmodule DemoWeb.OdysseyShowcaseLive do
 
             <.alert type="warning">
               <:title>Warning Alert</:title>
-              <:message>This is a warning message to draw attention to important information.</:message>
+              <:message>
+                This is a warning message to draw attention to important information.
+              </:message>
             </.alert>
 
             <.alert type="info" action_text="Learn More" action_url="https://example.com">
@@ -150,8 +174,8 @@ defmodule DemoWeb.OdysseyShowcaseLive do
         </section>
 
         <.odyssey_divider />
-
-        <!-- Toggle Button Section -->
+        
+    <!-- Toggle Button Section -->
         <section>
           <h2 class="text-2xl font-semibold mb-6">Toggle Button</h2>
           <div class="space-y-4">
@@ -169,16 +193,61 @@ defmodule DemoWeb.OdysseyShowcaseLive do
               <h3 class="text-lg font-medium mb-2">Status Options</h3>
               <.odyssey_toggle_button
                 options={["Active", "Inactive", "Pending"]}
-                selected="Active"
+                selected={@status_selection}
                 on_change="change_status"
+              />
+              <p class="text-sm text-gray-600 mt-2">Selected: <strong>{@status_selection}</strong></p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Toggle Buttons with Icons</h3>
+              <.odyssey_toggle_button
+                options={[
+                  %{icon: "hero-clock", label: "Minutes"},
+                  %{icon: "hero-calendar", label: "Hours"},
+                  %{icon: "hero-calendar-days", label: "Days"}
+                ]}
+                selected={@icon_toggle_selection}
+                on_change="change_icon_time_unit"
+              />
+              <p class="text-sm text-gray-600 mt-2">
+                Selected: <strong>{@icon_toggle_selection}</strong>
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Toggle Buttons with Value Keys</h3>
+              <.odyssey_toggle_button
+                options={[
+                  %{label: "Email", value: :email},
+                  %{label: "Text Message", value: :sms},
+                  %{icon: "hero-phone", label: "Phone Call", value: :phone}
+                ]}
+                selected={@channel_selection}
+                on_change="change_channel"
+              />
+              <p class="text-sm text-gray-600 mt-2">
+                Selected value: <strong>{inspect(@channel_selection)}</strong>
+              </p>
+              <p class="text-sm text-gray-500 mt-1">
+                Notice how the value can be different from the display label (atoms vs strings)
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">View Mode Selector (Simple)</h3>
+              <.odyssey_toggle_button
+                options={["List", "Grid", "Chart"]}
+                selected="List"
+                on_change="change_view_mode"
               />
             </div>
           </div>
         </section>
 
         <.odyssey_divider />
-
-        <!-- Navigation Section -->
+        
+    <!-- Navigation Section -->
         <section>
           <h2 class="text-2xl font-semibold mb-6">Navigation Components</h2>
           <div class="space-y-4">
@@ -189,8 +258,8 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-
-      <!-- Icons Section -->
+      
+    <!-- Icons Section -->
       <div :if={@current_tab == "icons"} class="space-y-8">
         <section>
           <h2 class="text-2xl font-semibold mb-6">Heroicons</h2>
@@ -250,8 +319,8 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-
-      <!-- Forms Section -->
+      
+    <!-- Forms Section -->
       <div :if={@current_tab == "forms"} class="space-y-8">
         <section>
           <h2 class="text-2xl font-semibold mb-6">Form Components</h2>
@@ -259,26 +328,56 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           <div class="space-y-8">
             <div>
               <h3 class="text-lg font-medium mb-4">Toggle Button Input Components</h3>
-              <p class="text-gray-600 mb-4">Interactive toggle buttons that can be used in forms for selecting between options.</p>
+              <p class="text-gray-600 mb-4">
+                Interactive toggle buttons that can be used in forms for selecting between options.
+              </p>
 
               <.form for={@form} phx-change="form_change" class="space-y-6">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Communication Channel</label>
-                  <.odyssey_toggle_button_input
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Communication Channel (with values)
+                  </label>
+                  <.odyssey_toggle_button
                     field={@form[:channel]}
-                    options={["Email", "SMS", "Push"]}
-                    value_map={%{"Email" => "email", "SMS" => "sms", "Push" => "push"}}
+                    options={[
+                      %{label: "Email", value: :email},
+                      %{label: "Text Message", value: :sms},
+                      %{icon: "hero-megaphone", label: "Push Notification", value: :push}
+                    ]}
                   />
-                  <p class="text-sm text-gray-500 mt-1">Current value: <strong>{@form_data["channel"] || "email"}</strong></p>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Current value: <strong>{inspect(@form_data["channel"] || :email)}</strong>
+                  </p>
                 </div>
 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Time Unit</label>
-                  <.odyssey_toggle_button_input
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Time Unit (simple strings)
+                  </label>
+                  <.odyssey_toggle_button
                     field={@form[:time_unit]}
                     options={["Minutes", "Hours", "Days", "Weeks"]}
                   />
-                  <p class="text-sm text-gray-500 mt-1">Current value: <strong>{@form_data["time_unit"] || "Minutes"}</strong></p>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Current value: <strong>{@form_data["time_unit"] || "Minutes"}</strong>
+                  </p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    View Mode (with icons)
+                  </label>
+                  <.odyssey_toggle_button
+                    field={@form[:view_mode]}
+                    options={[
+                      %{icon: "hero-list-bullet", label: "List"},
+                      %{icon: "hero-squares-2x2", label: "Grid"},
+                      %{icon: "hero-chart-bar", label: "Chart"}
+                    ]}
+                  />
+                  <p class="text-sm text-gray-500 mt-1">
+                    Current value: <strong>{@form_data["view_mode"] || "List"}</strong>
+                  </p>
                 </div>
               </.form>
             </div>
@@ -287,24 +386,29 @@ defmodule DemoWeb.OdysseyShowcaseLive do
 
             <div>
               <h3 class="text-lg font-medium mb-4">Activity Picker Component</h3>
-              <p class="text-gray-600 mb-4">A sophisticated component for selecting activities with search and filtering capabilities.</p>
+              <p class="text-gray-600 mb-4">
+                A sophisticated component for selecting activities with search and filtering capabilities.
+              </p>
 
               <div class="bg-gray-50 p-4 rounded-lg">
                 <p class="text-sm text-gray-600 mb-2">
-                  <strong>Note:</strong> The Activity Picker component requires a valid install_id and backend integration.
+                  <strong>Note:</strong>
+                  The Activity Picker component requires a valid install_id and backend integration.
                   In a real application, this would connect to your activity data source.
                 </p>
                 <div class="bg-white p-3 border rounded">
                   <div class="text-sm text-gray-500">Activity Picker would appear here</div>
-                  <div class="text-xs text-gray-400 mt-1">Requires: install_id, field binding, and activity data</div>
+                  <div class="text-xs text-gray-400 mt-1">
+                    Requires: install_id, field binding, and activity data
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
       </div>
-
-      <!-- Code Examples Section -->
+      
+    <!-- Code Examples Section -->
       <div class="mt-12 p-6 bg-gray-50 rounded-lg">
         <h2 class="text-xl font-semibold mb-4">Usage Examples</h2>
         <div class="space-y-4 text-sm">
@@ -326,15 +430,16 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
 
           <div>
-            <h3 class="font-medium">Activity Picker in Form:</h3>
-            <pre class="bg-white p-3 rounded border overflow-x-auto"><code>{"<.form for={@form} phx-change=\"form_change\">
-              <.odyssey_activity_picker
-                install_id=\"your-install-id\"
-                field={@form[:activity_id]}
-                title=\"Select Activities\"
-                multiple={true}
-              />
-            </.form>"}</code></pre>
+            <h3 class="font-medium">Toggle Button with Icons:</h3>
+            <pre class="bg-white p-3 rounded border overflow-x-auto"><code>&lt;.odyssey_toggle_button
+              options={["List", "Grid"]}
+              selected="List"
+              on_change="handle_change"
+            /&gt;</code></pre>
+          </div>
+
+          <div>
+            <p>Code examples temporarily disabled for debugging.</p>
           </div>
         </div>
       </div>

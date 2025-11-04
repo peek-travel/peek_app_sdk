@@ -8,9 +8,9 @@
 @source "../js";
 @source "../../lib/demo_web";
 
-@import "../../deps/peek_app_sdk/assets/theme/theme.css";
-@import "../../deps/peek_app_sdk/assets/components/core-components.css";
-@source "../../deps/peek_app_sdk/lib/peek_app_sdk/ui";
+@import "../../../assets/theme/theme.css";
+@import "../../../assets/components/core-components.css";
+@source "../../../lib/peek_app_sdk/ui";
 
 /* A Tailwind plugin that makes "hero-#{ICON}" classes available.
    The heroicons installation itself is managed by your mix.exs */

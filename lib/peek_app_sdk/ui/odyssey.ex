@@ -5,7 +5,6 @@ defmodule PeekAppSDK.UI.Odyssey do
   use Phoenix.Component
 
   defdelegate odyssey_activity_picker(assigns), to: PeekAppSDK.UI.Odyssey.OdysseyActivityPicker
-  defdelegate odyssey_toggle_button_input(assigns), to: PeekAppSDK.UI.Odyssey.ToggleButtonInputComponent
 
   attr(:current_path, :string, required: true)
   attr(:tabs, :list, required: true)
@@ -36,33 +35,7 @@ defmodule PeekAppSDK.UI.Odyssey do
     """
   end
 
-  attr(:options, :list, required: true, doc: "list of button options, e.g., [\"Minutes\", \"Hours\", \"Days\"]")
-  attr(:selected, :string, required: true, doc: "the currently selected option")
-  attr(:on_change, :string, required: true, doc: "event name to fire on change")
-  attr(:rest, :global)
-
-  def odyssey_toggle_button(assigns) do
-    ~H"""
-    <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50" role="group">
-      <button
-        :for={option <- @options}
-        type="button"
-        phx-click={@on_change}
-        phx-value-unit={option}
-        class={[
-          "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors",
-          @selected == option &&
-            "bg-white text-blue-700 shadow-sm",
-          @selected != option &&
-            "bg-transparent text-gray-600 hover:text-gray-900 cursor-pointer"
-        ]}
-        {@rest}
-      >
-        {option}
-      </button>
-    </div>
-    """
-  end
+  defdelegate odyssey_toggle_button(assigns), to: PeekAppSDK.UI.Odyssey.ToggleButton
 
   @doc """
   Renders a back navigation link.

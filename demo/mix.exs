@@ -56,8 +56,7 @@ defmodule Demo.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:peek_app_sdk, git: "https://github.com/peek-travel/peek_app_sdk.git"}
-
+      {:peek_app_sdk, path: ".."}
     ]
   end
 

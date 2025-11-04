@@ -27,10 +27,9 @@ import topbar from "../vendor/topbar"
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 
 // Import Odyssey web components (required for UI components to work)
-require('../../deps/peek_app_sdk/priv/static/odyssey_web_components.min.js');
+require('../../../priv/static/odyssey_web_components.min.js');
 
-import { OdysseyHooks, addOdysseyGlobalEvents } from "peek_app_sdk/assets/js/odyssey.js"
-
+import { OdysseyHooks, addOdysseyGlobalEvents } from "../../../assets/js/odyssey.js"
 addOdysseyGlobalEvents(window)
 
 const Hooks = {

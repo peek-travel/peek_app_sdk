@@ -18,7 +18,6 @@ defmodule DemoWeb.Router do
     pipe_through :browser
 
     live "/", OdysseyShowcaseLive
-    get "/home", PageController, :home
   end
 
   # Other scopes may use custom stacks.
