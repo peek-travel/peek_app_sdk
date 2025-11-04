@@ -4,7 +4,8 @@
     "test/*",
     "lib/peek_app_sdk/application.ex",
     "lib/peek_app_sdk/ui/core_components.ex",
-    "lib/peek_app_sdk/ui/get_text.ex"
+    "lib/peek_app_sdk/ui/get_text.ex",
+    "demo/**"
   ],
   "print_summary": true
 }
