@@ -11,10 +11,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="success">
+            <.odyssey_alert type="success">
               <:title>Success</:title>
               <:message>Done</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -30,10 +30,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="error">
+            <.odyssey_alert type="error">
               <:title>Error</:title>
               <:message>Failed</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -49,10 +49,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="warning">
+            <.odyssey_alert type="warning">
               <:title>Warning</:title>
               <:message>Careful</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -68,10 +68,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="info">
+            <.odyssey_alert type="info">
               <:title>Info</:title>
               <:message>Note</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -87,10 +87,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert>
+            <.odyssey_alert>
               <:title>Default</:title>
               <:message>Info</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -105,10 +105,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="info" action_text="Learn" action_url="https://example.com">
+            <.odyssey_alert type="info" action_text="Learn" action_url="https://example.com">
               <:title>Info</:title>
               <:message>More</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -124,10 +124,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="success">
+            <.odyssey_alert type="success">
               <:title>Test</:title>
               <:message>Message</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}
@@ -149,10 +149,10 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
         render_component(
           fn assigns ->
             ~H"""
-            <.alert type="unknown">
+            <.odyssey_alert type="unknown">
               <:title>Test</:title>
               <:message>Message</:message>
-            </.alert>
+            </.odyssey_alert>
             """
           end,
           %{}

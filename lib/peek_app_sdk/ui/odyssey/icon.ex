@@ -1,23 +1,37 @@
-defmodule PeekAppSDK.UI.Odyssey.Icons do
+defmodule PeekAppSDK.UI.Odyssey.Icon do
   @moduledoc """
-  Icon components for the Phoenix Starter Kit application.
-
-  This module provides various SVG icon components that can be used throughout
-  the application, including alert, warning, info, success, and cancel icons.
+  Odyssey icon component for Heroicons.
   """
-
   use Phoenix.Component
 
   @doc """
-  Renders an alert icon.
+  Renders a [Heroicon](https://heroicons.com).
+
+  Heroicons come in three styles – outline, solid, and mini.
+  By default, the outline style is used, but solid and mini may
+  be applied by using the `-solid` and `-mini` suffix.
+
+  You can customize the size and colors of the icons by setting
+  width, height, and background color classes.
+
+  Icons are extracted from the `deps/heroicons` directory and bundled within
+  your compiled app.css by the plugin in `assets/vendor/heroicons.js`.
 
   ## Examples
 
-      <.alert_icon class="w-5 h-5 text-red-500" />
+      <.odyssey_icon name="hero-x-mark" />
+      <.odyssey_icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
   """
-  attr :class, :string, default: "w-5 h-5"
+  attr :name, :string, required: true
+  attr :class, :string, default: "size-4"
 
-  def alert_icon(assigns) do
+  def odyssey_icon(%{name: "hero-" <> _} = assigns) do
+    ~H"""
+    <span class={[@name, @class]} />
+    """
+  end
+
+  def odyssey_icon(%{name: "alert"} = assigns) do
     ~H"""
     <svg
       class={@class}
@@ -35,16 +49,7 @@ defmodule PeekAppSDK.UI.Odyssey.Icons do
     """
   end
 
-  @doc """
-  Renders a warning icon.
-
-  ## Examples
-
-      <.warning_icon class="w-5 h-5 text-yellow-500" />
-  """
-  attr :class, :string, default: "w-5 h-5"
-
-  def warning_icon(assigns) do
+  def odyssey_icon(%{name: "warning"} = assigns) do
     ~H"""
     <svg
       class={@class}
@@ -62,16 +67,7 @@ defmodule PeekAppSDK.UI.Odyssey.Icons do
     """
   end
 
-  @doc """
-  Renders an info icon.
-
-  ## Examples
-
-      <.info_icon class="w-5 h-5" />
-  """
-  attr :class, :string, default: "w-5 h-5"
-
-  def info_icon(assigns) do
+  def odyssey_icon(%{name: "info"} = assigns) do
     ~H"""
     <svg
       class={@class}
@@ -89,16 +85,7 @@ defmodule PeekAppSDK.UI.Odyssey.Icons do
     """
   end
 
-  @doc """
-  Renders a success icon.
-
-  ## Examples
-
-      <.success_icon class="w-5 h-5" />
-  """
-  attr :class, :string, default: "w-5 h-5"
-
-  def success_icon(assigns) do
+  def odyssey_icon(%{name: "success"} = assigns) do
     ~H"""
     <svg
       class={@class}
@@ -116,16 +103,7 @@ defmodule PeekAppSDK.UI.Odyssey.Icons do
     """
   end
 
-  @doc """
-  Renders a cancel/close (X) icon.
-
-  ## Examples
-
-      <.cancel_icon class="w-3 h-3" />
-  """
-  attr :class, :string, default: "w-3 h-3"
-
-  def cancel_icon(assigns) do
+  def odyssey_icon(%{name: "cancel"} = assigns) do
     ~H"""
     <svg
       class={@class}

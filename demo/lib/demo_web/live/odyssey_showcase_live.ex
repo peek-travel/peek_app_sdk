@@ -147,29 +147,29 @@ defmodule DemoWeb.OdysseyShowcaseLive do
         <section>
           <h2 class="text-2xl font-semibold mb-6">Alert Components</h2>
           <div class="space-y-4">
-            <.alert type="success">
+            <.odyssey_alert type="success">
               <:title>Success Alert</:title>
               <:message>
                 This is a success message indicating that an operation completed successfully.
               </:message>
-            </.alert>
+            </.odyssey_alert>
 
-            <.alert type="error">
+            <.odyssey_alert type="error">
               <:title>Error Alert</:title>
               <:message>This is an error message indicating that something went wrong.</:message>
-            </.alert>
+            </.odyssey_alert>
 
-            <.alert type="warning">
+            <.odyssey_alert type="warning">
               <:title>Warning Alert</:title>
               <:message>
                 This is a warning message to draw attention to important information.
               </:message>
-            </.alert>
+            </.odyssey_alert>
 
-            <.alert type="info" action_text="Learn More" action_url="https://example.com">
+            <.odyssey_alert type="info" action_text="Learn More" action_url="https://example.com">
               <:title>Info Alert with Action</:title>
               <:message>This is an informational message with an optional action button.</:message>
-            </.alert>
+            </.odyssey_alert>
           </div>
         </section>
 
@@ -297,23 +297,23 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           <h2 class="text-2xl font-semibold mb-6">Custom SVG Icons</h2>
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             <div class="flex flex-col items-center p-4 border rounded-lg">
-              <.alert_icon class="h-8 w-8 mb-2" />
+              <.odyssey_icon name="alert" class="h-8 w-8 mb-2" />
               <span class="text-sm">alert_icon</span>
             </div>
             <div class="flex flex-col items-center p-4 border rounded-lg">
-              <.warning_icon class="h-8 w-8 mb-2" />
+              <.odyssey_icon name="warning" class="h-8 w-8 mb-2" />
               <span class="text-sm">warning_icon</span>
             </div>
             <div class="flex flex-col items-center p-4 border rounded-lg">
-              <.info_icon class="h-8 w-8 mb-2" />
+              <.odyssey_icon name="info" class="h-8 w-8 mb-2" />
               <span class="text-sm">info_icon</span>
             </div>
             <div class="flex flex-col items-center p-4 border rounded-lg">
-              <.success_icon class="h-8 w-8 mb-2" />
+              <.odyssey_icon name="success" class="h-8 w-8 mb-2" />
               <span class="text-sm">success_icon</span>
             </div>
             <div class="flex flex-col items-center p-4 border rounded-lg">
-              <.cancel_icon class="h-8 w-8 mb-2" />
+              <.odyssey_icon name="cancel" class="h-8 w-8 mb-2" />
               <span class="text-sm">cancel_icon</span>
             </div>
           </div>
@@ -414,10 +414,10 @@ defmodule DemoWeb.OdysseyShowcaseLive do
         <div class="space-y-4 text-sm">
           <div>
             <h3 class="font-medium">Basic Alert:</h3>
-            <pre class="bg-white p-3 rounded border overflow-x-auto"><code>&lt;.alert type="success"&gt;
+            <pre class="bg-white p-3 rounded border overflow-x-auto"><code>&lt;.odyssey_alert type="success"&gt;
               &lt;:title&gt;Success!&lt;/:title&gt;
               &lt;:message&gt;Operation completed successfully.&lt;/:message&gt;
-            &lt;/.alert&gt;</code></pre>
+            &lt;/.odyssey_alert&gt;</code></pre>
           </div>
 
           <div>

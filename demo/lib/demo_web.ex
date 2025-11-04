@@ -88,8 +88,6 @@ defmodule DemoWeb do
       import DemoWeb.CoreComponents
       # Odyssey UI components
       import PeekAppSDK.UI.Odyssey
-      import PeekAppSDK.UI.Odyssey.Alerts
-      import PeekAppSDK.UI.Odyssey.Icons
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS

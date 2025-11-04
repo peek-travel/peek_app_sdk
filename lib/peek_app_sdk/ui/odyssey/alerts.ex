@@ -37,7 +37,8 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   - `.alert-peek-action` - Action link positioning
   """
   use Phoenix.Component
-  import PeekAppSDK.UI.Odyssey.Icons
+
+  import PeekAppSDK.UI.Odyssey.Icon
 
   @doc """
   Renders an alert with different types and colors.
@@ -62,7 +63,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   slot :title, required: true
   slot :message, required: false
 
-  def alert(assigns) do
+  def odyssey_alert(assigns) do
     border_class =
       case assigns.type do
         "success" -> "border-success-300"
@@ -75,7 +76,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
     assigns = assign(assigns, :border_class, border_class)
 
     ~H"""
-    <div class={["max-w-4xl mx-auto px-6 mt-8 bg-white rounded-lg px-4 py-3 shadow-sm border-l-4 border", @border_class]}>
+    <div class={["max-w-4xl mx-auto mt-8 bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class]}>
       <div class="flex items-start">
         <div class="flex-shrink-0 mt-0.5 mr-3">
           <.alert_type_icon type={@type} />
@@ -105,25 +106,25 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
 
   defp alert_type_icon(%{type: "success"} = assigns) do
     ~H"""
-    <.success_icon class="w-5 h-5 text-green-500" />
+    <.odyssey_icon name="success" class="w-5 h-5 text-green-500" />
     """
   end
 
   defp alert_type_icon(%{type: "error"} = assigns) do
     ~H"""
-    <.alert_icon class="w-5 h-5 text-red-500" />
+    <.odyssey_icon name="alert" class="w-5 h-5 text-red-500" />
     """
   end
 
   defp alert_type_icon(%{type: "warning"} = assigns) do
     ~H"""
-    <.warning_icon class="w-5 h-5 text-yellow-500" />
+    <.odyssey_icon name="warning" class="w-5 h-5 text-yellow-500" />
     """
   end
 
   defp alert_type_icon(%{type: "info"} = assigns) do
     ~H"""
-    <.info_icon class="w-5 h-5 text-blue-500" />
+    <.odyssey_icon name="info" class="w-5 h-5 text-blue-500" />
     """
   end
 
