@@ -1,0 +1,3 @@
+#!/bin/bash
+
+iex --name demo-local@127.0.0.1 -S mix phx.server
