@@ -253,7 +253,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           <div class="space-y-4">
             <div>
               <h3 class="text-lg font-medium mb-2">Back Navigation</h3>
-              <.back navigate={~p"/"}>Back to Home</.back>
+              <.odyssey_back navigate={~p"/"}>Back to Home</.odyssey_back>
             </div>
           </div>
         </section>

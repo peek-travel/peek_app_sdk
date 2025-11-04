@@ -12,7 +12,7 @@ defmodule PeekAppSDK.UI.Odyssey do
   attr(:info_icon, :boolean, default: false)
   attr(:truncate_text, :boolean, default: false)
 
-  def tabs(assigns) do
+  def odyssey_tabs(assigns) do
     ~H"""
     <div class="my-4 border-b-2 border-gray-300">
       <div class="flex gap-6">
@@ -41,12 +41,12 @@ defmodule PeekAppSDK.UI.Odyssey do
 
   ## Examples
 
-      <.back navigate={~p"/posts"}>Back to posts</.back>
+      <.odyssey navigate={~p"/posts"}>Back to posts</.odyssey>
   """
   attr(:navigate, :any, required: true)
   slot(:inner_block, required: true)
 
-  def back(assigns) do
+  def odyssey_back(assigns) do
     ~H"""
     <.link navigate={@navigate} class="text-xl leading-6 text-zinc-900 hover:text-gray-primary">
       <.odyssey_icon name="hero-arrow-left" class="text-brand h-6 w-6 mr-4" />
