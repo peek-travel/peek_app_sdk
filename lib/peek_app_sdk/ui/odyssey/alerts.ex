@@ -76,7 +76,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
     assigns = assign(assigns, :border_class, border_class)
 
     ~H"""
-    <div class={["max-w-4xl mx-auto mt-8 bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class]}>
+    <div class={["max-w-4xl mx-auto bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class]}>
       <div class="flex items-start">
         <div class="flex-shrink-0 mt-0.5 mr-3">
           <.alert_type_icon type={@type} />
