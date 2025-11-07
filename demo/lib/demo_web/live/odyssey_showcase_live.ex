@@ -23,6 +23,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       |> assign(:toggle_selection, "Minutes")
       |> assign(:icon_toggle_selection, "Minutes")
       |> assign(:status_selection, "Active")
+      |> assign(:size_selection, "Medium")
       |> assign(:channel_selection, :email)
       |> assign(:form_data, form_data)
       |> assign(:form, to_form(form_data, as: "form"))
@@ -69,6 +70,12 @@ defmodule DemoWeb.OdysseyShowcaseLive do
   @impl true
   def handle_event("change_status", %{"value" => option}, socket) do
     socket = assign(socket, :status_selection, option)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("change_size", %{"value" => option}, socket) do
+    socket = assign(socket, :size_selection, option)
     {:noreply, socket}
   end
 
@@ -197,6 +204,17 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                 on_change="change_status"
               />
               <p class="text-sm text-gray-600 mt-2">Selected: <strong>{@status_selection}</strong></p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Toggle Button with Label</h3>
+              <.odyssey_toggle_button
+                options={["Small", "Medium", "Large"]}
+                selected={@size_selection}
+                on_change="change_size"
+                label="Size"
+              />
+              <p class="text-sm text-gray-600 mt-2">Selected: <strong>{@size_selection}</strong></p>
             </div>
 
             <div>
