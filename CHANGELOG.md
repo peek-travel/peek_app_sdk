@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2025-11-07]
+
+### Added
+- Added optional `label` attribute to `odyssey_toggle_button` and `odyssey_toggle_button_input` components
+  - When a label is provided, the toggle button is automatically wrapped in a fieldset with proper label styling
+  - Follows the same pattern as Phoenix core input components for consistency
+  - Maintains 100% backward compatibility - existing usage without labels continues to work unchanged
+  - Works seamlessly with both standalone and form-integrated usage
+
 ## [2025-11-04]
 
 ### Added

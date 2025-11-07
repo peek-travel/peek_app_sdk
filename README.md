@@ -189,6 +189,7 @@ In your `assets/css/app.css` file, add the Odyssey assets to your Tailwind sourc
 @source "../css";
 @source "../js";
 @source "../../lib/your_app_web";
+@import "../../deps/peek_app_sdk/assets/odyssey/odyssey_web_components.css";
 @source "../../deps/peek_app_sdk/assets";  /* Add this line */
 ```
 

@@ -47,6 +47,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
   attr(:selected, :string, required: false, doc: "the currently selected option (not needed when using field)")
   attr(:on_change, :string, required: false, doc: "event name to fire on change (not needed when using field)")
   attr(:field, Phoenix.HTML.FormField, required: false, doc: "optional form field for automatic form integration")
+  attr(:label, :string, required: false, doc: "optional label to wrap the toggle button in a fieldset")
   attr(:phx_target, :any, required: false, doc: "optional phx-target for LiveComponent integration")
   attr(:rest, :global)
 
@@ -66,8 +67,27 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
 
   # Standalone mode - regular component without form integration
   def odyssey_toggle_button(assigns) do
-    assigns = assign_new(assigns, :phx_target, fn -> nil end)
+    assigns =
+      assigns
+      |> assign_new(:phx_target, fn -> nil end)
+      |> assign_new(:label, fn -> nil end)
 
+    ~H"""
+    <%= if @label do %>
+      <fieldset class="fieldset mb-2">
+        <label>
+          <span class="label mb-1">{@label}</span>
+          <.do_odyssey_toggle_button {assigns} />
+        </label>
+      </fieldset>
+    <% else %>
+      <.do_odyssey_toggle_button {assigns} />
+    <% end %>
+    """
+  end
+
+  # Private function component for the button group to avoid duplication
+  defp do_odyssey_toggle_button(assigns) do
     ~H"""
     <div class="inline-flex rounded-lg" role="group">
       <button

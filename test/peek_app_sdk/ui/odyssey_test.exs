@@ -127,5 +127,59 @@ defmodule PeekAppSDK.UI.OdysseyTest do
       # The Hours button should have the selected styling
       assert html =~ "bg-gray-50 text-blue-600"
     end
+
+    test "renders without fieldset when no label is provided" do
+      html =
+        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+          options: ["Minutes", "Hours", "Days"],
+          selected: "Minutes",
+          on_change: "change_time_unit"
+        })
+
+      refute html =~ "<fieldset"
+      refute html =~ "class=\"fieldset mb-2\""
+      assert html =~ "class=\"inline-flex rounded-lg\""
+    end
+
+    test "renders with fieldset and label when label is provided" do
+      html =
+        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+          options: ["Minutes", "Hours", "Days"],
+          selected: "Minutes",
+          on_change: "change_time_unit",
+          label: "Time Unit"
+        })
+
+      assert html =~ "<fieldset"
+      assert html =~ "class=\"fieldset mb-2\""
+      assert html =~ "<label>"
+      assert html =~ "<span class=\"label mb-1\">Time Unit</span>"
+      assert html =~ "class=\"inline-flex rounded-lg\""
+    end
+
+    test "form integration passes through label to toggle_button component" do
+      form_data = %{"channel" => :email}
+      form = to_form(form_data, as: "form")
+
+      html =
+        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+          field: form[:channel],
+          label: "Communication Channel",
+          options: [
+            %{label: "Email", value: :email},
+            %{label: "Text Message", value: :sms}
+          ]
+        })
+
+      assert html =~ "<fieldset"
+      assert html =~ "class=\"fieldset mb-2\""
+      assert html =~ "<label>"
+      assert html =~ "<span class=\"label mb-1\">Communication Channel</span>"
+      assert html =~ "Email"
+      assert html =~ "Text Message"
+      # Should have hidden input for form integration
+      assert html =~ ~r/type="hidden"/
+      assert html =~ ~r/name="form\[channel\]"/
+    end
   end
 end
