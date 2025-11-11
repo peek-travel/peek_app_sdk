@@ -28,6 +28,18 @@ defmodule PeekAppSDK.UI.OdysseyTest do
       assert html =~ "bg-gray-50 text-blue-600"
     end
 
+    test "does not attach phx-click for selected option" do
+      html =
+        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+          options: ["Minutes", "Hours", "Days"],
+          selected: "Hours",
+          on_change: "change_time_unit"
+        })
+
+      refute html =~ ~r/value="Hours"[^>]*phx-click=/
+      assert html =~ ~r/value="Minutes"[^>]*phx-click="change_time_unit"/
+    end
+
     test "shows unselected options with gray styling" do
       html =
         render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
@@ -70,7 +82,9 @@ defmodule PeekAppSDK.UI.OdysseyTest do
       assert html =~ "Phone Call"
       assert html =~ "hero-phone"
       # Should have the selected button highlighted (email)
-      assert html =~ ~r/value="email"[^>]*phx-click="change_channel"/
+      # Selected option should not include a click handler; unselected should
+      refute html =~ ~r/value="email"[^>]*phx-click=/
+      assert html =~ ~r/value="sms"[^>]*phx-click="change_channel"/
     end
 
     test "automatically integrates with form fields when field is provided" do

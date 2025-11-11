@@ -94,7 +94,11 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
         :for={{option, index} <- Enum.with_index(@options)}
         type="button"
         value={to_string(option_value(option))}
-        phx-click={@on_change}
+        phx-click={
+          if to_string(@selected) == to_string(option_value(option)),
+            do: nil,
+            else: @on_change
+        }
         phx-target={@phx_target}
         class={
           [

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Follows the same pattern as Phoenix core input components for consistency
   - Maintains 100% backward compatibility - existing usage without labels continues to work unchanged
 
+
+### Fixed
+- Toggle button no longer emits an event when clicking the already-selected option, preventing redundant LiveView events in both standalone and form-integrated usage.
+
 ## [2025-11-07]
 
 ### Added
