@@ -144,7 +144,7 @@ table.table.table-zebra td {
   .fieldset label:has(input[type='checkbox']) span.label {
     @apply text-base;
     position: relative;
-    padding-left: 2rem; /* Space for checkbox */
+    padding-left: 1.5rem; /* Space for checkbox */
   }
 
   .fieldset
@@ -153,15 +153,6 @@ table.table.table-zebra td {
     input[type='checkbox'] {
     position: absolute;
     left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .fieldset label:has(input[type='checkbox']) span.label::before {
-    content: '';
-    @apply w-1 h-5 bg-interesting-pink rounded-full;
-    position: absolute;
-    left: 1.5rem;
     top: 50%;
     transform: translateY(-50%);
   }
