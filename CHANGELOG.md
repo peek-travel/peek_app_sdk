@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2025-11-11]
+
+### Added
+- Added optional `label` attribute to `odyssey_activity_picker` component
+  - When a label is provided, the activity picker is automatically wrapped in a fieldset with proper label styling
+  - Follows the same pattern as Phoenix core input components for consistency
+  - Maintains 100% backward compatibility - existing usage without labels continues to work unchanged
+
 ## [2025-11-07]
 
 ### Added

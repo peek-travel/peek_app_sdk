@@ -54,7 +54,7 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
     <div phx-hook="OdysseyActivityPicker" id={"#{@id}_hook"}>
       <!-- Hidden input for form value -->
       <input type="hidden" name={@field.name} value={process_ids_for_multi_select(@field.value)} />
-      
+
     <!-- Odyssey product picker will be rendered here -->
       <div>
         <odyssey-product-picker
@@ -87,6 +87,7 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
   attr(:multiple, :boolean, default: false, doc: "whether to allow multiple selections")
   attr(:install_id, :string, required: true, doc: "the install id for the current partner")
   attr(:title, :string, default: "Activity Picker", doc: "the title for the picker")
+  attr(:label, :string, required: false, doc: "optional label to wrap the activity picker in a fieldset")
 
   def odyssey_activity_picker(assigns) do
     assigns =
@@ -94,8 +95,25 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
       |> assign_new(:id, fn %{field: field} ->
         "#{field.form.name}_#{field.field}_activity_picker"
       end)
+      |> assign_new(:label, fn -> nil end)
       |> assign(module: __MODULE__)
 
+    ~H"""
+    <%= if @label do %>
+      <fieldset class="fieldset mb-2">
+        <label>
+          <span class="label mb-1">{@label}</span>
+          <.activity_picker_component {assigns} />
+        </label>
+      </fieldset>
+    <% else %>
+      <.activity_picker_component {assigns} />
+    <% end %>
+    """
+  end
+
+  # Private function component for the activity picker to avoid duplication
+  defp activity_picker_component(assigns) do
     ~H"""
     <.live_component {assigns} />
     """

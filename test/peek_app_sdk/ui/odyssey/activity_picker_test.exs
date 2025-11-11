@@ -258,6 +258,65 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPickerTest do
         render_component(TestActivityPicker, %{field: form[:activity_id]})
       end
     end
+
+    test "renders without fieldset when no label is provided" do
+      # Mock the GraphQL query response
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        response_data = %{activities: []}
+        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+      end)
+
+      form_data = %{"activity_id" => nil}
+      form = to_form(form_data, as: :test_form)
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_activity_picker field={@form[:activity_id]} install_id="test_install_id" />
+            """
+          end,
+          %{form: form}
+        )
+
+      # Should not contain fieldset or label elements
+      refute html =~ ~r/<fieldset/
+      refute html =~ ~r/<label>/
+      refute html =~ ~r/<span[^>]*class="label/
+      # Should contain the activity picker component
+      assert html =~ ~r/<odyssey-product-picker/
+    end
+
+    test "renders with fieldset and label when label is provided" do
+      # Mock the GraphQL query response
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        response_data = %{activities: []}
+        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+      end)
+
+      form_data = %{"activity_id" => nil}
+      form = to_form(form_data, as: :test_form)
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_activity_picker field={@form[:activity_id]} install_id="test_install_id" label="Select Activity" />
+            """
+          end,
+          %{form: form}
+        )
+
+      # Should contain fieldset with proper classes
+      assert html =~ ~r/<fieldset[^>]*class="fieldset mb-2"/
+      # Should contain label structure
+      assert html =~ ~r/<label>/
+      assert html =~ ~r/<span[^>]*class="label mb-1"[^>]*>Select Activity<\/span>/
+      # Should still contain the activity picker component
+      assert html =~ ~r/<odyssey-product-picker/
+    end
   end
 
   describe "load_activities/1" do
