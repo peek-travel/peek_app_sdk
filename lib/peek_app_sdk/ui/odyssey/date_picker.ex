@@ -25,8 +25,7 @@ defmodule PeekAppSDK.UI.Odyssey.DatePicker do
   attr :errors, :list, default: []
   attr :class, :string, default: nil, doc: "additional classes for the input"
 
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:expiration_date]"
+  attr :field, Phoenix.HTML.FormField, doc: "a form field struct retrieved from the form, for example: @form[:expiration_date]"
 
   attr :rest, :global, include: ~w(autocomplete disabled form max min readonly required step)
 

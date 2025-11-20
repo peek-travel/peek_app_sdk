@@ -25,15 +25,12 @@ defmodule PeekAppSDK.UI.Odyssey.PrefixInput do
     default: "text",
     values: ~w(text number)
 
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:discount]"
+  attr :field, Phoenix.HTML.FormField, doc: "a form field struct retrieved from the form, for example: @form[:discount]"
 
   attr :errors, :list, default: []
   attr :class, :string, default: nil, doc: "additional classes for the input"
 
-  attr :rest, :global,
-    include:
-      ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+  attr :rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
          multiple pattern placeholder readonly required rows size step)
 
   def odyssey_prefix_input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
@@ -82,5 +79,4 @@ defmodule PeekAppSDK.UI.Odyssey.PrefixInput do
     </p>
     """
   end
-
 end

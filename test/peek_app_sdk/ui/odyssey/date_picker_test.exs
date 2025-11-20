@@ -60,4 +60,3 @@ defmodule PeekAppSDK.UI.Odyssey.DatePickerTest do
     end
   end
 end
-
