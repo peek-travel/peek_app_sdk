@@ -13,7 +13,11 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       "activity_id" => "",
       "channel" => :email,
       "time_unit" => "Minutes",
-      "view_mode" => "List"
+      "view_mode" => "List",
+      "discount" => "",
+      "percentage" => "",
+      "start_date" => "",
+      "expiration_date" => ""
     }
 
     socket =
@@ -105,7 +109,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           A comprehensive demonstration of all available Odyssey UI components with examples and usage patterns.
         </p>
       </div>
-
+      
     <!-- Navigation Tabs -->
       <div class="my-4 border-b-2 border-gray-300">
         <div class="flex gap-6">
@@ -147,7 +151,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </button>
         </div>
       </div>
-
+      
     <!-- Components Section -->
       <div :if={@current_tab == "components"} class="space-y-12">
         <!-- Alerts Section -->
@@ -181,7 +185,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
         </section>
 
         <.odyssey_divider />
-
+        
     <!-- Toggle Button Section -->
         <section>
           <h2 class="text-2xl font-semibold mb-6">Toggle Button</h2>
@@ -264,7 +268,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
         </section>
 
         <.odyssey_divider />
-
+        
     <!-- Navigation Section -->
         <section>
           <h2 class="text-2xl font-semibold mb-6">Navigation Components</h2>
@@ -276,7 +280,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-
+      
     <!-- Icons Section -->
       <div :if={@current_tab == "icons"} class="space-y-8">
         <section>
@@ -337,7 +341,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-
+      
     <!-- Forms Section -->
       <div :if={@current_tab == "forms"} class="space-y-8">
         <section>
@@ -397,6 +401,48 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                     Current value: <strong>{@form_data["view_mode"] || "List"}</strong>
                   </p>
                 </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Prefix Inputs (amount and percentage)
+                  </label>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <.odyssey_prefix_input
+                      field={@form[:discount]}
+                      prefix="$"
+                      label="Discount amount"
+                      type="number"
+                    />
+                    <.odyssey_prefix_input
+                      field={@form[:percentage]}
+                      prefix="%"
+                      label="Discount percentage"
+                      type="number"
+                    />
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Current discount: <strong>{@form_data["discount"] || ""}</strong>,
+                    percentage: <strong>{@form_data["percentage"] || ""}</strong>
+                  </p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Date Pickers (start and expiration)
+                  </label>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <.odyssey_date_picker field={@form[:start_date]} label="Start date" required />
+                    <.odyssey_date_picker
+                      field={@form[:expiration_date]}
+                      label="Expiration date"
+                      required
+                    />
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Start date: <strong>{@form_data["start_date"] || ""}</strong>,
+                    expiration date: <strong>{@form_data["expiration_date"] || ""}</strong>
+                  </p>
+                </div>
               </.form>
             </div>
 
@@ -425,7 +471,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-
+      
     <!-- Code Examples Section -->
       <div class="mt-12 p-6 bg-gray-50 rounded-lg">
         <h2 class="text-xl font-semibold mb-4">Usage Examples</h2>

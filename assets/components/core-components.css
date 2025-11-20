@@ -57,7 +57,8 @@
     border-radius: 6px;
   }
 
-  .btn.disabled {
+  .btn.disabled,
+  .btn[disabled] {
     @apply opacity-50 cursor-not-allowed hover:bg-interaction-300;
     @apply pointer-events-none; /* Prevent hover, a little hacky but work */
   }
