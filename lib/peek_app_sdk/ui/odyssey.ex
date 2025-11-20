@@ -4,6 +4,8 @@ defmodule PeekAppSDK.UI.Odyssey do
   """
   use Phoenix.Component
 
+  import LiveSelect
+
   defdelegate odyssey_activity_picker(assigns), to: PeekAppSDK.UI.Odyssey.OdysseyActivityPicker
   defdelegate odyssey_alert(assigns), to: PeekAppSDK.UI.Odyssey.Alerts
   defdelegate odyssey_back(assigns), to: PeekAppSDK.UI.Odyssey.Back
