@@ -15,7 +15,9 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       "time_unit" => "Minutes",
       "view_mode" => "List",
       "discount" => "",
-      "percentage" => ""
+      "percentage" => "",
+      "start_date" => "",
+      "expiration_date" => ""
     }
 
     socket =
@@ -421,6 +423,28 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                   <p class="text-sm text-gray-500 mt-1">
                     Current discount: <strong>{@form_data["discount"] || ""}</strong>,
                     percentage: <strong>{@form_data["percentage"] || ""}</strong>
+                  </p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Date Pickers (start and expiration)
+                  </label>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <.odyssey_date_picker
+                      field={@form[:start_date]}
+                      label="Start date"
+                      required
+                    />
+                    <.odyssey_date_picker
+                      field={@form[:expiration_date]}
+                      label="Expiration date"
+                      required
+                    />
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Start date: <strong>{@form_data["start_date"] || ""}</strong>,
+                    expiration date: <strong>{@form_data["expiration_date"] || ""}</strong>
                   </p>
                 </div>
               </.form>
