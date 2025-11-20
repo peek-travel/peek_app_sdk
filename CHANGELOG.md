@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Included in the demo app under the Forms tab with start/expiration date examples.
   - Ships with focused tests to keep Odyssey UI coverage high.
 
+### Changed
+
+- Updated Odyssey `.btn` disabled styles so each variant keeps its own color when disabled, instead of using DaisyUI's generic disabled background.
+
 ## [2025-11-11]
 
 ### Added
