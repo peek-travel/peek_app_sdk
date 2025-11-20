@@ -13,7 +13,9 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       "activity_id" => "",
       "channel" => :email,
       "time_unit" => "Minutes",
-      "view_mode" => "List"
+      "view_mode" => "List",
+      "discount" => "",
+      "percentage" => ""
     }
 
     socket =
@@ -395,6 +397,30 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                   />
                   <p class="text-sm text-gray-500 mt-1">
                     Current value: <strong>{@form_data["view_mode"] || "List"}</strong>
+                  </p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Prefix Inputs (amount and percentage)
+                  </label>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <.odyssey_prefix_input
+                      field={@form[:discount]}
+                      prefix="$"
+                      label="Discount amount"
+                      type="number"
+                    />
+                    <.odyssey_prefix_input
+                      field={@form[:percentage]}
+                      prefix="%"
+                      label="Discount percentage"
+                      type="number"
+                    />
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Current discount: <strong>{@form_data["discount"] || ""}</strong>,
+                    percentage: <strong>{@form_data["percentage"] || ""}</strong>
                   </p>
                 </div>
               </.form>
