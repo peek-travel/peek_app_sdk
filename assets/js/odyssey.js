@@ -1,3 +1,5 @@
+import live_select from "live_select"
+
 // Function to add global event listeners
 function addOdysseyGlobalEvents(windowObj) {
   // Global event listener for triggering input events on form fields, this is
@@ -13,6 +15,7 @@ function addOdysseyGlobalEvents(windowObj) {
 }
 
 const OdysseyHooks = {
+    ...live_select,
     OdysseyActivityPicker: {
     mounted () {
       const picker = this.el.querySelector('odyssey-product-picker')

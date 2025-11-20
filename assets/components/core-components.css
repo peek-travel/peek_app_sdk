@@ -1,3 +1,5 @@
+@source "../../deps/live_select/lib/live_select/component.*ex" 
+
 @layer utilities {
   .fieldset .label {
     @apply text-sm font-normal text-neutrals-300 mb-2 block;

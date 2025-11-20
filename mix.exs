@@ -57,6 +57,7 @@ defmodule PeekAppSDK.MixProject do
       {:phoenix_live_view, "~> 1.0"},
       {:finch, "~> 0.13"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:live_select, "~> 1.0"},
 
       # Test dependencies
       {:mimic, "~> 1.7", only: :test},
