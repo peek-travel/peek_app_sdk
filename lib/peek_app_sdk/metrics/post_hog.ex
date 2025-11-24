@@ -31,6 +31,7 @@ defmodule PeekAppSDK.Metrics.PostHog do
         distinct_id: partner_id,
         partner_id: partner_id,
         partner_name: partner_name,
+        partner_is_test: partner.is_test,
         app_slug: app_id
       }
     }
