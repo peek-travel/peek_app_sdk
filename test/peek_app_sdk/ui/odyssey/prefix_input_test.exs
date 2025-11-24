@@ -45,6 +45,20 @@ defmodule PeekAppSDK.UI.Odyssey.PrefixInputTest do
       assert html =~ "is required"
     end
 
+    test "renders validation error message" do
+      html =
+        render_component(&Odyssey.odyssey_prefix_input/1, %{
+          id: "input",
+          name: "input",
+          value: "a",
+          prefix: "$",
+          label: "Label",
+          errors: ["must be a valid number"]
+        })
+
+      assert html =~ "must be a valid number"
+    end
+
     test "integrates with Phoenix.HTML.Form field" do
       form_data = %{"discount" => "25"}
       form = to_form(form_data, as: "form")

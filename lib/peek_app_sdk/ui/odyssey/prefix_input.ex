@@ -39,7 +39,7 @@ defmodule PeekAppSDK.UI.Odyssey.PrefixInput do
 
     assigns
     |> assign(field: nil, id: assigns.id || field.id)
-    |> assign_new(:errors, fn -> simple_errors end)
+    |> assign(:errors, simple_errors)
     |> assign_new(:name, fn -> field.name end)
     |> assign_new(:value, fn -> field.value end)
     |> odyssey_prefix_input()
