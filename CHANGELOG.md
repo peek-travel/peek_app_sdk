@@ -5,12 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2025-11-24]
-
-### Fixed
-
-- Fixed a bug where changeset errors were being reset and not displayed by the prefix input when used with a form field; validation errors from the changeset now render correctly.
-
 ## [2025-11-20]
 
 ### Added
@@ -26,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated Odyssey `.btn` disabled styles so each variant keeps its own color when disabled, instead of using DaisyUI's generic disabled background.
+
+### Fixed
+
+- Fixed a bug where changeset errors were being reset and not displayed by the prefix input when used with a form field; validation errors from the changeset now render correctly.
 
 ## [2025-11-11]
 
