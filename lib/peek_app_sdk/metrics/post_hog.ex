@@ -18,7 +18,7 @@ defmodule PeekAppSDK.Metrics.PostHog do
     Tesla.client(middleware)
   end
 
-  def track(%{name: partner_name, id: partner_id} = partner, event_id, payload) do
+  def track(%{name: partner_name, external_refid: partner_id} = partner, event_id, payload) do
     config = Config.get_config()
     posthog_key = config.posthog_key
     app_id = config.peek_app_id
