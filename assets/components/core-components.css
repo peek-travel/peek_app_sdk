@@ -59,8 +59,30 @@
 
   .btn.disabled,
   .btn[disabled] {
-    @apply opacity-50 cursor-not-allowed hover:bg-interaction-300;
-    @apply pointer-events-none; /* Prevent hover, a little hacky but work */
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+  }
+
+  /* Override DaisyUI's disabled background colors */
+
+  /* For default values we have default colors. Note: ghost and link has not yet been implemented */
+  .btn[disabled]:not(.btn-link, .btn-ghost, .btn-secondary, .btn-tertiary, .btn-danger),
+  .btn.disabled:not(.btn-link, .btn-ghost, .btn-secondary, .btn-tertiary, .btn-danger) {
+    @apply bg-interaction-300 hover:bg-interaction-300;
+  }
+
+  .btn.btn-secondary[disabled],
+  .btn.btn-secondary.disabled {
+    @apply bg-neutrals-100 hover:bg-neutrals-100;
+  }
+
+  .btn.btn-tertiary[disabled],
+  .btn.btn-tertiary.disabled {
+    @apply bg-neutrals-0 hover:bg-neutrals-0;
+  }
+
+  .btn.btn-danger[disabled],
+  .btn.btn-danger.disabled {
+    @apply bg-neutrals-0 hover:bg-neutrals-0;
   }
 
   .btn.btn-secondary {
