@@ -69,4 +69,6 @@ defmodule PeekAppSDK.Metrics do
       {:ok, %{...}}
   """
   defdelegate track(event_id, payload), to: PeekAppSDK.Metrics.Client
+
+  defdelegate track(partner, event, params \\ %{}), to: PeekAppSDK.Metrics.PostHog
 end
