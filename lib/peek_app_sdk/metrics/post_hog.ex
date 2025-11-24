@@ -27,13 +27,14 @@ defmodule PeekAppSDK.Metrics.PostHog do
     body = %{
       api_key: posthog_key,
       event: event_id,
-      properties: %{
-        distinct_id: partner_id,
-        partner_id: partner_id,
-        partner_name: partner_name,
-        partner_is_test: partner.is_test,
-        app_slug: app_id
-      }
+      properties:
+        Map.merge(payload, %{
+          distinct_id: partner_id,
+          partner_id: partner_id,
+          partner_name: partner_name,
+          partner_is_test: partner.is_test,
+          app_slug: app_id
+        })
     }
 
     if posthog_key do
