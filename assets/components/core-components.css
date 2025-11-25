@@ -103,6 +103,11 @@
     @apply hover:text-danger-400;
     @apply focus:ring-danger-100;
   }
+
+  /* Remove underline from button links, it's an internal design rule */
+  a.btn {
+    text-decoration: none !important;
+  }
 }
 
 /* Error message component with warning icon */
