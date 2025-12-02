@@ -45,12 +45,12 @@ var OdysseyWebcomponents=(function(u){"use strict";/**
         </div>
       </div>
     `}renderGroupHeader(t){if(!this.isGrouped||!t.category)return c;const e=t.products.map(i=>String(i.id)),s=e.length>0&&e.every(i=>this.selectedIds.has(i));return $`
-      <button class="flex w-full items-center gap-2 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleCategory(t)}>
+      <button class="text-left flex w-full items-center gap-2 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleCategory(t)}>
         ${this.checkIcon(s)}
         <span>${t.category}</span>
       </button>
     `}renderProduct(t){const e=this.selectedIds.has(String(t.id));return $`
-      <button class="flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleProduct(String(t.id))}>
+      <button class="text-left flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleProduct(String(t.id))}>
         ${this.checkIcon(e)}
         ${this.renderColorDot(t.color)}
         <span>${t.name}</span>

@@ -319,3 +319,42 @@ Here are some common event types that are used in the metrics service:
 - `user.login` - User login
 - `user.logout` - User logout
 - `app.error` - Application error
+
+
+## PostHog Tracking
+
+You can route events to a PostHog project of your choosing by configuring a project API key. When configured, the SDK will handle identification on install and attach useful partner/app context to every PostHog event you send.
+
+### Configuration
+
+Add your PostHog project key to your config (typically only in non-VCS env files):
+
+```elixir
+config :peek_app_sdk,
+  posthog_key: "phc_your_posthog_project_key"
+```
+
+If `posthog_key` is not configured, PostHog calls are no-ops.
+
+### What this enables
+
+- Identify on install: When you call `PeekAppSDK.Metrics.track_install/2` with a partner map, the SDK will:
+  - Send an Identify-like event to PostHog (`event: "$set"`) that sets person properties:
+    - `name` and `is_test`
+  - Then capture the `app.install` event.
+- PostHog event capture: Use the partner variant to send events directly to PostHog:
+
+```elixir
+partner = %{external_refid: "partner-123", name: "Bob's Surf", is_test: false}
+PeekAppSDK.Metrics.track(partner, "order.purchased", %{order_total: 129_00})
+```
+
+The SDK automatically includes these properties on every PostHog capture:
+- `distinct_id` (set to `partner.external_refid`)
+- `partner_id`, `partner_name`, `partner_is_test`
+- `app_slug` (your `peek_app_id`)
+
+### Notes
+
+- The non-partner `PeekAppSDK.Metrics.track/2` continues to send to Ahem.
+- Use `PeekAppSDK.Metrics.track(partner, event_id, payload)` to route events to PostHog.

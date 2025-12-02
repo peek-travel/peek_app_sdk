@@ -17,12 +17,12 @@
         </div>
       </div>
     `}renderGroupHeader(e){if(!this.isGrouped||!e.category)return l;let t=e.products.map(i=>String(i.id)),s=t.length>0&&t.every(i=>this.selectedIds.has(i));return $`
-      <button class="flex w-full items-center gap-2 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleCategory(e)}>
+      <button class="text-left flex w-full items-center gap-2 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleCategory(e)}>
         ${this.checkIcon(s)}
         <span>${e.category}</span>
       </button>
     `}renderProduct(e){let t=this.selectedIds.has(String(e.id));return $`
-      <button class="flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleProduct(String(e.id))}>
+      <button class="text-left flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50" @click=${()=>this.toggleProduct(String(e.id))}>
         ${this.checkIcon(t)}
         ${this.renderColorDot(e.color)}
         <span>${e.name}</span>
