@@ -18,7 +18,25 @@ defmodule PeekAppSDK.Metrics.PostHog do
     Tesla.client(middleware)
   end
 
-  def track(%{name: partner_name, external_refid: partner_id} = partner, event_id, payload) do
+  def identify(%{name: partner_name, external_refid: partner_id, is_test: is_test}) do
+    config = Config.get_config()
+    posthog_key = config.posthog_key
+    url = "https://us.i.posthog.com/i/v0/e/"
+
+    body = %{
+      api_key: posthog_key,
+      properties: %{"$set" => %{"name" => partner_name, "is_test" => is_test}},
+      timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
+      distinct_id: partner_id,
+      event: "$set"
+    }
+
+    if posthog_key do
+      Tesla.post!(client(), url, body)
+    end
+  end
+
+  def track(%{name: partner_name, external_refid: partner_id, is_test: is_test}, event_id, payload) do
     config = Config.get_config()
     posthog_key = config.posthog_key
     app_id = config.peek_app_id
@@ -32,9 +50,8 @@ defmodule PeekAppSDK.Metrics.PostHog do
           distinct_id: partner_id,
           partner_id: partner_id,
           partner_name: partner_name,
-          partner_is_test: partner.is_test,
-          app_slug: app_id,
-          "$process_person_profile": false
+          partner_is_test: is_test,
+          app_slug: app_id
         })
     }
 

@@ -3,11 +3,15 @@ defmodule PeekAppSDK.Metrics do
   This module provides functions for tracking metrics to Ahem.
   """
 
+  defdelegate identify(partner),
+    to: PeekAppSDK.Metrics.PostHog
+
   defdelegate track_install(external_refid, name, is_test, opts \\ []),
     to: PeekAppSDK.Metrics.Client
 
   def track_install(%{external_refid: external_refid, name: name, is_test: is_test} = partner, opts \\ []) do
     track_install(external_refid, name, is_test, opts)
+    identify(partner)
     track(partner, "app.install", %{})
   end
 

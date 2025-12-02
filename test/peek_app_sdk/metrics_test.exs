@@ -119,4 +119,36 @@ defmodule PeekAppSDK.MetricsTest do
       assert {:ok, _} = Metrics.track(event_id, payload)
     end
   end
+
+  describe "track_install identifies via PostHog when configured" do
+    test "posts ahem, then identify, then capture" do
+      prev = Application.get_env(:peek_app_sdk, :posthog_key)
+      Application.put_env(:peek_app_sdk, :posthog_key, "ph_test_key")
+      on_exit(fn -> Application.put_env(:peek_app_sdk, :posthog_key, prev) end)
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(self(), {:request, env.url, Jason.decode!(env.body)})
+
+        if String.contains?(env.url, "ahem.peeklabs.com/events/") do
+          {:ok, %Tesla.Env{status: 202}}
+        else
+          {:ok, %Tesla.Env{status: 200}}
+        end
+      end)
+
+      partner = %{external_refid: "p-1", name: "Partner Name", is_test: false}
+
+      assert {:ok, _} = PeekAppSDK.Metrics.track_install(partner, [])
+
+      assert_receive {:request, url1, _}
+      assert String.contains?(url1, "ahem.peeklabs.com/events/")
+      assert_receive {:request, url2, body2}
+      assert String.contains?(url2, "/i/v0/e/")
+      assert body2["event"] == "$set"
+      assert_receive {:request, url3, body3}
+      assert String.contains?(url3, "/capture")
+      assert body3["event"] == "app.install"
+    end
+  end
 end
