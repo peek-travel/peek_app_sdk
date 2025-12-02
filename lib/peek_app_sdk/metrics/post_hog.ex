@@ -12,7 +12,8 @@ defmodule PeekAppSDK.Metrics.PostHog do
     middleware = [
       Tesla.Middleware.JSON,
       {Tesla.Middleware.Headers, [{"Content-Type", "application/json"}]},
-      {Tesla.Middleware.Retry, delay: 500, max_retries: 10}
+      {Tesla.Middleware.Retry, delay: 500, max_retries: 10},
+      {Tesla.Middleware.BaseUrl, "https://us.i.posthog.com"}
     ]
 
     Tesla.client(middleware)
@@ -21,7 +22,6 @@ defmodule PeekAppSDK.Metrics.PostHog do
   def identify(%{name: partner_name, external_refid: partner_id, is_test: is_test}) do
     config = Config.get_config()
     posthog_key = config.posthog_key
-    url = "https://us.i.posthog.com/i/v0/e/"
 
     body = %{
       api_key: posthog_key,
@@ -32,7 +32,7 @@ defmodule PeekAppSDK.Metrics.PostHog do
     }
 
     if posthog_key do
-      Tesla.post!(client(), url, body)
+      Tesla.post!(client(), "/i/v0/e/", body)
     end
   end
 
@@ -40,7 +40,6 @@ defmodule PeekAppSDK.Metrics.PostHog do
     config = Config.get_config()
     posthog_key = config.posthog_key
     app_id = config.peek_app_id
-    url = "https://us.i.posthog.com/capture"
 
     body = %{
       api_key: posthog_key,
@@ -56,7 +55,7 @@ defmodule PeekAppSDK.Metrics.PostHog do
     }
 
     if posthog_key do
-      response = Tesla.post!(client(), url, body)
+      response = Tesla.post!(client(), "/capture", body)
 
       case response do
         %Tesla.Env{status: 200} ->
