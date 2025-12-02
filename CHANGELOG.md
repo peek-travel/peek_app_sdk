@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2025-12-02]
+
+### Added
+- Events can now be routed to a PostHog project of your choosing by configuring `:posthog_key`.
+  - `PeekAppSDK.Metrics.track_install/2` will automatically identify the partner in PostHog on install (sets `name` and `is_test`) and then capture `app.install`.
+  - `PeekAppSDK.Metrics.track/3` (partner variant) sends custom events to PostHog and automatically includes `distinct_id`, `partner_id`, `partner_name`, `partner_is_test`, and `app_slug`.
+
+### Changed
+- BREAKING: Metrics API is now partner-first for key functions:
+  - `PeekAppSDK.Metrics.track/3` now expects a partner map as the first argument when routing to PostHog (`track(partner, event_id, payload)`).
+  - `PeekAppSDK.Metrics.track_install/2` now expects a partner map as the first argument and will identify + capture in PostHog when configured.
+  - `PeekAppSDK.Metrics.track_uninstall/2` now expects a partner map as the first argument and will capture `app.uninstall` in PostHog when configured.
+
+Migration examples:
+- Before:
+  - `PeekAppSDK.Metrics.track("order.placed", %{anonymousId: partner_id, level: "info"})`
+  - `PeekAppSDK.Metrics.track_install(partner_id, partner_name, is_test)`
+  - `PeekAppSDK.Metrics.track_uninstall(partner_id, partner_name, is_test)`
+- After:
+  - `PeekAppSDK.Metrics.track(%{external_refid: partner_id, name: partner_name, is_test: is_test}, "order.placed", %{level: "info"})`
+  - `PeekAppSDK.Metrics.track_install(%{external_refid: partner_id, name: partner_name, is_test: is_test})`
+  - `PeekAppSDK.Metrics.track_uninstall(%{external_refid: partner_id, name: partner_name, is_test: is_test})`
+
+Note: Legacy arities remain temporarily for compatibility but are considered deprecated and may be removed in the next major release.
+
+### Fixed
+- Cosmetic fix for the activity picker component.
+
+
 ## [2025-11-24]
 
 ### Added
