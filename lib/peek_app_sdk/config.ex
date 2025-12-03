@@ -74,7 +74,8 @@ defmodule PeekAppSDK.Config do
       peek_app_id: Application.get_env(:peek_app_sdk, :peek_app_id),
       peek_api_base_url: Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
       peek_api_key: Application.get_env(:peek_app_sdk, :peek_api_key),
-      client_secret_token: Application.get_env(:peek_app_sdk, :client_secret_token)
+      client_secret_token: Application.get_env(:peek_app_sdk, :client_secret_token),
+      posthog_key: Application.get_env(:peek_app_sdk, :posthog_key)
     }
   end
 
