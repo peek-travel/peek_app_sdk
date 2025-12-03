@@ -33,6 +33,11 @@ Note: Legacy arities remain temporarily for compatibility but are considered dep
 ### Fixed
 - Cosmetic fix for the activity picker component.
 
+## [2025-11-25]
+
+### Changed
+
+- Updated core Odyssey `a.btn` button link styling in `assets/components/core-components.css` to remove underlines from button links per internal design rules.
 
 ## [2025-11-24]
 
