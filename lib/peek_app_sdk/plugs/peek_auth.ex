@@ -95,7 +95,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
     }
   end
 
-  # defp build_account_user(_), do: nil
+  defp build_account_user(_), do: nil
 
   @doc """
   LiveView on_mount callback to set the peek_install_id in the socket assigns.
