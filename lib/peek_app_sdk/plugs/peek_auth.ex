@@ -78,6 +78,23 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
     }
   end
 
+  defp build_account_user(%{
+         "user" => %{
+           "id" => current_user_id,
+           "email" => current_user_email,
+           "is_admin" => current_user_is_peek_admin,
+           "name" => current_user_name
+         }
+       }) do
+    %PeekAppSDK.AccountUser{
+      email: current_user_email,
+      id: current_user_id,
+      is_peek_admin: current_user_is_peek_admin,
+      name: current_user_name,
+      primary_role: nil
+    }
+  end
+
   defp build_account_user(_), do: nil
 
   @doc """
