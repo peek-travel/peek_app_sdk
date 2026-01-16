@@ -62,7 +62,6 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButtonInputComponent do
         id={@field.id}
         name={@field.name}
         value={to_string(@selected)}
-        phx-change="validate"
       />
       <.odyssey_toggle_button
         options={@options}
