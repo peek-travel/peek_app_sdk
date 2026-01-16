@@ -18,7 +18,7 @@ defmodule PeekAppSDK.UI.Odyssey.Back do
 
   def odyssey_back(assigns) do
     ~H"""
-    <.link navigate={@navigate} class="text-xl leading-6 text-zinc-900 hover:text-gray-primary">
+    <.link navigate={@navigate} class="text-xl leading-6 text-zinc-900 hover:text-gray-primary no-underline">
       <.odyssey_icon name="hero-arrow-left" class="text-brand h-6 w-6 mr-4" />
       {render_slot(@inner_block)}
     </.link>
