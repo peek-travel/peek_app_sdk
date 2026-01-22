@@ -9,7 +9,7 @@ defmodule PeekAppSDK.MixProject do
       name: "Peek SDK",
       source_url: "https://github.com/peek-travel/peek_app_sdk",
       version: @version,
-      elixir: "~> 1.18",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -19,8 +19,13 @@ defmodule PeekAppSDK.MixProject do
         test_task: "test",
         summary: [threshold: 90]
       ],
-      package: package(),
-      preferred_cli_env: [
+      package: package()
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,

@@ -77,11 +77,11 @@ defmodule PeekAppSDK.Plugs.ClientAuthTest do
         |> put_req_header("x-peek-auth", "Bearer #{token}")
 
       conn = ClientAuth.set_peek_install_id_from_client(conn, %{})
-      assert conn.assigns.peek_account_user.email == nil
-      assert conn.assigns.peek_account_user.id == nil
-      assert conn.assigns.peek_account_user.is_peek_admin == nil
-      assert conn.assigns.peek_account_user.name == nil
-      assert conn.assigns.peek_account_user.primary_role == nil
+      assert conn.assigns.peek_account_user.email == :null
+      assert conn.assigns.peek_account_user.id == :null
+      assert conn.assigns.peek_account_user.is_peek_admin == :null
+      assert conn.assigns.peek_account_user.name == :null
+      assert conn.assigns.peek_account_user.primary_role == :null
     end
 
     test "sets install ID from header with map options" do
@@ -157,11 +157,11 @@ defmodule PeekAppSDK.Plugs.ClientAuthTest do
       conn = ClientAuth.set_peek_install_id_from_client(conn, %{})
 
       assert conn.assigns.peek_install_id == install_id
-      assert conn.assigns.peek_account_user.email == nil
-      assert conn.assigns.peek_account_user.id == nil
-      assert conn.assigns.peek_account_user.is_peek_admin == nil
-      assert conn.assigns.peek_account_user.name == nil
-      assert conn.assigns.peek_account_user.primary_role == nil
+      assert conn.assigns.peek_account_user.email == :null
+      assert conn.assigns.peek_account_user.id == :null
+      assert conn.assigns.peek_account_user.is_peek_admin == :null
+      assert conn.assigns.peek_account_user.name == :null
+      assert conn.assigns.peek_account_user.primary_role == :null
     end
 
     test "handles missing account user fields in claims" do
