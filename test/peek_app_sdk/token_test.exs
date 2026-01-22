@@ -59,11 +59,11 @@ defmodule PeekAppSDK.TokenTest do
       assert claims["iss"] == "peek_app_sdk"
       assert claims["sub"] == install_id
       assert claims["exp"]
-      assert claims["current_user_email"] == nil
-      assert claims["current_user_id"] == nil
-      assert claims["current_user_is_peek_admin"] == nil
+      assert claims["current_user_email"] == :null
+      assert claims["current_user_id"] == :null
+      assert claims["current_user_is_peek_admin"] == :null
       assert claims["current_user_name"] == "hook"
-      assert claims["current_user_primary_role"] == nil
+      assert claims["current_user_primary_role"] == :null
     end
 
     test "generates a valid token with atom config_id" do
@@ -181,11 +181,11 @@ defmodule PeekAppSDK.TokenTest do
       assert claims["iss"] == "app_registry_client"
       assert claims["sub"] == install_id
       assert claims["exp"]
-      assert claims["current_user_email"] == nil
-      assert claims["current_user_id"] == nil
-      assert claims["current_user_is_peek_admin"] == nil
-      assert claims["current_user_name"] == nil
-      assert claims["current_user_primary_role"] == nil
+      assert claims["current_user_email"] == :null
+      assert claims["current_user_id"] == :null
+      assert claims["current_user_is_peek_admin"] == :null
+      assert claims["current_user_name"] == :null
+      assert claims["current_user_primary_role"] == :null
     end
 
     test "generates a valid client token with atom config_id" do
