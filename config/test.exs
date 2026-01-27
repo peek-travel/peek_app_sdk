@@ -4,7 +4,7 @@ import Config
 config :peek_app_sdk,
   peek_app_secret: "test_secret",
   peek_app_id: "test_app_id",
-  peek_api_base_url: "https://apps.peekapis.com",
+  peek_api_base_url: "https://apps.example.peekapis.com",
   peek_api_key: "test_api_key",
   client_secret_token: "test_client_secret",
   # Centralized configuration structure

@@ -16,7 +16,7 @@ defmodule PeekAppSDK.ClientTest do
         assert env.method == :post
 
         assert env.url ==
-                 "https://apps.peekapis.com/backoffice-gql/test_app_id/test_operation_name"
+                 "https://apps.example.peekapis.com/backoffice-gql/test_app_id/test_operation_name"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -44,7 +44,7 @@ defmodule PeekAppSDK.ClientTest do
         assert env.method == :post
 
         assert env.url ==
-                 "https://apps.peekapis.com/backoffice-gql/project_name_app_id/test"
+                 "https://apps.example.peekapis.com/backoffice-gql/project_name_app_id/test"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -77,7 +77,7 @@ defmodule PeekAppSDK.ClientTest do
         assert env.method == :post
 
         assert env.url ==
-                 "https://apps.peekapis.com/backoffice-gql/project_name_app_id/test"
+                 "https://apps.example.peekapis.com/backoffice-gql/project_name_app_id/test"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,
@@ -117,7 +117,7 @@ defmodule PeekAppSDK.ClientTest do
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
-        assert env.url == "https://apps.peekapis.com/backoffice-gql/other_app_id/test"
+        assert env.url == "https://apps.example.peekapis.com/backoffice-gql/other_app_id/test"
 
         assert Jason.decode!(env.body) == %{
                  "query" => query,

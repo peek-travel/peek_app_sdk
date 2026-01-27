@@ -59,7 +59,7 @@ defmodule PeekAppSDK.Client do
         {:ok, data}
 
       {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected PeekPro response (#{status}): #{inspect(body)}")
+        Logger.error("Unexpected PeekPro response when hitting #{url} - (#{status}): #{inspect(body)}")
         {:error, status}
     end
   end
