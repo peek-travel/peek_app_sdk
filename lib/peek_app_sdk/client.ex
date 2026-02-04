@@ -64,6 +64,56 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  @doc """
+  Queries the Peek Pro API.
+
+  ## Examples
+
+  Using the default configuration:
+
+      iex> PeekAppSDK.Client.query_peek_pro_v2("install_id", "query { test }")
+      {:ok, %{test: "success"}}
+
+  Using a specific application's configuration:
+
+      iex> PeekAppSDK.Client.query_peek_pro_v2("install_id", "query { test }", %{}, :project_name)
+      {:ok, %{test: "success"}}
+  """
+  @spec query_peek_pro_v2(String.t(), String.t(), map()) ::
+          {:ok, map()} | {:error, any()}
+  def query_peek_pro_v2(install_id, gql_query, gql_variables \\ %{}) do
+    body_params = %{
+      "query" => gql_query,
+      "variables" => gql_variables
+    }
+
+    config = Config.get_config(nil)
+    peek_app_id = config.peek_app_id
+    peek_api_key = config.peek_api_key
+
+    operation_name = operation_name(gql_query)
+
+    url = "#{String.trim(config.peek_api_base_url)}/#{peek_app_id}/peek_backoffice_api-v1/#{operation_name}"
+
+    case Tesla.request(client(),
+           method: :post,
+           url: url,
+           body: body_params,
+           headers: headers(install_id, nil, peek_api_key)
+         ) do
+      # If we get back an error, fail the whole thing and return the error for now.
+      {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
+        {:error, errors}
+
+      {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
+        {:ok, data}
+
+      {:ok, %Tesla.Env{status: status, body: body}} ->
+        Logger.error("Unexpected PeekPro response when hitting #{url} - (#{status}): #{inspect(body)}")
+        {:error, status}
+    end
+  end
+
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/
 
