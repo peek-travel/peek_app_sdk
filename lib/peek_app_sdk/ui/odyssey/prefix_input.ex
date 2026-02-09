@@ -49,7 +49,7 @@ defmodule PeekAppSDK.UI.Odyssey.PrefixInput do
     ~H"""
     <fieldset class="fieldset mb-2">
       <span :if={@label} class="label block !mb-0">{@label}</span>
-      <div class="flex items-center gap-0 w-[200px]">
+      <div class="flex items-center gap-0">
         <span class="inline-flex items-center justify-center px-3 rounded-l-md border border-r-0 border-neutrals-200 bg-neutrals-50 text-neutrals-300 h-[35px] text-base">
           {@prefix}
         </span>
