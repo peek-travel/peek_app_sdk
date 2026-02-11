@@ -527,6 +527,16 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                     expiration date: <strong>{@form_data["expiration_date"] || ""}</strong>
                   </p>
                 </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Color Input
+                  </label>
+                  <.odyssey_color_input field={@form[:brand_color]} label="Brand Color" />
+                  <p class="text-sm text-gray-500 mt-1">
+                    Current color: <strong>{@form_data["brand_color"] || "#000000"}</strong>
+                  </p>
+                </div>
               </.form>
             </div>
 
