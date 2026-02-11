@@ -38,7 +38,7 @@ defmodule PeekAppSDK.UI.Odyssey.ColorInput do
     |> assign(field: nil, id: assigns.id || field.id)
     |> assign(:errors, simple_errors)
     |> assign_new(:name, fn -> field.name end)
-    |> assign_new(:value, fn -> field.value || "#000000" end)
+    |> assign(:value, field.value || "#000000")
     |> odyssey_color_input()
   end
 
