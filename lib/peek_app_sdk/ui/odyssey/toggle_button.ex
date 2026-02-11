@@ -90,7 +90,11 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
         </label>
       </fieldset>
     <% else %>
-      <.do_odyssey_toggle_button {assigns} />
+      <div :if={@tooltip} class="flex items-center gap-2">
+        <.do_odyssey_toggle_button {assigns} />
+        <.odyssey_tooltip text={@tooltip} location={@tooltip_location} />
+      </div>
+      <.do_odyssey_toggle_button :if={is_nil(@tooltip)} {assigns} />
     <% end %>
     """
   end

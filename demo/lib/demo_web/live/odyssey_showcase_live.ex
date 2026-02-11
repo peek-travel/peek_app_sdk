@@ -287,6 +287,16 @@ defmodule DemoWeb.OdysseyShowcaseLive do
               />
               <p class="text-sm text-gray-600 mt-2">This toggle button is disabled and cannot be interacted with.</p>
             </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Toggle Button with Tooltip (No Label)</h3>
+              <.odyssey_toggle_button
+                options={["Daily", "Weekly", "Monthly"]}
+                selected="Weekly"
+                on_change="change_frequency"
+                tooltip="Select how often you want to receive reports"
+              />
+            </div>
           </div>
         </section>
 

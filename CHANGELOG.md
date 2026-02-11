@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `location` attr to `odyssey_tooltip` supporting `top`, `bottom`, `left`, `right` (default: `top`).
 - Added `dismissable` attr and `<:action>` slot to `odyssey_alert` for inline dismiss button and custom actions.
 - Added `disabled` attr to `odyssey_toggle_button` to disable interaction.
+- Toggle button tooltip now renders after the button group when no label is provided.
 
 ## [2026-02-09]
 
