@@ -109,7 +109,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           A comprehensive demonstration of all available Odyssey UI components with examples and usage patterns.
         </p>
       </div>
-      
+
     <!-- Navigation Tabs -->
       <div class="my-4 border-b-2 border-gray-300">
         <div class="flex gap-6">
@@ -151,7 +151,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </button>
         </div>
       </div>
-      
+
     <!-- Components Section -->
       <div :if={@current_tab == "components"} class="space-y-12">
         <!-- Alerts Section -->
@@ -181,11 +181,23 @@ defmodule DemoWeb.OdysseyShowcaseLive do
               <:title>Info Alert with Action</:title>
               <:message>This is an informational message with an optional action button.</:message>
             </.odyssey_alert>
+
+            <.odyssey_alert type="info" dismissable>
+              <:title>Dismissable Alert</:title>
+              <:message>Click the dismiss button to hide this alert.</:message>
+            </.odyssey_alert>
+
+            <.odyssey_alert type="info" dismissable>
+              <:title>Alert with Custom Action</:title>
+              <:action>
+                <button type="button" class="btn btn-primary text-sm">Take Action</button>
+              </:action>
+            </.odyssey_alert>
           </div>
         </section>
 
         <.odyssey_divider />
-        
+
     <!-- Toggle Button Section -->
         <section>
           <h2 class="text-2xl font-semibold mb-6">Toggle Button</h2>
@@ -268,7 +280,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
         </section>
 
         <.odyssey_divider />
-        
+
     <!-- Navigation Section -->
         <section>
           <h2 class="text-2xl font-semibold mb-6">Navigation Components</h2>
@@ -279,8 +291,48 @@ defmodule DemoWeb.OdysseyShowcaseLive do
             </div>
           </div>
         </section>
+
+        <.odyssey_divider />
+
+        <section>
+          <h2 class="text-2xl font-semibold mb-6">Tooltip Components</h2>
+          <div class="space-y-8">
+            <div>
+              <h3 class="text-lg font-medium mb-4">Top (default)</h3>
+              <.odyssey_tooltip text="Tooltip appears above.">
+                Hover for info
+              </.odyssey_tooltip>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-4">Bottom</h3>
+              <.odyssey_tooltip text="Tooltip appears below." location="bottom">
+                Hover for info
+              </.odyssey_tooltip>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-4">Left</h3>
+              <.odyssey_tooltip text="Tooltip appears to the left." location="left">
+                Hover for info
+              </.odyssey_tooltip>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-4">Right</h3>
+              <.odyssey_tooltip text="Tooltip appears to the right." location="right">
+                Hover for info
+              </.odyssey_tooltip>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-4">Icon Only (no slot content)</h3>
+              <.odyssey_tooltip text="Just the info icon, no label." />
+            </div>
+          </div>
+        </section>
       </div>
-      
+
     <!-- Icons Section -->
       <div :if={@current_tab == "icons"} class="space-y-8">
         <section>
@@ -341,7 +393,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-      
+
     <!-- Forms Section -->
       <div :if={@current_tab == "forms"} class="space-y-8">
         <section>
@@ -383,6 +435,17 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                   <p class="text-sm text-gray-500 mt-1">
                     Current value: <strong>{@form_data["time_unit"] || "Minutes"}</strong>
                   </p>
+                </div>
+
+                <div>
+                  <h3 class="text-lg font-medium mb-2">Toggle with Label and Tooltip</h3>
+                  <.odyssey_toggle_button
+                    label="Notification Preference"
+                    tooltip="Choose how you'd like to receive notifications from us."
+                    options={["Email", "SMS", "Push"]}
+                    selected="Email"
+                    on_change="change_notification"
+                  />
                 </div>
 
                 <div>
@@ -471,7 +534,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
           </div>
         </section>
       </div>
-      
+
     <!-- Code Examples Section -->
       <div class="mt-12 p-6 bg-gray-50 rounded-lg">
         <h2 class="text-xl font-semibold mb-4">Usage Examples</h2>

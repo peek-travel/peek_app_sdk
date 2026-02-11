@@ -139,8 +139,8 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
       assert html =~ "shadow-sm"
       assert html =~ "border-l-4"
       assert html =~ "text-sm leading-relaxed text-neutrals-300"
-      assert html =~ "flex items-start"
-      assert html =~ "flex-shrink-0 mt-0.5 mr-3"
+      assert html =~ "flex items-center"
+      assert html =~ "flex-shrink-0 mr-3"
       assert html =~ "flex-1"
     end
 
