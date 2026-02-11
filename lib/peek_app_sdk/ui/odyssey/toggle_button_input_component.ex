@@ -71,6 +71,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButtonInputComponent do
         label={assigns[:label]}
         tooltip={assigns[:tooltip]}
         tooltip_location={assigns[:tooltip_location] || "right"}
+        disabled={assigns[:disabled] || false}
         {@rest}
       />
     </div>
