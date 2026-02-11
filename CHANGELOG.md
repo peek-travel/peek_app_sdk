@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `odyssey_tooltip` component to the demo app showcase with examples for both default and top caret variants.
-- Added optional 'tooltip' arg to `odyssey_toggle_button` component
+- Added optional `tooltip` and `tooltip_location` attrs to `odyssey_toggle_button` component.
+- Added `location` attr to `odyssey_tooltip` supporting `top`, `bottom`, `left`, `right` (default: `top`).
+- Added `dismissable` attr and `<:action>` slot to `odyssey_alert` for inline dismiss button and custom actions.
 
 ## [2026-02-09]
 

@@ -38,6 +38,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   """
   use Phoenix.Component
 
+  alias Phoenix.LiveView.JS
   import PeekAppSDK.UI.Odyssey.Icon
 
   @doc """
@@ -59,9 +60,11 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   attr :class, :string, default: nil
   attr :action_text, :string, default: nil, doc: "text for the action button"
   attr :action_url, :string, default: nil, doc: "URL for the action button"
+  attr :dismissable, :boolean, default: false, doc: "show a dismiss button"
 
   slot :title, required: true
   slot :message, required: false
+  slot :action, required: false, doc: "custom action slot (e.g., buttons)"
 
   def odyssey_alert(assigns) do
     border_class =
@@ -73,23 +76,41 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
         _ -> "border-info-300"
       end
 
-    assigns = assign(assigns, :border_class, border_class)
+    has_actions = assigns.action != [] || assigns.dismissable || (assigns.action_text && assigns.action_url)
+    alert_id = if assigns.dismissable, do: "alert-#{System.unique_integer([:positive])}"
+
+    assigns = assign(assigns, border_class: border_class, has_actions: has_actions, alert_id: alert_id)
 
     ~H"""
-    <div class={["max-w-4xl mx-auto bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class]}>
-      <div class="flex items-start">
-        <div class="flex-shrink-0 mt-0.5 mr-3">
+    <div
+      id={@alert_id}
+      class={["max-w-4xl mx-auto bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class]}
+    >
+      <div class="flex items-center">
+        <div class="flex-shrink-0 mr-3">
           <.alert_type_icon type={@type} />
         </div>
-        <div class="flex-1">
-          <div :if={@title != []} class="font-medium text-base mb-1 text-neutrals-350">
-            {render_slot(@title)}
+        <div class="flex-1 flex items-center justify-between gap-4">
+          <div>
+            <div :if={@title != []} class="font-medium text-base text-neutrals-350">
+              {render_slot(@title)}
+            </div>
+            <div :if={@message != []} class="text-sm leading-relaxed text-neutrals-300">
+              {render_slot(@message)}
+            </div>
           </div>
-          <div class="text-sm leading-relaxed text-neutrals-300">
-            {render_slot(@message)}
-          </div>
-          <div :if={@action_text && @action_url} class="mt-2 flex justify-end">
+          <div :if={@has_actions} class="flex items-center gap-3 flex-shrink-0">
+            <button
+              :if={@dismissable}
+              type="button"
+              phx-click={JS.hide(transition: "fade-out", to: "##{@alert_id}")}
+              class="text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+            >
+              Dismiss
+            </button>
+            {render_slot(@action)}
             <a
+              :if={@action_text && @action_url}
               href={@action_url}
               target="_blank"
               rel="noopener noreferrer"

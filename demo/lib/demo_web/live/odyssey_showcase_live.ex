@@ -181,6 +181,18 @@ defmodule DemoWeb.OdysseyShowcaseLive do
               <:title>Info Alert with Action</:title>
               <:message>This is an informational message with an optional action button.</:message>
             </.odyssey_alert>
+
+            <.odyssey_alert type="info" dismissable>
+              <:title>Dismissable Alert</:title>
+              <:message>Click the dismiss button to hide this alert.</:message>
+            </.odyssey_alert>
+
+            <.odyssey_alert type="info" dismissable>
+              <:title>Alert with Custom Action</:title>
+              <:action>
+                <button type="button" class="btn btn-primary text-sm">Take Action</button>
+              </:action>
+            </.odyssey_alert>
           </div>
         </section>
 
