@@ -69,6 +69,8 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButtonInputComponent do
         on_change="odyssey_toggle_button_change"
         phx_target={@myself}
         label={assigns[:label]}
+        tooltip={assigns[:tooltip]}
+        tooltip_location={assigns[:tooltip_location] || "right"}
         {@rest}
       />
     </div>

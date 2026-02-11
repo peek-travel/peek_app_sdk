@@ -36,7 +36,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
       />
   """
   use Phoenix.Component
-  import PeekAppSDK.UI.Odyssey, only: [odyssey_icon: 1]
+  import PeekAppSDK.UI.Odyssey, only: [odyssey_icon: 1, odyssey_tooltip: 1]
 
   attr(:options, :list,
     required: true,
@@ -48,6 +48,8 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
   attr(:on_change, :string, required: false, doc: "event name to fire on change (not needed when using field)")
   attr(:field, Phoenix.HTML.FormField, required: false, doc: "optional form field for automatic form integration")
   attr(:label, :string, required: false, doc: "optional label to wrap the toggle button in a fieldset")
+  attr(:tooltip, :string, required: false, doc: "optional tooltip text to display next to the label")
+  attr(:tooltip_location, :string, default: "right", doc: "tooltip position: top, bottom, left, right")
   attr(:phx_target, :any, required: false, doc: "optional phx-target for LiveComponent integration")
   attr(:rest, :global)
 
@@ -71,12 +73,18 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
       assigns
       |> assign_new(:phx_target, fn -> nil end)
       |> assign_new(:label, fn -> nil end)
+      |> assign_new(:tooltip, fn -> nil end)
 
     ~H"""
     <%= if @label do %>
       <fieldset class="fieldset mb-2">
         <label>
-          <span class="label mb-1">{@label}</span>
+          <span class="label mb-1">
+            <.odyssey_tooltip :if={@tooltip} text={@tooltip} location={@tooltip_location}>{@label}</.odyssey_tooltip>
+            <%= if is_nil(@tooltip) do %>
+              {@label}
+            <% end %>
+          </span>
           <.do_odyssey_toggle_button {assigns} />
         </label>
       </fieldset>

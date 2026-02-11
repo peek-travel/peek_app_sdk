@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-02-11]
+
+### Added
+
+- Added `odyssey_tooltip` component to the demo app showcase with examples for both default and top caret variants.
+- Added optional 'tooltip' arg to `odyssey_toggle_button` component
+
 ## [2026-02-09]
 
 ### Changed
