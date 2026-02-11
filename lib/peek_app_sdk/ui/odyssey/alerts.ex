@@ -84,7 +84,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
     ~H"""
     <div
       id={@alert_id}
-      class={["max-w-4xl mx-auto bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class]}
+      class={["max-w-4xl mx-auto bg-white rounded-lg px-2 py-3 shadow-sm border-l-4 border", @border_class, @class]}
     >
       <div class="flex items-center">
         <div class="flex-shrink-0 mr-3">
