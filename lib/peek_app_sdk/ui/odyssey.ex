@@ -7,6 +7,7 @@ defmodule PeekAppSDK.UI.Odyssey do
   defdelegate odyssey_activity_picker(assigns), to: PeekAppSDK.UI.Odyssey.OdysseyActivityPicker
   defdelegate odyssey_alert(assigns), to: PeekAppSDK.UI.Odyssey.Alerts
   defdelegate odyssey_back(assigns), to: PeekAppSDK.UI.Odyssey.Back
+  defdelegate odyssey_color_input(assigns), to: PeekAppSDK.UI.Odyssey.ColorInput
   defdelegate odyssey_divider(assigns), to: PeekAppSDK.UI.Odyssey.Divider
   defdelegate odyssey_icon(assigns), to: PeekAppSDK.UI.Odyssey.Icon
   defdelegate odyssey_tabs(assigns), to: PeekAppSDK.UI.Odyssey.Tabs
