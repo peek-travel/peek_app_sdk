@@ -50,6 +50,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
   attr(:label, :string, required: false, doc: "optional label to wrap the toggle button in a fieldset")
   attr(:tooltip, :string, required: false, doc: "optional tooltip text to display next to the label")
   attr(:tooltip_location, :string, default: "right", doc: "tooltip position: top, bottom, left, right")
+  attr(:disabled, :boolean, default: false, doc: "disable the toggle button")
   attr(:phx_target, :any, required: false, doc: "optional phx-target for LiveComponent integration")
   attr(:rest, :global)
 
@@ -96,32 +97,32 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
 
   # Private function component for the button group to avoid duplication
   defp do_odyssey_toggle_button(assigns) do
+    assigns = assign_new(assigns, :disabled, fn -> false end)
+
     ~H"""
     <div class="inline-flex rounded-lg" role="group">
       <button
         :for={{option, index} <- Enum.with_index(@options)}
         type="button"
+        disabled={@disabled}
         value={to_string(option_value(option))}
         phx-click={
-          if to_string(@selected) == to_string(option_value(option)),
+          if @disabled || to_string(@selected) == to_string(option_value(option)),
             do: nil,
             else: @on_change
         }
         phx-target={@phx_target}
-        class={
-          [
-            "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors border border-gray-200",
-            # Rounded corners only on first and last buttons
-            index == 0 && "rounded-l-lg",
-            index == length(@options) - 1 && "rounded-r-lg",
-            # Remove left border on all buttons except the first to avoid double borders
-            index > 0 && "-ml-px",
-            to_string(@selected) == to_string(option_value(option)) &&
-              "bg-gray-50 text-blue-600 z-10 relative",
-            to_string(@selected) != to_string(option_value(option)) &&
-              "bg-white text-gray-600 hover:text-gray-900 cursor-pointer"
-          ]
-        }
+        class={[
+          "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors border border-gray-200",
+          index == 0 && "rounded-l-lg",
+          index == length(@options) - 1 && "rounded-r-lg",
+          index > 0 && "-ml-px",
+          @disabled && "opacity-50 cursor-not-allowed",
+          !@disabled && to_string(@selected) == to_string(option_value(option)) &&
+            "bg-gray-50 text-blue-600 z-10 relative",
+          !@disabled && to_string(@selected) != to_string(option_value(option)) &&
+            "bg-white text-gray-600 hover:text-gray-900 cursor-pointer"
+        ]}
         {@rest}
       >
         <%= if option_icon(option) do %>

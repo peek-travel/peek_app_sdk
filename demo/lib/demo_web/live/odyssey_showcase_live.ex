@@ -276,6 +276,17 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                 on_change="change_view_mode"
               />
             </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Disabled Toggle Button</h3>
+              <.odyssey_toggle_button
+                options={["Option A", "Option B", "Option C"]}
+                selected="Option B"
+                on_change="noop"
+                disabled
+              />
+              <p class="text-sm text-gray-600 mt-2">This toggle button is disabled and cannot be interacted with.</p>
+            </div>
           </div>
         </section>
 
