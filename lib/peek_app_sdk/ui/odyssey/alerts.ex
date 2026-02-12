@@ -61,6 +61,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   attr :action_text, :string, default: nil, doc: "text for the action button"
   attr :action_url, :string, default: nil, doc: "URL for the action button"
   attr :dismissable, :boolean, default: false, doc: "show a dismiss button"
+  attr :full, :boolean, default: false, doc: "full-width with actions pushed to the right"
 
   slot :title, required: true
   slot :message, required: false
@@ -84,9 +85,14 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
     ~H"""
     <div
       id={@alert_id}
-      class={["flex w-fit bg-white rounded-lg px-4 py-3 shadow-sm border-l-4 border", @border_class, @class]}
+      class={[
+        "flex bg-white rounded-lg px-4 py-3 shadow-sm border-l-4 border",
+        (@full && "w-full") || "w-fit",
+        @border_class,
+        @class
+      ]}
     >
-      <div class="flex items-center">
+      <div class={["flex items-center", @full && "flex-1"]}>
         <div class="flex-shrink-0 mr-3">
           <.alert_type_icon type={@type} />
         </div>
@@ -99,7 +105,7 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
               {render_slot(@message)}
             </div>
           </div>
-          <div :if={@has_actions} class="flex items-center gap-3 flex-shrink-0">
+          <div :if={@has_actions} class="flex items-center gap-3 flex-shrink-0 ml-6">
             <button
               :if={@dismissable}
               type="button"

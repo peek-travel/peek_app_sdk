@@ -199,9 +199,9 @@ defmodule DemoWeb.OdysseyShowcaseLive do
               <:message>This alert is only as wide as its content.</:message>
             </.odyssey_alert>
 
-            <.odyssey_alert type="warning" class="w-full max-w-4xl mx-auto">
-              <:title>Centered Full-width Alert</:title>
-              <:message>Use class="w-full max-w-4xl mx-auto" to center and make full-width.</:message>
+            <.odyssey_alert type="warning" full dismissable>
+              <:title>Full-width Alert</:title>
+              <:message>Use full attr for full-width with actions pushed to the right.</:message>
             </.odyssey_alert>
           </div>
         </section>

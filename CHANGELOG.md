@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking
 
-- `odyssey_alert` is now content-width by default (`flex w-fit`) instead of centered full-width. Use `class="w-full max-w-4xl mx-auto"` to restore the previous centered behavior.
+- `odyssey_alert` is now content-width by default (`flex w-fit`) instead of centered full-width. Use the new `full` attr for full-width alerts with actions pushed to the right, or `class="w-full"` for manual control.
+
+### Added
+
+- Added `full` attr to `odyssey_alert` for full-width alerts with dismiss/actions pushed to the right.
 
 ### Fixed
 
