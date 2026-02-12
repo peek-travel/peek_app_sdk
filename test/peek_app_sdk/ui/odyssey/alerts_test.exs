@@ -133,7 +133,7 @@ defmodule PeekAppSDK.UI.Odyssey.AlertsTest do
           %{}
         )
 
-      assert html =~ "max-w-4xl"
+      assert html =~ "flex w-fit"
       assert html =~ "bg-white"
       assert html =~ "rounded-lg"
       assert html =~ "shadow-sm"

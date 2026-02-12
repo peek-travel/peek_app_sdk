@@ -193,6 +193,16 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                 <button type="button" class="btn btn-primary text-sm">Take Action</button>
               </:action>
             </.odyssey_alert>
+
+            <.odyssey_alert type="success">
+              <:title>Content-width Alert</:title>
+              <:message>This alert is only as wide as its content.</:message>
+            </.odyssey_alert>
+
+            <.odyssey_alert type="warning" class="w-full max-w-4xl mx-auto">
+              <:title>Centered Full-width Alert</:title>
+              <:message>Use class="w-full max-w-4xl mx-auto" to center and make full-width.</:message>
+            </.odyssey_alert>
           </div>
         </section>
 

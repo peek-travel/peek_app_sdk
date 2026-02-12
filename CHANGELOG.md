@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2026-02-12]
 
+### Breaking
+
+- `odyssey_alert` is now content-width by default (`flex w-fit`) instead of centered full-width. Use `class="w-full max-w-4xl mx-auto"` to restore the previous centered behavior.
+
 ### Fixed
 
 - Fix size of color input to be a square
