@@ -53,7 +53,7 @@ defmodule PeekAppSDK.UI.Odyssey.ColorInput do
           id={@id}
           value={@value}
           class={[
-            "h-[35px] w-[60px] rounded-md border border-neutrals-200 bg-neutrals-100 cursor-pointer",
+            "h-[35px] w-[55px] rounded-md border border-neutrals-200 bg-neutrals-100 cursor-pointer",
             "hover:border-neutrals-250",
             "focus:outline-none focus:ring-4 focus:ring-neutrals-100 focus:border-neutrals-200",
             @errors != [] && "border-error",

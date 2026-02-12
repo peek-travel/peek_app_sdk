@@ -56,6 +56,9 @@
     @apply shadow-none;
     border-radius: 6px;
   }
+  .btn.btn-icon {
+    @apply px-8 py-0;
+  }
 
   .btn.disabled,
   .btn[disabled] {
@@ -102,6 +105,13 @@
     @apply text-danger-300;
     @apply hover:text-danger-400;
     @apply focus:ring-danger-100;
+  }
+
+  .btn.btn-ghost {
+    @apply bg-transparent border-none;
+    @apply text-interaction-300;
+    @apply hover:text-interaction-400;
+    @apply focus:ring-0;
   }
 
   /* Remove underline from button links, it's an internal design rule */
