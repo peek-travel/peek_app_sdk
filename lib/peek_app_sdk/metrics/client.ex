@@ -153,7 +153,7 @@ defmodule PeekAppSDK.Metrics.Client do
   defp event_url,
     do: "https://ahem.peeklabs.com/events/#{Application.fetch_env!(:peek_app_sdk, :peek_app_id)}"
 
-  defp do_post!(body, _opts \\ []) do
+  defp do_post!(body) do
     response = Tesla.post!(client(), event_url(), body)
 
     case response do

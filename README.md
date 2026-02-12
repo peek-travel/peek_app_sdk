@@ -345,14 +345,16 @@ If `posthog_key` is not configured, PostHog calls are no-ops.
 - PostHog event capture: Use the partner variant to send events directly to PostHog:
 
 ```elixir
-partner = %{external_refid: "partner-123", name: "Bob's Surf", is_test: false}
+partner = %{external_refid: "partner-123", name: "Bob's Surf", is_test: false, platform: "peek"}
 PeekAppSDK.Metrics.track(partner, "order.purchased", %{order_total: 129_00})
 ```
 
 The SDK automatically includes these properties on every PostHog capture:
-- `distinct_id` (set to `partner.external_refid`)
+
+- `distinct_id` (set to `"#{platform}-#{partner.external_refid}"`, e.g., "peek-partner-123")
 - `partner_id`, `partner_name`, `partner_is_test`
 - `app_slug` (your `peek_app_id`)
+- `platform` (from the partner map)
 
 ### Notes
 

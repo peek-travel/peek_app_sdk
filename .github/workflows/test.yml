@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Build and test
@@ -17,8 +20,8 @@ jobs:
       - name: Set up Erlang and Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.19.5'
-          otp-version: '28.3.1'
+          elixir-version: "1.19.5"
+          otp-version: "28.3.1"
 
       - name: Cache deps
         uses: actions/cache@v3
@@ -36,7 +39,32 @@ jobs:
       - name: Check formatting
         run: mix format --check-formatted
 
+      - name: Run credo
+        run: mix credo
+
       - name: Run tests with coverage
-        run: mix coveralls.github
+        run: mix coveralls.lcov
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: cover/lcov.info
+
+  coverage_analysis:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-lcov
+          path: cover
+      - name: Verify coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v2
+        with:
+          path: cover/lcov.info
+          min_coverage: 100

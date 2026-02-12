@@ -17,7 +17,7 @@ defmodule PeekAppSDK.MixProject do
       test_coverage: [
         tool: ExCoveralls,
         test_task: "test",
-        summary: [threshold: 90]
+        summary: [threshold: 100]
       ],
       package: package()
     ]

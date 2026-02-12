@@ -19,15 +19,15 @@ defmodule PeekAppSDK.Metrics.PostHog do
     Tesla.client(middleware)
   end
 
-  def identify(%{name: partner_name, external_refid: partner_id, is_test: is_test}) do
+  def identify(%{name: partner_name, external_refid: partner_id, is_test: is_test, platform: platform}) do
     config = Config.get_config()
     posthog_key = config.posthog_key
 
     body = %{
       api_key: posthog_key,
-      properties: %{"$set" => %{"name" => partner_name, "is_test" => is_test}},
+      properties: %{"$set" => %{"name" => partner_name, "is_test" => is_test, "platform" => platform}},
       timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
-      distinct_id: partner_id,
+      distinct_id: "#{platform}-#{partner_id}",
       event: "$set"
     }
 
@@ -36,21 +36,23 @@ defmodule PeekAppSDK.Metrics.PostHog do
     end
   end
 
-  def track(%{name: partner_name, external_refid: partner_id, is_test: is_test}, event_id, payload) do
+  def track(%{name: partner_name, external_refid: partner_id, is_test: is_test, platform: platform}, event_id, payload) do
     config = Config.get_config()
     posthog_key = config.posthog_key
     app_id = config.peek_app_id
+    distinct_id = "#{platform}-#{partner_id}"
 
     body = %{
       api_key: posthog_key,
       event: event_id,
       properties:
         Map.merge(payload, %{
-          distinct_id: partner_id,
+          distinct_id: distinct_id,
           partner_id: partner_id,
           partner_name: partner_name,
           partner_is_test: is_test,
-          app_slug: app_id
+          app_slug: app_id,
+          platform: platform
         })
     }
 

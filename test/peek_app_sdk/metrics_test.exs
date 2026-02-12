@@ -120,8 +120,26 @@ defmodule PeekAppSDK.MetricsTest do
     end
   end
 
-  describe "track_install identifies via PostHog when configured" do
-    test "posts ahem, then identify, then capture" do
+  describe "update_configuration_status/3" do
+    test "delegates to PeekAppSDK.Metrics.Client.update_configuration_status/4" do
+      install_id = "test_install_123"
+      status = "configured"
+      notes = "All set up"
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :put
+        assert String.contains?(env.url, install_id)
+
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      assert :ok = Metrics.update_configuration_status(install_id, status, notes)
+    end
+  end
+
+  describe "track_install/2 with partner map" do
+    test "calls track_install/4, identify, and track for PostHog" do
       prev = Application.get_env(:peek_app_sdk, :posthog_key)
       Application.put_env(:peek_app_sdk, :posthog_key, "ph_test_key")
       on_exit(fn -> Application.put_env(:peek_app_sdk, :posthog_key, prev) end)
@@ -137,7 +155,7 @@ defmodule PeekAppSDK.MetricsTest do
         end
       end)
 
-      partner = %{external_refid: "p-1", name: "Partner Name", is_test: false}
+      partner = %{external_refid: "p-1", name: "Partner Name", is_test: false, platform: "peek"}
 
       assert {:ok, _} = PeekAppSDK.Metrics.track_install(partner, [])
 
@@ -149,6 +167,92 @@ defmodule PeekAppSDK.MetricsTest do
       assert_receive {:request, url3, body3}
       assert String.contains?(url3, "/capture")
       assert body3["event"] == "app.install"
+    end
+
+    test "calls track_install/4, identify, and track with default opts" do
+      prev = Application.get_env(:peek_app_sdk, :posthog_key)
+      Application.put_env(:peek_app_sdk, :posthog_key, "ph_test_key")
+      on_exit(fn -> Application.put_env(:peek_app_sdk, :posthog_key, prev) end)
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(self(), {:request, env.url, Jason.decode!(env.body)})
+
+        if String.contains?(env.url, "ahem.peeklabs.com/events/") do
+          {:ok, %Tesla.Env{status: 202}}
+        else
+          {:ok, %Tesla.Env{status: 200}}
+        end
+      end)
+
+      partner = %{external_refid: "p-2", name: "Test Partner", is_test: true, platform: "peek"}
+
+      assert {:ok, _} = PeekAppSDK.Metrics.track_install(partner)
+
+      assert_receive {:request, url1, _}
+      assert String.contains?(url1, "ahem.peeklabs.com/events/")
+      assert_receive {:request, url2, body2}
+      assert String.contains?(url2, "/i/v0/e/")
+      assert body2["event"] == "$set"
+      assert_receive {:request, url3, body3}
+      assert String.contains?(url3, "/capture")
+      assert body3["event"] == "app.install"
+    end
+  end
+
+  describe "track_uninstall/2 with partner map" do
+    test "calls track_uninstall/4 and track for PostHog" do
+      prev = Application.get_env(:peek_app_sdk, :posthog_key)
+      Application.put_env(:peek_app_sdk, :posthog_key, "ph_test_key")
+      on_exit(fn -> Application.put_env(:peek_app_sdk, :posthog_key, prev) end)
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(self(), {:request, env.url, Jason.decode!(env.body)})
+
+        if String.contains?(env.url, "ahem.peeklabs.com/events/") do
+          {:ok, %Tesla.Env{status: 202}}
+        else
+          {:ok, %Tesla.Env{status: 200}}
+        end
+      end)
+
+      partner = %{external_refid: "p-3", name: "Uninstall Partner", is_test: false, platform: "peek"}
+
+      assert {:ok, _} = PeekAppSDK.Metrics.track_uninstall(partner, [])
+
+      assert_receive {:request, url1, _}
+      assert String.contains?(url1, "ahem.peeklabs.com/events/")
+      assert_receive {:request, url2, body2}
+      assert String.contains?(url2, "/capture")
+      assert body2["event"] == "app.uninstall"
+    end
+
+    test "calls track_uninstall/4 and track with default opts" do
+      prev = Application.get_env(:peek_app_sdk, :posthog_key)
+      Application.put_env(:peek_app_sdk, :posthog_key, "ph_test_key")
+      on_exit(fn -> Application.put_env(:peek_app_sdk, :posthog_key, prev) end)
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(self(), {:request, env.url, Jason.decode!(env.body)})
+
+        if String.contains?(env.url, "ahem.peeklabs.com/events/") do
+          {:ok, %Tesla.Env{status: 202}}
+        else
+          {:ok, %Tesla.Env{status: 200}}
+        end
+      end)
+
+      partner = %{external_refid: "p-4", name: "Test Uninstall", is_test: true, platform: "peek"}
+
+      assert {:ok, _} = PeekAppSDK.Metrics.track_uninstall(partner)
+
+      assert_receive {:request, url1, _}
+      assert String.contains?(url1, "ahem.peeklabs.com/events/")
+      assert_receive {:request, url2, body2}
+      assert String.contains?(url2, "/capture")
+      assert body2["event"] == "app.uninstall"
     end
   end
 end
