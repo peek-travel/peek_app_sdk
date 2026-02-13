@@ -1,5 +1,6 @@
 defmodule PeekAppSDK.Client do
   require Logger
+  use Retry
 
   alias PeekAppSDK.Config
 
@@ -32,6 +33,19 @@ defmodule PeekAppSDK.Client do
   @spec query_peek_pro(String.t(), String.t(), map(), atom() | nil) ::
           {:ok, map()} | {:error, any()}
   def query_peek_pro(install_id, gql_query, gql_variables \\ %{}, config_id \\ nil) do
+    retry with: 200 |> exponential_backoff() |> randomize() |> cap(2000) |> Stream.take(5), atoms: [:rate_limited] do
+      case do_query_peek_pro(install_id, gql_query, gql_variables, config_id) do
+        {:error, 429} -> :rate_limited
+        result -> result
+      end
+    after
+      result -> result
+    else
+      error -> error
+    end
+  end
+
+  defp do_query_peek_pro(install_id, gql_query, gql_variables, config_id) do
     body_params = %{
       "query" => gql_query,
       "variables" => gql_variables
@@ -51,7 +65,6 @@ defmodule PeekAppSDK.Client do
            body: body_params,
            headers: headers(install_id, config_id, peek_api_key)
          ) do
-      # If we get back an error, fail the whole thing and return the error for now.
       {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
         {:error, errors}
 
