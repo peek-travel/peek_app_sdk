@@ -217,5 +217,97 @@ defmodule PeekAppSDK.Metrics.ClientTest do
         end
       end
     end
+
+    test "successfully updates configuration status" do
+      install_id = "test_install_123"
+      status = "configured"
+      notes = "Configuration completed successfully"
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :put
+        assert String.contains?(env.url, "/registry/installations/")
+        assert String.contains?(env.url, install_id)
+        assert String.contains?(env.url, "/configuration_status")
+
+        body = Jason.decode!(env.body)
+        assert body["status"] == status
+        assert body["notes"] == notes
+
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      assert :ok = Client.update_configuration_status(install_id, status, notes)
+    end
+
+    test "successfully updates configuration status without notes" do
+      install_id = "test_install_456"
+      status = "pending"
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :put
+
+        body = Jason.decode!(env.body)
+        assert body["status"] == status
+        assert body["notes"] == nil
+
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      assert :ok = Client.update_configuration_status(install_id, status)
+    end
+
+    test "handles error response from configuration status API" do
+      install_id = "test_install_789"
+      status = "configured"
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :put
+        {:ok, %Tesla.Env{status: 404, body: %{error: "Installation not found"}}}
+      end)
+
+      assert {:error, {404, %{error: "Installation not found"}}} =
+               Client.update_configuration_status(install_id, status)
+    end
+
+    test "uses custom config_id when provided" do
+      install_id = "test_install_custom"
+      status = "configured"
+      config_id = :project_name
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :put
+        # Should use project_name's app_id from config
+        assert String.contains?(env.url, "project_name_app_id")
+
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      assert :ok = Client.update_configuration_status(install_id, status, nil, config_id)
+    end
+
+    test "uses config without peek_api_key" do
+      install_id = "test_install_no_key"
+      status = "configured"
+      config_id = :other_app
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :put
+        # Should use other_app's app_id from config
+        assert String.contains?(env.url, "other_app_id")
+        # Should only have X-Peek-Auth header, not pk-api-key
+        headers = Map.new(env.headers)
+        assert Map.has_key?(headers, "X-Peek-Auth")
+        refute Map.has_key?(headers, "pk-api-key")
+
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      assert :ok = Client.update_configuration_status(install_id, status, nil, config_id)
+    end
   end
 end

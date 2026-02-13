@@ -340,19 +340,26 @@ If `posthog_key` is not configured, PostHog calls are no-ops.
 
 - Identify on install: When you call `PeekAppSDK.Metrics.track_install/2` with a partner map, the SDK will:
   - Send an Identify-like event to PostHog (`event: "$set"`) that sets person properties:
-    - `name` and `is_test`
+    - `name`, `is_test`, and `platform`
   - Then capture the `app.install` event.
 - PostHog event capture: Use the partner variant to send events directly to PostHog:
 
 ```elixir
+# Platform is optional - defaults to "peek"
 partner = %{external_refid: "partner-123", name: "Bob's Surf", is_test: false}
+PeekAppSDK.Metrics.track(partner, "order.purchased", %{order_total: 129_00})
+
+# Or specify platform explicitly for non-peek partners
+partner = %{external_refid: "partner-456", name: "CNG Partner", is_test: false, platform: "cng"}
 PeekAppSDK.Metrics.track(partner, "order.purchased", %{order_total: 129_00})
 ```
 
 The SDK automatically includes these properties on every PostHog capture:
-- `distinct_id` (set to `partner.external_refid`)
+
+- `distinct_id` - Prefixed as `"#{platform}-#{partner.external_refid}"` (e.g., "peek-partner-123", "cng-partner-456").
 - `partner_id`, `partner_name`, `partner_is_test`
 - `app_slug` (your `peek_app_id`)
+- `platform` (from the partner map, defaults to "peek")
 
 ### Notes
 

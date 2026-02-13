@@ -1,0 +1,20 @@
+#!/bin/bash
+set -e
+
+echo "Running local checks..."
+echo ""
+
+echo "→ Running mix format..."
+mix format
+
+echo ""
+echo "→ Running mix credo..."
+mix credo
+
+echo ""
+echo "→ Running tests with coverage..."
+mix coveralls.lcov
+
+echo ""
+echo "✓ All checks passed!"
+

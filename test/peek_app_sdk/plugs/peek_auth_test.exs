@@ -183,6 +183,39 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       assert conn.assigns.peek_account_user == nil
     end
 
+    test "handles legacy account user format with is_admin field" do
+      install_id = "test_install_id"
+
+      # Create a token with legacy format (is_admin instead of primary_role)
+      config = PeekAppSDK.Config.get_config()
+      shared_secret_key = config.peek_app_secret
+      signer = Joken.Signer.create("HS256", shared_secret_key)
+
+      params = %{
+        "iss" => "peek_app_sdk",
+        "sub" => install_id,
+        "exp" => DateTime.utc_now() |> DateTime.add(60) |> DateTime.to_unix(),
+        "user" => %{
+          "email" => "legacy@example.com",
+          "id" => "legacy123",
+          "is_admin" => true,
+          "name" => "Legacy User"
+        }
+      }
+
+      {:ok, token, _claims} = Token.generate_and_sign(params, signer)
+      conn = conn(:post, "/", %{"peek-auth" => token})
+
+      conn = PeekAuth.set_peek_install_id(conn, %{})
+
+      assert conn.assigns.peek_install_id == install_id
+      assert conn.assigns.peek_account_user.email == "legacy@example.com"
+      assert conn.assigns.peek_account_user.id == "legacy123"
+      assert conn.assigns.peek_account_user.is_peek_admin == true
+      assert conn.assigns.peek_account_user.name == "Legacy User"
+      assert conn.assigns.peek_account_user.primary_role == nil
+    end
+
     test "handles non-keyword list and non-map options" do
       install_id = "test_install_id"
       token = Token.new_for_app_installation!(install_id)

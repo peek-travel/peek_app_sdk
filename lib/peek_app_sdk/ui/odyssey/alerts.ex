@@ -68,19 +68,11 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
   slot :action, required: false, doc: "custom action slot (e.g., buttons)"
 
   def odyssey_alert(assigns) do
-    border_class =
-      case assigns.type do
-        "success" -> "border-success-300"
-        "error" -> "border-danger-300"
-        "warning" -> "border-warning-300"
-        "info" -> "border-info-300"
-        _ -> "border-info-300"
-      end
-
-    has_actions = assigns.action != [] || assigns.dismissable || (assigns.action_text && assigns.action_url)
-    alert_id = if assigns.dismissable, do: "alert-#{System.unique_integer([:positive])}"
-
-    assigns = assign(assigns, border_class: border_class, has_actions: has_actions, alert_id: alert_id)
+    assigns =
+      assigns
+      |> assign(:border_class, get_border_class(assigns.type))
+      |> assign(:has_actions, has_actions?(assigns))
+      |> assign(:alert_id, get_alert_id(assigns.dismissable))
 
     ~H"""
     <div
@@ -129,6 +121,24 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
       </div>
     </div>
     """
+  end
+
+  defp get_border_class(type) do
+    case type do
+      "success" -> "border-success-300"
+      "error" -> "border-danger-300"
+      "warning" -> "border-warning-300"
+      "info" -> "border-info-300"
+      _ -> "border-info-300"
+    end
+  end
+
+  defp has_actions?(assigns) do
+    assigns.action != [] || assigns.dismissable || (assigns.action_text && assigns.action_url)
+  end
+
+  defp get_alert_id(dismissable) do
+    if dismissable, do: "alert-#{System.unique_integer([:positive])}"
   end
 
   defp alert_type_icon(%{type: "success"} = assigns) do

@@ -3,10 +3,12 @@ defmodule PeekAppSDK.UI.OdysseyTest do
   import Phoenix.LiveViewTest
   import Phoenix.Component
 
+  alias PeekAppSDK.UI.Odyssey
+
   describe "odyssey_toggle_button component" do
     test "renders all options" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", "Hours", "Days"],
           selected: "Minutes",
           on_change: "change_time_unit"
@@ -19,7 +21,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "highlights selected option" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", "Hours", "Days"],
           selected: "Hours",
           on_change: "change_time_unit"
@@ -30,7 +32,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "does not attach phx-click for selected option" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", "Hours", "Days"],
           selected: "Hours",
           on_change: "change_time_unit"
@@ -42,7 +44,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "shows unselected options with gray styling" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", "Hours", "Days"],
           selected: "Days",
           on_change: "change_time_unit"
@@ -53,7 +55,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "renders options with icons when maps are provided" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: [%{icon: "hero-clock", label: "Minutes"}, %{icon: "hero-calendar", label: "Hours"}],
           selected: "Minutes",
           on_change: "change_time_unit"
@@ -67,7 +69,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "supports value key for different display vs actual values" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: [
             %{label: "Email", value: :email},
             %{label: "Text Message", value: :sms},
@@ -92,7 +94,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
       form = to_form(form_data, as: "form")
 
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           field: form[:channel],
           options: [
             %{label: "Email", value: :email},
@@ -117,7 +119,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "handles mixed string and map options" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", %{icon: "hero-calendar", label: "Hours"}],
           selected: "Hours",
           on_change: "change_time_unit"
@@ -132,7 +134,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "correctly identifies selected option when using maps" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: [%{icon: "hero-clock", label: "Minutes"}, %{icon: "hero-calendar", label: "Hours"}],
           selected: "Hours",
           on_change: "change_time_unit"
@@ -144,7 +146,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "renders without fieldset when no label is provided" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", "Hours", "Days"],
           selected: "Minutes",
           on_change: "change_time_unit"
@@ -157,7 +159,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
     test "renders with fieldset and label when label is provided" do
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           options: ["Minutes", "Hours", "Days"],
           selected: "Minutes",
           on_change: "change_time_unit",
@@ -176,7 +178,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
       form = to_form(form_data, as: "form")
 
       html =
-        render_component(&PeekAppSDK.UI.Odyssey.odyssey_toggle_button/1, %{
+        render_component(&Odyssey.odyssey_toggle_button/1, %{
           field: form[:channel],
           label: "Communication Channel",
           options: [
