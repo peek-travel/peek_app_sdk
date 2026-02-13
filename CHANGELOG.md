@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-02-13]
+
+### Added
+
+- `query_peek_pro/4` now automatically retries on 429 rate limit errors with exponential backoff (200ms base, randomized, capped at 2s, up to 5 retries). No API changes required.
+
 ## [2026-02-12]
 
 ### Breaking

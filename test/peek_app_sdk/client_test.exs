@@ -245,4 +245,79 @@ defmodule PeekAppSDK.ClientTest do
       assert_raise RuntimeError, fn -> Client.operation_name(query) end
     end
   end
+
+  describe "query_peek_pro/4 retry behavior" do
+    test "retries on 429 rate limit and succeeds on subsequent attempt" do
+      install_id = "test_install_id"
+      query = "query Test { test }"
+      response_data = %{test: "success"}
+
+      call_count = :counters.new(1, [:atomics])
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        count = :counters.get(call_count, 1)
+        :counters.add(call_count, 1, 1)
+
+        if count < 2 do
+          {:ok, %Tesla.Env{status: 429, body: %{error: "rate limited"}}}
+        else
+          {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+        end
+      end)
+
+      assert {:ok, ^response_data} = Client.query_peek_pro(install_id, query)
+      assert :counters.get(call_count, 1) == 3
+    end
+
+    test "returns error after exhausting all retry attempts on persistent 429" do
+      install_id = "test_install_id"
+      query = "query Test { test }"
+
+      call_count = :counters.new(1, [:atomics])
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        :counters.add(call_count, 1, 1)
+        {:ok, %Tesla.Env{status: 429, body: %{error: "rate limited"}}}
+      end)
+
+      assert :rate_limited = Client.query_peek_pro(install_id, query)
+      # 1 initial attempt + 5 retries = 6 total calls
+      assert :counters.get(call_count, 1) == 6
+    end
+
+    test "does not retry on non-429 errors" do
+      install_id = "test_install_id"
+      query = "query Test { test }"
+
+      call_count = :counters.new(1, [:atomics])
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        :counters.add(call_count, 1, 1)
+        {:ok, %Tesla.Env{status: 500, body: %{error: "server error"}}}
+      end)
+
+      assert {:error, 500} = Client.query_peek_pro(install_id, query)
+      assert :counters.get(call_count, 1) == 1
+    end
+
+    test "does not retry on GraphQL errors" do
+      install_id = "test_install_id"
+      query = "query Test { test }"
+      errors = [%{message: "Invalid query"}]
+
+      call_count = :counters.new(1, [:atomics])
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        :counters.add(call_count, 1, 1)
+        {:ok, %Tesla.Env{status: 200, body: %{errors: errors}}}
+      end)
+
+      assert {:error, ^errors} = Client.query_peek_pro(install_id, query)
+      assert :counters.get(call_count, 1) == 1
+    end
+  end
 end
