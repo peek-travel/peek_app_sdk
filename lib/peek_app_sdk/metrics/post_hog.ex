@@ -5,6 +5,8 @@ defmodule PeekAppSDK.Metrics.PostHog do
   Client for sending metrics to the Peek Pro metrics service.
   """
 
+  @default_platform "peek"
+
   @doc """
   Creates a Tesla client with the appropriate middleware configuration.
   """
@@ -19,15 +21,29 @@ defmodule PeekAppSDK.Metrics.PostHog do
     Tesla.client(middleware)
   end
 
-  def identify(%{name: partner_name, external_refid: partner_id, is_test: is_test, platform: platform}) do
+  @doc """
+  Extracts platform from partner map, defaulting to "peek" if not present.
+  """
+  def get_platform(%{platform: platform}), do: platform
+  def get_platform(_), do: @default_platform
+
+  @doc """
+  Builds the distinct_id for PostHog. Only prefixes for non-peek platforms
+  to maintain backward compatibility with existing peek partners.
+  """
+  def build_distinct_id(partner_id, platform), do: "#{platform}-#{partner_id}"
+
+  def identify(%{name: partner_name, external_refid: partner_id, is_test: is_test} = partner) do
     config = Config.get_config()
     posthog_key = config.posthog_key
+    platform = get_platform(partner)
+    distinct_id = build_distinct_id(partner_id, platform)
 
     body = %{
       api_key: posthog_key,
       properties: %{"$set" => %{"name" => partner_name, "is_test" => is_test, "platform" => platform}},
       timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
-      distinct_id: "#{platform}-#{partner_id}",
+      distinct_id: distinct_id,
       event: "$set"
     }
 
@@ -36,11 +52,12 @@ defmodule PeekAppSDK.Metrics.PostHog do
     end
   end
 
-  def track(%{name: partner_name, external_refid: partner_id, is_test: is_test, platform: platform}, event_id, payload) do
+  def track(%{name: partner_name, external_refid: partner_id, is_test: is_test} = partner, event_id, payload) do
     config = Config.get_config()
     posthog_key = config.posthog_key
     app_id = config.peek_app_id
-    distinct_id = "#{platform}-#{partner_id}"
+    platform = get_platform(partner)
+    distinct_id = build_distinct_id(partner_id, platform)
 
     body = %{
       api_key: posthog_key,

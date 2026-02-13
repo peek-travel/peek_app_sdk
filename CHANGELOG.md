@@ -10,12 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking
 
 - `odyssey_alert` is now content-width by default (`flex w-fit`) instead of centered full-width. Use the new `full` attr for full-width alerts with actions pushed to the right, or `class="w-full"` for manual control.
-- PostHog `distinct_id` is now prefixed with the platform (e.g., "peek-partner-123" instead of "partner-123"). The partner map must now include a `platform` field: `%{external_refid: "...", name: "...", is_test: false, platform: "peek"}`.
 
 ### Added
 
 - Added `full` attr to `odyssey_alert` for full-width alerts with dismiss/actions pushed to the right.
-- PostHog `identify` now sets `platform` as a user property alongside `name` and `is_test`.
+- PostHog now supports `platform` field in partner map (optional, defaults to "peek"). All `distinct_id` values are prefixed with platform (e.g., "peek-partner-123", "cng-partner-456"). Run `scripts/posthog_migration.js` to alias existing users before deploying.
+- PostHog `identify` and `track` now set `platform` as a property.
+- Added `scripts/posthog_migration.js` for migrating existing PostHog data to include platform.
 
 ### Fixed
 
