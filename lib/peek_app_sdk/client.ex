@@ -94,11 +94,11 @@ defmodule PeekAppSDK.Client do
     end
   end
 
-  defp headers(install_id, config_id, nil) do
+  def headers(install_id, config_id, nil) do
     [x_peek_auth_header(install_id, config_id)]
   end
 
-  defp headers(install_id, config_id, peek_api_key) do
+  def headers(install_id, config_id, peek_api_key) do
     [
       x_peek_auth_header(install_id, config_id),
       {"pk-api-key", peek_api_key}
