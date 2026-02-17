@@ -244,7 +244,7 @@ defmodule PeekAppSDK.ClientTest do
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
       end)
 
-      assert {:ok, ^response_data} = Client.query_platform(install_id, :get, url, body_params)
+      assert {:ok, ^response_data} = PeekAppSDK.query_platform(install_id, :get, url, body_params)
     end
 
     test "successfully queries platform with POST method and body" do
