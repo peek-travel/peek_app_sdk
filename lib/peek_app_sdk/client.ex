@@ -64,6 +64,30 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  def query_platform(install_id, method, url, body_params) do
+    config = Config.get_config(nil)
+    peek_app_id = config.peek_app_id
+    peek_api_key = config.peek_api_key
+
+    case Tesla.request(client(),
+           method: method,
+           url: "#{String.trim(config.peek_api_base_url)}/#{peek_app_id}#{url}",
+           body: body_params,
+           headers: headers(install_id, nil, peek_api_key)
+         ) do
+      # If we get back an error, fail the whole thing and return the error for now.
+      {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
+        {:error, errors}
+
+      {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
+        {:ok, data}
+
+      {:ok, %Tesla.Env{status: status, body: body}} ->
+        Logger.error("Unexpected PeekPro response when hitting #{url} - (#{status}): #{inspect(body)}")
+        {:error, status}
+    end
+  end
+
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/
 
