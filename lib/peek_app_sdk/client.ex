@@ -64,40 +64,14 @@ defmodule PeekAppSDK.Client do
     end
   end
 
-  @doc """
-  Queries the Peek Pro API.
-
-  ## Examples
-
-  Using the default configuration:
-
-      iex> PeekAppSDK.Client.query_peek_pro_v2("install_id", "query { test }")
-      {:ok, %{test: "success"}}
-
-  Using a specific application's configuration:
-
-      iex> PeekAppSDK.Client.query_peek_pro_v2("install_id", "query { test }", %{}, :project_name)
-      {:ok, %{test: "success"}}
-  """
-  @spec query_peek_pro_v2(String.t(), String.t(), map()) ::
-          {:ok, map()} | {:error, any()}
-  def query_peek_pro_v2(install_id, gql_query, gql_variables \\ %{}) do
-    body_params = %{
-      "query" => gql_query,
-      "variables" => gql_variables
-    }
-
+  def query_platform(install_id, method, url, body_params) do
     config = Config.get_config(nil)
     peek_app_id = config.peek_app_id
     peek_api_key = config.peek_api_key
 
-    operation_name = operation_name(gql_query)
-
-    url = "#{String.trim(config.peek_api_base_url)}/#{peek_app_id}/peek_backoffice_api-v1/#{operation_name}"
-
     case Tesla.request(client(),
-           method: :post,
-           url: url,
+           method: method,
+           url: "#{String.trim(config.peek_api_base_url)}/#{peek_app_id}#{url}",
            body: body_params,
            headers: headers(install_id, nil, peek_api_key)
          ) do
