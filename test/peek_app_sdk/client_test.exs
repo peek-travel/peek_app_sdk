@@ -225,16 +225,16 @@ defmodule PeekAppSDK.ClientTest do
   end
 
   describe "query_platform/4" do
-    test "successfully queries platform with GET method" do
+    test "successfully queries platform with GET method using full URL" do
       install_id = "test_install_id"
-      url = "/some/endpoint"
+      url = "https://api.example.com/some/endpoint"
       body_params = %{}
       response_data = %{result: "success"}
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :get
-        assert env.url == "https://apps.example.peekapis.com/test_app_id/some/endpoint"
+        assert env.url == "https://api.example.com/some/endpoint"
         assert Jason.decode!(env.body) == body_params
 
         assert Enum.any?(env.headers, fn {k, v} ->
@@ -249,14 +249,14 @@ defmodule PeekAppSDK.ClientTest do
 
     test "successfully queries platform with POST method and body" do
       install_id = "test_install_id"
-      url = "/api/resource"
+      url = "https://api.example.com/api/resource"
       body_params = %{"key" => "value"}
       response_data = %{created: true}
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
-        assert env.url == "https://apps.example.peekapis.com/test_app_id/api/resource"
+        assert env.url == "https://api.example.com/api/resource"
         assert Jason.decode!(env.body) == body_params
 
         {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
@@ -267,7 +267,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "handles error response" do
       install_id = "test_install_id"
-      url = "/api/resource"
+      url = "https://api.example.com/api/resource"
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn _env, _opts ->
@@ -279,7 +279,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "bubbles up errors when status is 200 but errors key is present" do
       install_id = "test_install_id"
-      url = "/api/resource"
+      url = "https://api.example.com/api/resource"
 
       errors = [%{message: "Validation failed"}]
 
