@@ -73,22 +73,29 @@ defmodule PeekAppSDK.UI.Odyssey.Alerts do
       |> assign(:border_class, get_border_class(assigns.type))
       |> assign(:has_actions, has_actions?(assigns))
       |> assign(:alert_id, get_alert_id(assigns.dismissable))
+      |> assign(:has_message, assigns.message != [])
 
     ~H"""
     <div
       id={@alert_id}
       class={[
-        "flex bg-white rounded-lg px-4 py-3 shadow-sm border-l-4 border",
+        "flex bg-white rounded-lg px-4 py-3 shadow-sm border-t-1 border-b-1 border-r-1 border-l-4",
         (@full && "w-full") || "w-fit",
         @border_class,
         @class
       ]}
     >
-      <div class={["flex items-center", @full && "flex-1"]}>
-        <div class="flex-shrink-0 mr-3">
+      <div class={["flex", @full && "flex-1"]}>
+        <div class={[
+          "flex-shrink-0 mr-3 flex",
+          (@has_message && "items-start pt-0.5") || "items-center"
+        ]}>
           <.alert_type_icon type={@type} />
         </div>
-        <div class="flex-1 flex items-center justify-between gap-4">
+        <div class={[
+          "flex-1 flex justify-between gap-4",
+          (@has_message && "items-start") || "items-center"
+        ]}>
           <div>
             <div :if={@title != []} class="font-medium text-base text-neutrals-350">
               {render_slot(@title)}

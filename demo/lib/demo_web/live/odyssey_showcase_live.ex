@@ -164,6 +164,12 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                 This is a success message indicating that an operation completed successfully.
               </:message>
             </.odyssey_alert>
+            <.odyssey_alert type="success">
+              <:title>Success!</:title>
+            </.odyssey_alert>
+            <.odyssey_alert type="success" dismissable>
+              <:title>Success!</:title>
+            </.odyssey_alert>
 
             <.odyssey_alert type="error">
               <:title>Error Alert</:title>
