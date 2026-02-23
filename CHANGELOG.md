@@ -5,11 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2026-02-24]
 
 ### Changed
 
 - `odyssey_activity_picker` now accepts optional `activities` list. When provided, skips GraphQL fetch and uses the passed activities directly. `install_id` is now optional (only required when `activities` not provided).
+- `odyssey_tooltip` now wraps inner_block content when provided instead of showing info icon. Use `<.odyssey_tooltip text="..."><button>Click me</button></.odyssey_tooltip>` to add tooltip to custom elements.
+- `odyssey_alert` icon now vertically aligns with title text instead of centering on entire content block.
 
 ## [2026-02-17]
 
