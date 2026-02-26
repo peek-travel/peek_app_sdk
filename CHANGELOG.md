@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `PeekAppSDK.Client.query_platform/4` for cross-brand API querying. Accepts `install_id`, HTTP method, URL path, and body params.
 
+## [2026-02-13]
+
+### Added
+
+- `query_peek_pro/4` now automatically retries on 429 rate limit errors with exponential backoff (200ms base, randomized, capped at 2s, up to 5 retries). No API changes required.
+
 ## [2026-02-12]
 
 ### Breaking
