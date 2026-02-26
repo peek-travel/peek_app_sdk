@@ -85,4 +85,7 @@ defmodule PeekAppSDK do
           {:ok, map()} | {:error, any()}
   defdelegate query_peek_pro(install_id, gql_query, gql_variables \\ %{}, config_id \\ nil),
     to: PeekAppSDK.Client
+
+  defdelegate query_platform(install_id, method, url, body),
+    to: PeekAppSDK.Client
 end

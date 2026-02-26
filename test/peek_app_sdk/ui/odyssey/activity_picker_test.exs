@@ -317,6 +317,56 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPickerTest do
       # Should still contain the activity picker component
       assert html =~ ~r/<odyssey-product-picker/
     end
+
+    test "uses provided activities instead of fetching when activities option is passed" do
+      form_data = %{"activity_id" => nil}
+      form = to_form(form_data, as: :test_form)
+
+      activities = [
+        %{id: "activity_1", name: "Kayaking", color: "#1E90FF"},
+        %{id: "activity_2", name: "Snorkeling", color: "#00CED1"}
+      ]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.form for={@form} phx-change="change">
+              <.odyssey_activity_picker field={@form[:activity_id]} activities={@activities} />
+            </.form>
+            """
+          end,
+          %{form: form, activities: activities}
+        )
+
+      assert html =~ "Kayaking"
+      assert html =~ "Snorkeling"
+      assert html =~ "#1E90FF"
+      assert html =~ "#00CED1"
+      assert html =~ ~r/<odyssey-product-picker[^>]*>/
+    end
+
+    test "does not call GraphQL when activities are provided" do
+      form_data = %{"activity_id" => nil}
+      form = to_form(form_data, as: :test_form)
+
+      activities = [
+        %{id: "activity_1", name: "Test Activity", color: "#000000"}
+      ]
+
+      # No Tesla mock - if GraphQL is called, this will fail
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_activity_picker field={@form[:activity_id]} activities={@activities} />
+            """
+          end,
+          %{form: form, activities: activities}
+        )
+
+      assert html =~ "Test Activity"
+    end
   end
 
   describe "load_activities/1" do

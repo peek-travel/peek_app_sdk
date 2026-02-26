@@ -77,6 +77,28 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  def query_platform(install_id, method, url, body_params) do
+    config = Config.get_config(nil)
+    peek_api_key = config.peek_api_key
+
+    case Tesla.request(client(),
+           method: method,
+           url: url,
+           body: body_params,
+           headers: headers(install_id, nil, peek_api_key)
+         ) do
+      {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
+        {:error, errors}
+
+      {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
+        {:ok, data}
+
+      {:ok, %Tesla.Env{status: status, body: body}} ->
+        Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
+        {:error, status}
+    end
+  end
+
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/
 
@@ -107,11 +129,11 @@ defmodule PeekAppSDK.Client do
     end
   end
 
-  defp headers(install_id, config_id, nil) do
+  def headers(install_id, config_id, nil) do
     [x_peek_auth_header(install_id, config_id)]
   end
 
-  defp headers(install_id, config_id, peek_api_key) do
+  def headers(install_id, config_id, peek_api_key) do
     [
       x_peek_auth_header(install_id, config_id),
       {"pk-api-key", peek_api_key}

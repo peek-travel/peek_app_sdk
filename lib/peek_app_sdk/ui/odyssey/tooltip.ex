@@ -8,14 +8,13 @@ defmodule PeekAppSDK.UI.Odyssey.Tooltip do
 
   def odyssey_tooltip(assigns) do
     ~H"""
-    <div class="flex items-center gap-2">
+    <div class="group relative inline-block">
       <%= if @inner_block != [] do %>
-        <span>{render_slot(@inner_block)}</span>
-      <% end %>
-      <div class="group relative">
+        {render_slot(@inner_block)}
+      <% else %>
         <span class="hero-information-circle h-4 w-4 mb-1 text-gray-primary group-hover:text-gray-700" />
-        <.tooltip location={@location}>{@text}</.tooltip>
-      </div>
+      <% end %>
+      <.tooltip location={@location}>{@text}</.tooltip>
     </div>
     """
   end

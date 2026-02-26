@@ -8,6 +8,12 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
       <.form for={@form} phx-change="change">
         <.odyssey_activity_picker install_id="abc123" field={@form[:activity_id]} />
       </.form>
+
+  Or with pre-loaded activities:
+
+      <.form for={@form} phx-change="change">
+        <.odyssey_activity_picker activities={@activities} field={@form[:activity_id]} />
+      </.form>
   """
 
   use Phoenix.LiveComponent
@@ -22,13 +28,18 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
   def update(assigns, socket) do
     socket = assign(socket, assigns)
 
-    socket =
-      socket
-      |> assign(products: load_activities(socket.assigns.install_id))
+    products =
+      case Map.get(assigns, :activities) do
+        nil -> load_activities(socket.assigns.install_id)
+        activities -> activities
+      end
+
+    socket = assign(socket, products: products)
 
     {:ok, socket}
   end
 
+  @spec load_activities(binary()) :: list()
   def load_activities(install_id) do
     query = """
       query OdysseyActivityPickerActivities {
@@ -85,7 +96,8 @@ defmodule PeekAppSDK.UI.Odyssey.OdysseyActivityPicker do
   attr(:field, :any, required: true, doc: "a Phoenix.HTML.FormField struct")
   attr(:id, :string, doc: "component id, defaults to form_field_activity_picker")
   attr(:multiple, :boolean, default: false, doc: "whether to allow multiple selections")
-  attr(:install_id, :string, required: true, doc: "the install id for the current partner")
+  attr(:install_id, :string, required: false, doc: "the install id for the current partner (required if activities not provided)")
+  attr(:activities, :list, required: false, doc: "optional list of activities to display (if not provided, will fetch using install_id)")
   attr(:title, :string, default: "Activity Picker", doc: "the title for the picker")
   attr(:label, :string, required: false, doc: "optional label to wrap the activity picker in a fieldset")
 
