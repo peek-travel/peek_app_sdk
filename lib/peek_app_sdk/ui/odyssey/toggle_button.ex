@@ -79,15 +79,15 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
     ~H"""
     <%= if @label do %>
       <fieldset class="fieldset mb-2">
-        <label>
-          <span class="label mb-1">
+        <div>
+          <span class="label mb-1 block">
             <.odyssey_tooltip :if={@tooltip} text={@tooltip} location={@tooltip_location}>{@label}</.odyssey_tooltip>
             <%= if is_nil(@tooltip) do %>
               {@label}
             <% end %>
           </span>
           <.do_odyssey_toggle_button {assigns} />
-        </label>
+        </div>
       </fieldset>
     <% else %>
       <div :if={@tooltip} class="flex items-center gap-2">
