@@ -225,56 +225,57 @@ defmodule PeekAppSDK.ClientTest do
   end
 
   describe "query_platform/4" do
-    test "successfully queries platform with GET method using full URL" do
+    test "successfully returns raw response body for 200 status" do
       install_id = "test_install_id"
       url = "https://api.example.com/some/endpoint"
       body_params = %{}
-      response_data = %{result: "success"}
+      response_body = %{result: "success", other_field: "value"}
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :get
-        assert env.url == "https://api.example.com/some/endpoint"
+        assert env.url == url
         assert Jason.decode!(env.body) == body_params
 
         assert Enum.any?(env.headers, fn {k, v} ->
                  k == "X-Peek-Auth" && String.starts_with?(v, "Bearer ")
                end)
 
-        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+        {:ok, %Tesla.Env{status: 200, body: response_body}}
       end)
 
-      assert {:ok, ^response_data} = PeekAppSDK.query_platform(install_id, :get, url, body_params)
+      assert {:ok, ^response_body} = PeekAppSDK.query_platform(install_id, :get, url, body_params)
     end
 
-    test "successfully queries platform with POST method and body" do
+    test "successfully returns raw response body for 201 status" do
       install_id = "test_install_id"
       url = "https://api.example.com/api/resource"
       body_params = %{"key" => "value"}
-      response_data = %{created: true}
+      response_body = %{created: true, id: 123}
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn env, _opts ->
         assert env.method == :post
-        assert env.url == "https://api.example.com/api/resource"
+        assert env.url == url
         assert Jason.decode!(env.body) == body_params
 
-        {:ok, %Tesla.Env{status: 200, body: %{data: response_data}}}
+        {:ok, %Tesla.Env{status: 201, body: response_body}}
       end)
 
-      assert {:ok, ^response_data} = Client.query_platform(install_id, :post, url, body_params)
+      assert {:ok, ^response_body} = Client.query_platform(install_id, :post, url, body_params)
     end
 
-    test "handles error response" do
+    test "handles error response with status and body tuple" do
       install_id = "test_install_id"
       url = "https://api.example.com/api/resource"
+      error_body = %{error: "Not found"}
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn _env, _opts ->
-        {:ok, %Tesla.Env{status: 404, body: %{error: "Not found"}}}
+        {:ok, %Tesla.Env{status: 404, body: error_body}}
       end)
 
-      assert {:error, 404} = Client.query_platform(install_id, :get, url, %{})
+      assert {:error, {404, ^error_body}} = Client.query_platform(install_id, :get, url, %{})
     end
 
     test "bubbles up errors when status is 200 but errors key is present" do
@@ -289,69 +290,6 @@ defmodule PeekAppSDK.ClientTest do
       end)
 
       assert {:error, ^errors} = Client.query_platform(install_id, :post, url, %{})
-    end
-  end
-
-  describe "query_platform_raw/4" do
-    test "successfully returns raw response body for 200 status" do
-      install_id = "test_install_id"
-      url = "https://api.example.com/some/endpoint"
-      body_params = %{}
-      response_body = %{result: "success", other_field: "value"}
-
-      Tesla.Adapter.Finch
-      |> Mimic.stub(:call, fn env, _opts ->
-        assert env.method == :get
-        assert env.url == url
-
-        {:ok, %Tesla.Env{status: 200, body: response_body}}
-      end)
-
-      assert {:ok, ^response_body} = Client.query_platform_raw(install_id, :get, url, body_params)
-    end
-
-    test "successfully returns raw response body for 201 status" do
-      install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
-      body_params = %{"key" => "value"}
-      response_body = %{created: true, id: 123}
-
-      Tesla.Adapter.Finch
-      |> Mimic.stub(:call, fn env, _opts ->
-        assert env.method == :post
-        assert env.url == url
-
-        {:ok, %Tesla.Env{status: 201, body: response_body}}
-      end)
-
-      assert {:ok, ^response_body} = Client.query_platform_raw(install_id, :post, url, body_params)
-    end
-
-    test "handles error response with status and body tuple" do
-      install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
-      error_body = %{error: "Not found"}
-
-      Tesla.Adapter.Finch
-      |> Mimic.stub(:call, fn _env, _opts ->
-        {:ok, %Tesla.Env{status: 404, body: error_body}}
-      end)
-
-      assert {:error, {404, ^error_body}} = Client.query_platform_raw(install_id, :get, url, %{})
-    end
-
-    test "bubbles up errors when status is 200 but errors key is present" do
-      install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
-
-      errors = [%{message: "Validation failed"}]
-
-      Tesla.Adapter.Finch
-      |> Mimic.stub(:call, fn _env, _opts ->
-        {:ok, %Tesla.Env{status: 200, body: %{errors: errors}}}
-      end)
-
-      assert {:error, ^errors} = Client.query_platform_raw(install_id, :post, url, %{})
     end
   end
 
