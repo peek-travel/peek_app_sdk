@@ -88,4 +88,13 @@ defmodule PeekAppSDK do
 
   defdelegate query_platform(install_id, method, url, body),
     to: PeekAppSDK.Client
+
+  @doc """
+  Queries a platform API and returns the raw response body.
+  Unlike `query_platform/4`, this does not expect a `{data: ...}` wrapper around the response.
+  """
+  @spec query_platform_raw(String.t(), atom(), String.t(), map()) ::
+          {:ok, map()} | {:error, list()} | {:error, {integer(), any()}}
+  defdelegate query_platform_raw(install_id, method, url, body),
+    to: PeekAppSDK.Client
 end

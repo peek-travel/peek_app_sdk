@@ -99,6 +99,35 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  @doc """
+  Queries a platform API and returns the raw response body.
+  Unlike `query_platform/4`, this does not expect a `{data: ...}` wrapper around the response.
+  """
+  @spec query_platform_raw(String.t(), atom(), String.t(), map()) ::
+          {:ok, map()} | {:error, list()} | {:error, {integer(), any()}}
+  def query_platform_raw(install_id, method, url, body_params) do
+    config = Config.get_config(nil)
+    peek_api_key = config.peek_api_key
+
+    case Tesla.request(client(),
+           method: method,
+           url: url,
+           body: body_params,
+           headers: headers(install_id, nil, peek_api_key)
+         ) do
+      {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
+        {:error, errors}
+
+      {:ok, %Tesla.Env{status: status, body: body}} when status in 200..299 ->
+        {:ok, body}
+
+      {:ok, %Tesla.Env{status: status, body: body}} ->
+        Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
+
+        {:error, {status, body}}
+    end
+  end
+
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/
 
