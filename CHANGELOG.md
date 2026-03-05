@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `query_platform/4` now handles all 2xx status codes as success, returning `{:ok, body}` with the raw response body. Previously only `200` responses with a `%{data: data}` GraphQL structure were treated as success, causing non-GraphQL platform APIs (e.g. ACME) to incorrectly fall through to the error path.
+- Added logging to `verify_peek_auth/2` and `verify_client_request/2` to help debug token verification failures. Warning messages now include the specific error reason and config_id context.
 
 ## [2026-02-27]
 
