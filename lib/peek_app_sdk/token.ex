@@ -1,5 +1,6 @@
 defmodule PeekAppSDK.Token do
   use Joken.Config
+  require Logger
 
   alias PeekAppSDK.AccountUser
   alias PeekAppSDK.Config
@@ -31,10 +32,12 @@ defmodule PeekAppSDK.Token do
       {:ok, %{"sub" => sub} = claims} ->
         {:ok, sub, claims}
 
-      {:error, _reason} ->
+      {:error, reason} ->
+        Logger.warning("Token verification failed for config_id=#{inspect(config_id)}: #{inspect(reason)}")
         {:error, :unauthorized}
 
-      _ ->
+      other ->
+        Logger.warning("Token verification failed for config_id=#{inspect(config_id)} with unexpected result: #{inspect(other)}")
         {:error, :unauthorized}
     end
   end
@@ -68,13 +71,16 @@ defmodule PeekAppSDK.Token do
         {:ok, %{"sub" => sub} = claims} ->
           {:ok, sub, claims}
 
-        {:error, _reason} ->
+        {:error, reason} ->
+          Logger.warning("Client token verification failed for config_id=#{inspect(config_id)}: #{inspect(reason)}")
           {:error, :unauthorized}
 
-        _ ->
+        other ->
+          Logger.warning("Client token verification failed for config_id=#{inspect(config_id)} with unexpected result: #{inspect(other)}")
           {:error, :unauthorized}
       end
     else
+      Logger.warning("Client token verification failed for config_id=#{inspect(config_id)}: client_secret_token not configured")
       {:error, :unauthorized}
     end
   end
