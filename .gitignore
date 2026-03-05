@@ -27,3 +27,4 @@ peek_app_sdk-*.tar
 
 # Ignore ElixirLS build artifacts
 .elixir_ls/
+/.claude

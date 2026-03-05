@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-03-05]
+
+### Changed
+
+- `query_platform/4` now handles all 2xx status codes as success, returning `{:ok, body}` with the raw response body. Previously only `200` responses with a `%{data: data}` GraphQL structure were treated as success, causing non-GraphQL platform APIs (e.g. ACME) to incorrectly fall through to the error path.
+
 ## [2026-02-27]
 
 ### Fixed
