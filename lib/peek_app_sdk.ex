@@ -90,7 +90,7 @@ defmodule PeekAppSDK do
   Queries a platform API and returns the raw response body.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, {integer(), any()}}
+          {:ok, map()} | {:error, list()} | {:error, integer()}
   defdelegate query_platform(install_id, method, url, body),
     to: PeekAppSDK.Client
 end

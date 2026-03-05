@@ -247,6 +247,19 @@ defmodule PeekAppSDK.ClientTest do
       assert {:ok, ^response_body} = PeekAppSDK.query_platform(install_id, :get, url, body_params)
     end
 
+    test "returns data when 200 response has data key (backwards compatible)" do
+      install_id = "test_install_id"
+      url = "https://api.example.com/api/resource"
+      data = %{result: "success"}
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: %{data: data}}}
+      end)
+
+      assert {:ok, ^data} = Client.query_platform(install_id, :get, url, %{})
+    end
+
     test "successfully returns raw response body for 201 status" do
       install_id = "test_install_id"
       url = "https://api.example.com/api/resource"
@@ -265,17 +278,16 @@ defmodule PeekAppSDK.ClientTest do
       assert {:ok, ^response_body} = Client.query_platform(install_id, :post, url, body_params)
     end
 
-    test "handles error response with status and body tuple" do
+    test "handles error response" do
       install_id = "test_install_id"
       url = "https://api.example.com/api/resource"
-      error_body = %{error: "Not found"}
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn _env, _opts ->
-        {:ok, %Tesla.Env{status: 404, body: error_body}}
+        {:ok, %Tesla.Env{status: 404, body: %{error: "Not found"}}}
       end)
 
-      assert {:error, {404, ^error_body}} = Client.query_platform(install_id, :get, url, %{})
+      assert {:error, 404} = Client.query_platform(install_id, :get, url, %{})
     end
 
     test "bubbles up errors when status is 200 but errors key is present" do

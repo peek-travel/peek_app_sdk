@@ -81,7 +81,7 @@ defmodule PeekAppSDK.Client do
   Queries a platform API and returns the raw response body.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, {integer(), any()}}
+          {:ok, map()} | {:error, list()} | {:error, integer()}
   def query_platform(install_id, method, url, body_params) do
     config = Config.get_config(nil)
     peek_api_key = config.peek_api_key
@@ -95,13 +95,16 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: 200, body: %{errors: [_error | _rest] = errors}}} ->
         {:error, errors}
 
+      {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
+        {:ok, data}
+
       {:ok, %Tesla.Env{status: status, body: body}} when status in 200..299 ->
         {:ok, body}
 
       {:ok, %Tesla.Env{status: status, body: body}} ->
         Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
 
-        {:error, {status, body}}
+        {:error, status}
     end
   end
 
