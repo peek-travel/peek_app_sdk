@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `odyssey_toggle_button` with label no longer makes entire row clickable (was triggering first button when clicking anywhere on the row).
+- `odyssey_tabs` active tab now has `pointer-events-none` to prevent unnecessary re-navigation when clicking the current tab.
 
 ## [2026-02-24]
 

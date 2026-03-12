@@ -21,7 +21,7 @@ defmodule PeekAppSDK.UI.Odyssey.Tabs do
           class={[
             "pb-2 text-base font-medium leading-6 relative no-underline",
             tab[:truncate_text] && "truncate",
-            @current_path == tab.path && "text-brand -mb-[2px] border-b-2 border-brand",
+            @current_path == tab.path && "text-brand -mb-[2px] border-b-2 border-brand pointer-events-none",
             @current_path != tab.path && "text-gray-primary"
           ]}
         >
