@@ -107,21 +107,22 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
           id={"#{@id}_checkboxes"}
         >
           <div :for={product <- @products} class="flex items-center gap-3">
+            <% product_id = product[@id_key] %>
             <input
               type="checkbox"
-              id={"#{@id}_product_#{product.id}"}
-              checked={product.id in @selected_ids}
-              data-product-id={product.id}
+              id={"#{@id}_product_#{product_id}"}
+              checked={product_id in @selected_ids}
+              data-product-id={product_id}
               disabled={@disabled}
               class="checkbox checkbox-sm product-picker-checkbox"
             />
             <div
               class="w-3 h-3 rounded-sm flex-shrink-0"
-              style={"background-color: #{product.color_hex}"}
+              style={"background-color: #{product[@color_key] || "#888888"}"}
             >
             </div>
-            <label for={"#{@id}_product_#{product.id}"} class="text-sm text-gray-700 cursor-pointer">
-              {product.name}
+            <label for={"#{@id}_product_#{product_id}"} class="text-sm text-gray-700 cursor-pointer">
+              {product[@name_key]}
             </label>
           </div>
         </div>
@@ -150,6 +151,9 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
     {:noreply, socket}
   end
 
+  defp to_existing_atom(value) when is_atom(value), do: value
+  defp to_existing_atom(value) when is_binary(value), do: String.to_existing_atom(value)
+
   defp encode_selected_products([]), do: ""
   defp encode_selected_products(ids), do: Enum.join(ids, ",")
 
@@ -174,10 +178,14 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   """
   attr :field, :any, required: true, doc: "a Phoenix.HTML.FormField struct"
   attr :id, :string, doc: "component id, defaults to form_field_product_picker"
-  attr :products, :list, required: true, doc: "list of %{id, name, color_hex} maps"
+
+  attr :products, :list, required: true, doc: "list of product maps"
 
   attr :selected_ids, :list, doc: "list of pre-selected product IDs (auto-extracted from field value when omitted)"
 
+  attr :id_key, :atom, default: :id, doc: "key to read product ID from each product map"
+  attr :name_key, :atom, default: :name, doc: "key to read product name from each product map"
+  attr :color_key, :atom, default: :color_hex, doc: "key to read product color hex from each product map"
   attr :all_label, :string, default: "All Products", doc: "label for the 'all' toggle option"
   attr :specific_label, :string, default: "Specific Products", doc: "label for the 'specific' toggle option"
   attr :label, :string, required: false, doc: "label for the toggle button"
@@ -190,6 +198,9 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
         "#{field.form.name}_#{field.field}_product_picker"
       end)
       |> assign_new(:label, fn -> nil end)
+      |> assign(:id_key, to_existing_atom(assigns[:id_key] || :id))
+      |> assign(:name_key, to_existing_atom(assigns[:name_key] || :name))
+      |> assign(:color_key, to_existing_atom(assigns[:color_key] || :color_hex))
       |> assign(:module, __MODULE__)
 
     ~H"""

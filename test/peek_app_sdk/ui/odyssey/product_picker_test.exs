@@ -247,6 +247,66 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
     end
   end
 
+  describe "custom key attrs" do
+    test "uses custom color_key" do
+      form = to_form(%{"p" => nil}, as: :t)
+      products = [%{id: "1", name: "A", hex: "#AA0000"}]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker field={@form[:p]} products={@products} selected_ids={["1"]} color_key={:hex} />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ "background-color: #AA0000"
+    end
+
+    test "uses custom id_key and name_key" do
+      form = to_form(%{"p" => nil}, as: :t)
+      products = [%{product_id: "x1", title: "Kayak", color_hex: "#000"}]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker
+              field={@form[:p]}
+              products={@products}
+              selected_ids={["x1"]}
+              id_key={:product_id}
+              name_key={:title}
+            />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ "Kayak"
+      assert html =~ "data-product-id=\"x1\""
+    end
+
+    test "falls back to #888888 when color key is missing" do
+      form = to_form(%{"p" => nil}, as: :t)
+      products = [%{id: "1", name: "A"}]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker field={@form[:p]} products={@products} selected_ids={["1"]} />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ "background-color: #888888"
+    end
+  end
+
   describe "extract_ids_from_field/1" do
     alias PeekAppSDK.UI.Odyssey.ProductPicker
 
