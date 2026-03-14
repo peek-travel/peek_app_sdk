@@ -35,6 +35,37 @@ const OdysseyHooks = {
         })
       }
     }
+  },
+  OdysseyProductPicker: {
+    mounted () {
+      this.el.addEventListener('click', (event) => {
+        if (event.target.classList.contains('product-picker-checkbox')) {
+          event.stopPropagation()
+        }
+      })
+
+      this.el.addEventListener('change', (event) => {
+        if (event.target.classList.contains('product-picker-checkbox')) {
+          event.preventDefault()
+          event.stopPropagation()
+
+          const checkboxes = this.el.querySelectorAll('.product-picker-checkbox:checked')
+          const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.productId)
+
+          const hiddenInput = this.el.querySelector('input[type="hidden"]')
+          hiddenInput.value = selectedIds.join(',')
+          hiddenInput.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      })
+
+      this.handleEvent('update-product-selection', ({ field_id, value }) => {
+        const hiddenInput = document.getElementById(field_id)
+        if (hiddenInput) {
+          hiddenInput.value = value
+          hiddenInput.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      })
+    }
   }
 }
 

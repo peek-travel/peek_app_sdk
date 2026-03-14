@@ -12,6 +12,7 @@ defmodule PeekAppSDK.UI.Odyssey do
   defdelegate odyssey_icon(assigns), to: PeekAppSDK.UI.Odyssey.Icon
   defdelegate odyssey_tabs(assigns), to: PeekAppSDK.UI.Odyssey.Tabs
   defdelegate odyssey_toggle_button(assigns), to: PeekAppSDK.UI.Odyssey.ToggleButton
+  defdelegate odyssey_product_picker(assigns), to: PeekAppSDK.UI.Odyssey.ProductPicker
   defdelegate odyssey_prefix_input(assigns), to: PeekAppSDK.UI.Odyssey.PrefixInput
   defdelegate odyssey_date_picker(assigns), to: PeekAppSDK.UI.Odyssey.DatePicker
   defdelegate odyssey_tooltip(assigns), to: PeekAppSDK.UI.Odyssey.Tooltip
