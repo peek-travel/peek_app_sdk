@@ -5,12 +5,23 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
 
   Integrates with forms via a hidden input field and a JS hook.
 
+  When `selected_ids` is not provided, the component automatically extracts IDs
+  from the form field's value. It handles lists of structs/maps with an `:id` or
+  `"id"` key, as well as `Ecto.Changeset` structs (via `get_change(:id)`).
+
   ## Examples
 
+      # Auto-extract selected_ids from field value:
       <.odyssey_product_picker
         field={@form[:whitelisted_products]}
         products={@products}
-        selected_ids={@selected_ids}
+      />
+
+      # Or pass them explicitly:
+      <.odyssey_product_picker
+        field={@form[:whitelisted_products]}
+        products={@products}
+        selected_ids={["prod_1", "prod_2"]}
       />
   """
 
@@ -26,14 +37,41 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
 
   @impl true
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
+    selected_ids = resolve_selected_ids(assigns)
+    socket = assign(socket, Map.put(assigns, :selected_ids, selected_ids))
 
     socket =
       socket
-      |> assign_new(:apply_to_mode, fn -> determine_mode(socket.assigns.selected_ids) end)
+      |> assign_new(:apply_to_mode, fn -> determine_mode(selected_ids) end)
 
     {:ok, socket}
   end
+
+  defp resolve_selected_ids(%{selected_ids: ids}) when is_list(ids), do: ids
+  defp resolve_selected_ids(%{field: field}), do: extract_ids_from_field(field.value)
+
+  @doc """
+  Extracts product IDs from a form field value.
+
+  Handles:
+  - `nil` or empty list → `[]`
+  - list of maps/structs with `:id` or `"id"` key
+  - list of `Ecto.Changeset` structs (extracts via `get_change(:id)`)
+  """
+  def extract_ids_from_field(nil), do: []
+
+  def extract_ids_from_field([_ | _] = items) do
+    items
+    |> Enum.map(&extract_id/1)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  def extract_ids_from_field(_), do: []
+
+  defp extract_id(%{__struct__: Ecto.Changeset, changes: %{id: id}}), do: id
+  defp extract_id(%{id: id}), do: id
+  defp extract_id(%{"id" => id}), do: id
+  defp extract_id(_), do: nil
 
   defp determine_mode([]), do: "all"
   defp determine_mode(_), do: "specific"
@@ -118,7 +156,15 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   @doc """
   Renders a product picker component.
 
+  When `selected_ids` is omitted, the component auto-extracts IDs from the form
+  field's value (handling structs, maps, and Ecto changesets).
+
   ## Examples
+
+      <.odyssey_product_picker
+        field={@form[:whitelisted_products]}
+        products={@products}
+      />
 
       <.odyssey_product_picker
         field={@form[:whitelisted_products]}
@@ -129,7 +175,9 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   attr :field, :any, required: true, doc: "a Phoenix.HTML.FormField struct"
   attr :id, :string, doc: "component id, defaults to form_field_product_picker"
   attr :products, :list, required: true, doc: "list of %{id, name, color_hex} maps"
-  attr :selected_ids, :list, default: [], doc: "list of pre-selected product IDs"
+
+  attr :selected_ids, :list, doc: "list of pre-selected product IDs (auto-extracted from field value when omitted)"
+
   attr :all_label, :string, default: "All Products", doc: "label for the 'all' toggle option"
   attr :specific_label, :string, default: "Specific Products", doc: "label for the 'specific' toggle option"
   attr :label, :string, required: false, doc: "label for the toggle button"

@@ -178,5 +178,106 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
 
       assert html =~ ~r/value="p1,p2"/
     end
+
+    test "auto-extracts selected_ids from field value with atom-key maps" do
+      field_value = [%{id: "p1", name: "Tour A"}, %{id: "p2", name: "Tour B"}]
+      form = to_form(%{"products" => field_value}, as: :test)
+
+      products = [
+        %{id: "p1", name: "Tour A", color_hex: "#111"},
+        %{id: "p2", name: "Tour B", color_hex: "#222"}
+      ]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker field={@form[:products]} products={@products} />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ ~r/value="p1,p2"/
+      assert html =~ "Tour A"
+    end
+
+    test "auto-extracts selected_ids from field value with string-key maps" do
+      field_value = [%{"id" => "p1"}, %{"id" => "p2"}]
+      form = to_form(%{"products" => field_value}, as: :test)
+
+      products = [
+        %{id: "p1", name: "Tour A", color_hex: "#111"},
+        %{id: "p2", name: "Tour B", color_hex: "#222"}
+      ]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker field={@form[:products]} products={@products} />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ ~r/value="p1,p2"/
+    end
+
+    test "auto-extracts selected_ids from Ecto.Changeset-like structs" do
+      changeset_like = [
+        %{__struct__: Ecto.Changeset, changes: %{id: "p1"}, data: nil, valid?: true, errors: []},
+        %{__struct__: Ecto.Changeset, changes: %{id: "p2"}, data: nil, valid?: true, errors: []}
+      ]
+
+      form = to_form(%{"products" => changeset_like}, as: :test)
+      products = [%{id: "p1", name: "A", color_hex: "#111"}, %{id: "p2", name: "B", color_hex: "#222"}]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker field={@form[:products]} products={@products} />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ ~r/value="p1,p2"/
+    end
+  end
+
+  describe "extract_ids_from_field/1" do
+    alias PeekAppSDK.UI.Odyssey.ProductPicker
+
+    test "returns empty list for nil" do
+      assert ProductPicker.extract_ids_from_field(nil) == []
+    end
+
+    test "returns empty list for non-list values" do
+      assert ProductPicker.extract_ids_from_field("something") == []
+      assert ProductPicker.extract_ids_from_field(42) == []
+    end
+
+    test "extracts ids from atom-key maps" do
+      assert ProductPicker.extract_ids_from_field([%{id: "a"}, %{id: "b"}]) == ["a", "b"]
+    end
+
+    test "extracts ids from string-key maps" do
+      assert ProductPicker.extract_ids_from_field([%{"id" => "x"}]) == ["x"]
+    end
+
+    test "extracts ids from changeset-like structs" do
+      cs = %{__struct__: Ecto.Changeset, changes: %{id: "c1"}, data: nil, valid?: true, errors: []}
+      assert ProductPicker.extract_ids_from_field([cs]) == ["c1"]
+    end
+
+    test "skips items without an id" do
+      assert ProductPicker.extract_ids_from_field([%{name: "no id"}, %{id: "ok"}]) == ["ok"]
+    end
+
+    test "returns empty list for empty list" do
+      assert ProductPicker.extract_ids_from_field([]) == []
+    end
   end
 end
