@@ -35,6 +35,68 @@ const OdysseyHooks = {
         })
       }
     }
+  },
+  OdysseySelect: {
+    mounted () {
+      this.positionDropdown()
+    },
+    updated () {
+      this.positionDropdown()
+    },
+    positionDropdown () {
+      const dropdown = this.el.querySelector('[data-dropdown]')
+      if (!dropdown) return
+
+      const button = this.el.querySelector('button')
+      const buttonRect = button.getBoundingClientRect()
+      const dropdownHeight = dropdown.offsetHeight
+      const viewportHeight = window.innerHeight
+      const spaceBelow = viewportHeight - buttonRect.bottom
+      const spaceAbove = buttonRect.top
+
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        dropdown.style.bottom = '100%'
+        dropdown.style.top = 'auto'
+        dropdown.style.marginBottom = '0.5rem'
+        dropdown.style.marginTop = '0'
+      } else {
+        dropdown.style.top = '100%'
+        dropdown.style.bottom = 'auto'
+        dropdown.style.marginTop = '0.5rem'
+        dropdown.style.marginBottom = '0'
+      }
+    }
+  },
+  OdysseyProductPicker: {
+    mounted () {
+      this.el.addEventListener('click', (event) => {
+        if (event.target.classList.contains('product-picker-checkbox')) {
+          event.stopPropagation()
+        }
+      })
+
+      this.el.addEventListener('change', (event) => {
+        if (event.target.classList.contains('product-picker-checkbox')) {
+          event.preventDefault()
+          event.stopPropagation()
+
+          const checkboxes = this.el.querySelectorAll('.product-picker-checkbox:checked')
+          const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.productId)
+
+          const hiddenInput = this.el.querySelector('input[type="hidden"]')
+          hiddenInput.value = selectedIds.join(',')
+          hiddenInput.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      })
+
+      this.handleEvent('update-product-selection', ({ field_id, value }) => {
+        const hiddenInput = document.getElementById(field_id)
+        if (hiddenInput) {
+          hiddenInput.value = value
+          hiddenInput.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      })
+    }
   }
 }
 

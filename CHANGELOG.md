@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-03-14]
+
+### Added
+
+- Added `odyssey_product_picker` component — a form-integrated product selector with "All" / "Specific" toggle and per-product checkboxes. Expects products as `%{id, name, color}` atom-keyed maps. Auto-extracts `selected_ids` from the form field value (supports maps, structs, and Ecto changesets) when not explicitly provided.
+- Added `OdysseyProductPicker` JS hook for client-side checkbox ↔ hidden field sync.
+- Added `odyssey_select` component — a generic dropdown LiveComponent with search/filter.
+- Added product picker and select demos to the showcase app with LiveView tests.
+
 ## [2026-03-05]
 
 ### Changed

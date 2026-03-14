@@ -17,7 +17,8 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       "discount" => "",
       "percentage" => "",
       "start_date" => "",
-      "expiration_date" => ""
+      "expiration_date" => "",
+      "whitelisted_products" => ""
     }
 
     socket =
@@ -32,6 +33,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       |> assign(:form_data, form_data)
       |> assign(:form, to_form(form_data, as: "form"))
       |> assign(:sample_activities, sample_activities())
+      |> assign(:sample_products, sample_products())
 
     {:ok, socket}
   end
@@ -559,6 +561,26 @@ defmodule DemoWeb.OdysseyShowcaseLive do
             <.odyssey_divider />
 
             <div>
+              <h3 class="text-lg font-medium mb-4">Product Picker Component</h3>
+              <p class="text-gray-600 mb-4">
+                Select products with a toggle between "All" and "Specific" modes.
+                When "Specific" is selected, checkboxes appear for each product.
+              </p>
+
+              <.form for={@form} phx-change="validate" id="product-picker-form">
+                <.odyssey_product_picker
+                  field={@form[:whitelisted_products]}
+                  products={@sample_products}
+                  all_label="All Products"
+                  specific_label="Specific Products"
+                  label="Apply to"
+                />
+              </.form>
+            </div>
+
+            <.odyssey_divider />
+
+            <div>
               <h3 class="text-lg font-medium mb-4">Activity Picker Component</h3>
               <p class="text-gray-600 mb-4">
                 A sophisticated component for selecting activities with search and filtering capabilities.
@@ -619,6 +641,15 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       </div>
     </div>
     """
+  end
+
+  defp sample_products do
+    [
+      %{id: "prod_1", name: "Wine Tasting", color: "#8B5CF6"},
+      %{id: "prod_2", name: "Cooking Class", color: "#F59E0B"},
+      %{id: "prod_3", name: "City Tour", color: "#10B981"},
+      %{id: "prod_4", name: "Sunset Cruise", color: "#3B82F6"}
+    ]
   end
 
   defp sample_activities do
