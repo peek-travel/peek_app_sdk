@@ -10,8 +10,8 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
 
       products = [
-        %{id: "p1", name: "Kayak Tour", color_hex: "#FF5733"},
-        %{id: "p2", name: "Snorkel Trip", color_hex: "#33FF57"}
+        %{id: "p1", name: "Kayak Tour", color: "#FF5733"},
+        %{id: "p2", name: "Snorkel Trip", color: "#33FF57"}
       ]
 
       html =
@@ -36,8 +36,8 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
 
       products = [
-        %{id: "p1", name: "Kayak Tour", color_hex: "#FF5733"},
-        %{id: "p2", name: "Snorkel Trip", color_hex: "#33FF57"}
+        %{id: "p1", name: "Kayak Tour", color: "#FF5733"},
+        %{id: "p2", name: "Snorkel Trip", color: "#33FF57"}
       ]
 
       html =
@@ -86,7 +86,7 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
     test "renders disabled state" do
       form = to_form(%{"products" => nil}, as: :test)
 
-      products = [%{id: "p1", name: "Tour", color_hex: "#000"}]
+      products = [%{id: "p1", name: "Tour", color: "#000"}]
 
       html =
         render_component(
@@ -158,8 +158,8 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       form = to_form(%{"products" => nil}, as: :test)
 
       products = [
-        %{id: "p1", name: "Tour A", color_hex: "#111"},
-        %{id: "p2", name: "Tour B", color_hex: "#222"}
+        %{id: "p1", name: "Tour A", color: "#111"},
+        %{id: "p2", name: "Tour B", color: "#222"}
       ]
 
       html =
@@ -184,8 +184,8 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       form = to_form(%{"products" => field_value}, as: :test)
 
       products = [
-        %{id: "p1", name: "Tour A", color_hex: "#111"},
-        %{id: "p2", name: "Tour B", color_hex: "#222"}
+        %{id: "p1", name: "Tour A", color: "#111"},
+        %{id: "p2", name: "Tour B", color: "#222"}
       ]
 
       html =
@@ -207,8 +207,8 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       form = to_form(%{"products" => field_value}, as: :test)
 
       products = [
-        %{id: "p1", name: "Tour A", color_hex: "#111"},
-        %{id: "p2", name: "Tour B", color_hex: "#222"}
+        %{id: "p1", name: "Tour A", color: "#111"},
+        %{id: "p2", name: "Tour B", color: "#222"}
       ]
 
       html =
@@ -231,7 +231,7 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       ]
 
       form = to_form(%{"products" => changeset_like}, as: :test)
-      products = [%{id: "p1", name: "A", color_hex: "#111"}, %{id: "p2", name: "B", color_hex: "#222"}]
+      products = [%{id: "p1", name: "A", color: "#111"}, %{id: "p2", name: "B", color: "#222"}]
 
       html =
         render_component(
@@ -244,66 +244,6 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
         )
 
       assert html =~ ~r/value="p1,p2"/
-    end
-  end
-
-  describe "custom key attrs" do
-    test "uses custom color_key" do
-      form = to_form(%{"p" => nil}, as: :t)
-      products = [%{id: "1", name: "A", hex: "#AA0000"}]
-
-      html =
-        render_component(
-          fn assigns ->
-            ~H"""
-            <.odyssey_product_picker field={@form[:p]} products={@products} selected_ids={["1"]} color_key={:hex} />
-            """
-          end,
-          %{form: form, products: products}
-        )
-
-      assert html =~ "background-color: #AA0000"
-    end
-
-    test "uses custom id_key and name_key" do
-      form = to_form(%{"p" => nil}, as: :t)
-      products = [%{product_id: "x1", title: "Kayak", color_hex: "#000"}]
-
-      html =
-        render_component(
-          fn assigns ->
-            ~H"""
-            <.odyssey_product_picker
-              field={@form[:p]}
-              products={@products}
-              selected_ids={["x1"]}
-              id_key={:product_id}
-              name_key={:title}
-            />
-            """
-          end,
-          %{form: form, products: products}
-        )
-
-      assert html =~ "Kayak"
-      assert html =~ "data-product-id=\"x1\""
-    end
-
-    test "falls back to #888888 when color key is missing" do
-      form = to_form(%{"p" => nil}, as: :t)
-      products = [%{id: "1", name: "A"}]
-
-      html =
-        render_component(
-          fn assigns ->
-            ~H"""
-            <.odyssey_product_picker field={@form[:p]} products={@products} selected_ids={["1"]} />
-            """
-          end,
-          %{form: form, products: products}
-        )
-
-      assert html =~ "background-color: #888888"
     end
   end
 

@@ -5,23 +5,18 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
 
   Integrates with forms via a hidden input field and a JS hook.
 
+  Products must conform to `%{id: string, name: string, color: string}` (atom keys).
+  Callers are responsible for mapping their data to this shape before passing it in.
+
   When `selected_ids` is not provided, the component automatically extracts IDs
   from the form field's value. It handles lists of structs/maps with an `:id` or
   `"id"` key, as well as `Ecto.Changeset` structs (via `get_change(:id)`).
 
   ## Examples
 
-      # Auto-extract selected_ids from field value:
       <.odyssey_product_picker
         field={@form[:whitelisted_products]}
-        products={@products}
-      />
-
-      # Or pass them explicitly:
-      <.odyssey_product_picker
-        field={@form[:whitelisted_products]}
-        products={@products}
-        selected_ids={["prod_1", "prod_2"]}
+        products={Enum.map(@raw_products, &%{id: &1.id, name: &1.name, color: &1.colorHex})}
       />
   """
 
@@ -107,22 +102,21 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
           id={"#{@id}_checkboxes"}
         >
           <div :for={product <- @products} class="flex items-center gap-3">
-            <% product_id = product[@id_key] %>
             <input
               type="checkbox"
-              id={"#{@id}_product_#{product_id}"}
-              checked={product_id in @selected_ids}
-              data-product-id={product_id}
+              id={"#{@id}_product_#{product.id}"}
+              checked={product.id in @selected_ids}
+              data-product-id={product.id}
               disabled={@disabled}
               class="checkbox checkbox-sm product-picker-checkbox"
             />
             <div
               class="w-3 h-3 rounded-sm flex-shrink-0"
-              style={"background-color: #{product[@color_key] || "#888888"}"}
+              style={"background-color: #{product.color}"}
             >
             </div>
-            <label for={"#{@id}_product_#{product_id}"} class="text-sm text-gray-700 cursor-pointer">
-              {product[@name_key]}
+            <label for={"#{@id}_product_#{product.id}"} class="text-sm text-gray-700 cursor-pointer">
+              {product.name}
             </label>
           </div>
         </div>
@@ -151,9 +145,6 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
     {:noreply, socket}
   end
 
-  defp to_existing_atom(value) when is_atom(value), do: value
-  defp to_existing_atom(value) when is_binary(value), do: String.to_existing_atom(value)
-
   defp encode_selected_products([]), do: ""
   defp encode_selected_products(ids), do: Enum.join(ids, ",")
 
@@ -179,13 +170,8 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   attr :field, :any, required: true, doc: "a Phoenix.HTML.FormField struct"
   attr :id, :string, doc: "component id, defaults to form_field_product_picker"
 
-  attr :products, :list, required: true, doc: "list of product maps"
-
+  attr :products, :list, required: true, doc: "list of %{id: string, name: string, color: string} maps"
   attr :selected_ids, :list, doc: "list of pre-selected product IDs (auto-extracted from field value when omitted)"
-
-  attr :id_key, :atom, default: :id, doc: "key to read product ID from each product map"
-  attr :name_key, :atom, default: :name, doc: "key to read product name from each product map"
-  attr :color_key, :atom, default: :color_hex, doc: "key to read product color hex from each product map"
   attr :all_label, :string, default: "All Products", doc: "label for the 'all' toggle option"
   attr :specific_label, :string, default: "Specific Products", doc: "label for the 'specific' toggle option"
   attr :label, :string, required: false, doc: "label for the toggle button"
@@ -198,9 +184,6 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
         "#{field.form.name}_#{field.field}_product_picker"
       end)
       |> assign_new(:label, fn -> nil end)
-      |> assign(:id_key, to_existing_atom(assigns[:id_key] || :id))
-      |> assign(:name_key, to_existing_atom(assigns[:name_key] || :name))
-      |> assign(:color_key, to_existing_atom(assigns[:color_key] || :color_hex))
       |> assign(:module, __MODULE__)
 
     ~H"""

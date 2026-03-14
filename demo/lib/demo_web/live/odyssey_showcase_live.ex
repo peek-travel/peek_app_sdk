@@ -645,10 +645,10 @@ defmodule DemoWeb.OdysseyShowcaseLive do
 
   defp sample_products do
     [
-      %{id: "prod_1", name: "Wine Tasting", color_hex: "#8B5CF6"},
-      %{id: "prod_2", name: "Cooking Class", color_hex: "#F59E0B"},
-      %{id: "prod_3", name: "City Tour", color_hex: "#10B981"},
-      %{id: "prod_4", name: "Sunset Cruise", color_hex: "#3B82F6"}
+      %{id: "prod_1", name: "Wine Tasting", color: "#8B5CF6"},
+      %{id: "prod_2", name: "Cooking Class", color: "#F59E0B"},
+      %{id: "prod_3", name: "City Tour", color: "#10B981"},
+      %{id: "prod_4", name: "Sunset Cruise", color: "#3B82F6"}
     ]
   end
 
