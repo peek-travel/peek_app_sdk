@@ -36,6 +36,37 @@ const OdysseyHooks = {
       }
     }
   },
+  OdysseySelect: {
+    mounted () {
+      this.positionDropdown()
+    },
+    updated () {
+      this.positionDropdown()
+    },
+    positionDropdown () {
+      const dropdown = this.el.querySelector('[data-dropdown]')
+      if (!dropdown) return
+
+      const button = this.el.querySelector('button')
+      const buttonRect = button.getBoundingClientRect()
+      const dropdownHeight = dropdown.offsetHeight
+      const viewportHeight = window.innerHeight
+      const spaceBelow = viewportHeight - buttonRect.bottom
+      const spaceAbove = buttonRect.top
+
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        dropdown.style.bottom = '100%'
+        dropdown.style.top = 'auto'
+        dropdown.style.marginBottom = '0.5rem'
+        dropdown.style.marginTop = '0'
+      } else {
+        dropdown.style.top = '100%'
+        dropdown.style.bottom = 'auto'
+        dropdown.style.marginTop = '0.5rem'
+        dropdown.style.marginBottom = '0'
+      }
+    }
+  },
   OdysseyProductPicker: {
     mounted () {
       this.el.addEventListener('click', (event) => {
