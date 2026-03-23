@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `odyssey_select` now accepts an optional `label` attr, wrapping the component in a fieldset with label styling consistent with other Odyssey form components.
+- `odyssey_select` now supports form-integrated mode when a `field` attr is provided (like `odyssey_toggle_button`). Manages a hidden input for form binding with single and multiple selection via the `multiple` attr. Standalone mode (via `on_select`) remains unchanged.
 
 ### Changed
 
