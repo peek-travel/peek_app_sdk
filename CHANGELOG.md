@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-03-23]
+
+### Added
+
+- `odyssey_select` now accepts an optional `label` attr, wrapping the component in a fieldset with label styling consistent with other Odyssey form components.
+
+### Changed
+
+- `odyssey_select` color dots are now only rendered when the item has a color value. Items without a color field no longer show a grey fallback dot.
+
 ## [2026-03-14]
 
 ### Added

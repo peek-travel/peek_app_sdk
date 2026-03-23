@@ -108,6 +108,7 @@ defmodule PeekAppSDK.UI.Odyssey.Select do
             phx-target={@myself}
           >
             <span
+              :if={get_color(item, @color_field)}
               class="inline-block h-2.5 w-2.5 rounded-full mr-2 align-middle"
               aria-hidden="true"
               style={"background-color: #{get_color(item, @color_field)}"}
@@ -139,7 +140,7 @@ defmodule PeekAppSDK.UI.Odyssey.Select do
     {:noreply, socket |> assign(:open, false) |> assign(:search, "")}
   end
 
-  defp get_color(item, field), do: Map.get(item, field) || "#CCCCCC"
+  defp get_color(item, field), do: Map.get(item, field)
 
   defp filtered_items(items, search, excluded_ids) do
     excluded_ids = Enum.map(excluded_ids, &to_string/1)
@@ -174,12 +175,25 @@ defmodule PeekAppSDK.UI.Odyssey.Select do
   attr :excluded_ids, :list, default: [], doc: "list of ids to exclude"
   attr :color_field, :atom, default: :color_hex, doc: "atom for the color field on items"
   attr :context, :any, default: nil, doc: "additional context included in the message"
+  attr :label, :string, required: false, doc: "optional label to wrap the select in a fieldset"
 
   def odyssey_select(assigns) do
-    assigns = assign(assigns, :module, __MODULE__)
+    assigns =
+      assigns
+      |> assign(:module, __MODULE__)
+      |> assign_new(:label, fn -> nil end)
 
     ~H"""
-    <.live_component {assigns} />
+    <%= if @label do %>
+      <fieldset class="fieldset mb-2">
+        <div>
+          <span class="label mb-1 block">{@label}</span>
+          <.live_component {assigns} />
+        </div>
+      </fieldset>
+    <% else %>
+      <.live_component {assigns} />
+    <% end %>
     """
   end
 end
