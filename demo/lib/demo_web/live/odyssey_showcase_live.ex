@@ -18,7 +18,9 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       "percentage" => "",
       "start_date" => "",
       "expiration_date" => "",
-      "whitelisted_products" => ""
+      "whitelisted_products" => "",
+      "category_id" => "",
+      "tag_ids" => ""
     }
 
     socket =
@@ -30,10 +32,13 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       |> assign(:status_selection, "Active")
       |> assign(:size_selection, "Medium")
       |> assign(:channel_selection, :email)
+      |> assign(:standalone_select_item, nil)
       |> assign(:form_data, form_data)
       |> assign(:form, to_form(form_data, as: "form"))
       |> assign(:sample_activities, sample_activities())
       |> assign(:sample_products, sample_products())
+      |> assign(:sample_categories, sample_categories())
+      |> assign(:sample_tags, sample_tags())
 
     {:ok, socket}
   end
@@ -99,6 +104,12 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       |> assign(:form, to_form(form_params, as: "form"))
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:item_selected, _context, id}, socket) do
+    item = Enum.find(socket.assigns.sample_categories, &(to_string(&1.id) == to_string(id)))
+    {:noreply, assign(socket, :standalone_select_item, item)}
   end
 
   @impl true
@@ -313,6 +324,53 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                 selected="Weekly"
                 on_change="change_frequency"
                 tooltip="Select how often you want to receive reports"
+              />
+            </div>
+          </div>
+        </section>
+
+        <.odyssey_divider />
+
+    <!-- Select Dropdown Section -->
+        <section>
+          <h2 class="text-2xl font-semibold mb-6">Select Dropdown</h2>
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-lg font-medium mb-2">Standalone Select (event-based)</h3>
+              <p class="text-gray-600 mb-4">
+                Fires an event when an item is selected. No form integration needed.
+              </p>
+              <.odyssey_select
+                id="standalone-category-picker"
+                items={@sample_categories}
+                on_select={:item_selected}
+                title="Pick a Category"
+                color_field={:color}
+              />
+              <p class="text-sm text-gray-600 mt-2">
+                Selected: <strong>{if @standalone_select_item, do: @standalone_select_item.name, else: "None"}</strong>
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Standalone Select with Label</h3>
+              <.odyssey_select
+                id="labeled-category-picker"
+                items={@sample_categories}
+                on_select={:item_selected}
+                title="Pick a Category"
+                color_field={:color}
+                label="Category"
+              />
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Select without Colors</h3>
+              <.odyssey_select
+                id="no-color-picker"
+                items={@sample_tags}
+                on_select={:item_selected}
+                title="Pick a Tag"
               />
             </div>
           </div>
@@ -581,6 +639,52 @@ defmodule DemoWeb.OdysseyShowcaseLive do
             <.odyssey_divider />
 
             <div>
+              <h3 class="text-lg font-medium mb-4">Select Dropdown (Form-Integrated)</h3>
+              <p class="text-gray-600 mb-4">
+                The same odyssey_select component, but with a form field binding.
+                Automatically tracks selected state and syncs with the form.
+              </p>
+
+              <.form for={@form} phx-change="validate" id="select-form" class="space-y-6">
+                <div>
+                  <h4 class="text-base font-medium mb-2">Single Select</h4>
+                  <p class="text-gray-500 text-sm mb-2">
+                    Selecting an item closes the dropdown and shows the selection in the button.
+                  </p>
+                  <.odyssey_select
+                    field={@form[:category_id]}
+                    items={@sample_categories}
+                    title="Select Category"
+                    color_field={:color}
+                    label="Category"
+                  />
+                  <p class="text-sm text-gray-500 mt-1">
+                    Form value: <strong>{@form_data["category_id"] || "(empty)"}</strong>
+                  </p>
+                </div>
+
+                <div>
+                  <h4 class="text-base font-medium mb-2">Multiple Select</h4>
+                  <p class="text-gray-500 text-sm mb-2">
+                    Clicking items toggles them on/off. Dropdown stays open for further selections.
+                  </p>
+                  <.odyssey_select
+                    field={@form[:tag_ids]}
+                    items={@sample_tags}
+                    title="Select Tags"
+                    multiple={true}
+                    label="Tags"
+                  />
+                  <p class="text-sm text-gray-500 mt-1">
+                    Form value: <strong>{@form_data["tag_ids"] || "(empty)"}</strong>
+                  </p>
+                </div>
+              </.form>
+            </div>
+
+            <.odyssey_divider />
+
+            <div>
               <h3 class="text-lg font-medium mb-4">Activity Picker Component</h3>
               <p class="text-gray-600 mb-4">
                 A sophisticated component for selecting activities with search and filtering capabilities.
@@ -649,6 +753,27 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       %{id: "prod_2", name: "Cooking Class", color: "#F59E0B"},
       %{id: "prod_3", name: "City Tour", color: "#10B981"},
       %{id: "prod_4", name: "Sunset Cruise", color: "#3B82F6"}
+    ]
+  end
+
+  defp sample_categories do
+    [
+      %{id: "cat_1", name: "Food & Drink", color: "#F59E0B"},
+      %{id: "cat_2", name: "Outdoor Adventures", color: "#10B981"},
+      %{id: "cat_3", name: "Arts & Culture", color: "#8B5CF6"},
+      %{id: "cat_4", name: "Water Sports", color: "#3B82F6"},
+      %{id: "cat_5", name: "Nightlife", color: "#EC4899"}
+    ]
+  end
+
+  defp sample_tags do
+    [
+      %{id: "tag_1", name: "Family Friendly"},
+      %{id: "tag_2", name: "Bestseller"},
+      %{id: "tag_3", name: "New"},
+      %{id: "tag_4", name: "Seasonal"},
+      %{id: "tag_5", name: "Premium"},
+      %{id: "tag_6", name: "Group Discount"}
     ]
   end
 
