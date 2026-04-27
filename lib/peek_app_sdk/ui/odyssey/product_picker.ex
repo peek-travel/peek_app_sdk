@@ -1,9 +1,12 @@
 defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   @moduledoc """
   A live component for selecting products with a toggle between "All" and "Specific".
-  When "Specific" is selected, displays checkboxes for each product.
 
-  Integrates with forms via a hidden input field and a JS hook.
+  When "Specific" is selected, displays a searchable list where clicking a row
+  toggles selection. Selected state is managed server-side (no JS checkbox hacks).
+
+  Integrates with forms via a hidden input field. The parent form is notified of
+  changes via the global `trigger-input` phx event (wired up by `addOdysseyGlobalEvents`).
 
   Products must conform to `%{id: string, name: string, color: string}` (atom keys).
   Callers are responsible for mapping their data to this shape before passing it in.
@@ -27,16 +30,22 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
 
   @impl true
   def mount(socket) do
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(:search, "")
+     |> assign(:filtered_products, [])}
   end
 
   @impl true
   def update(assigns, socket) do
     selected_ids = resolve_selected_ids(assigns)
-    socket = assign(socket, Map.put(assigns, :selected_ids, selected_ids))
+    search = Map.get(socket.assigns, :search, "")
 
     socket =
       socket
+      |> assign(assigns)
+      |> assign(:selected_ids, selected_ids)
+      |> assign(:filtered_products, filter_products(assigns[:products] || [], search))
       |> assign_new(:apply_to_mode, fn -> determine_mode(selected_ids) end)
 
     {:ok, socket}
@@ -71,10 +80,17 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   defp determine_mode([]), do: "all"
   defp determine_mode(_), do: "specific"
 
+  defp filter_products(products, ""), do: products
+
+  defp filter_products(products, search) do
+    query = String.downcase(search)
+    Enum.filter(products, &String.contains?(String.downcase(&1.name), query))
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
-    <div id={@id} phx-hook="OdysseyProductPicker" data-integration="product-picker">
+    <div id={@id} data-integration="product-picker">
       <input
         type="hidden"
         name={@field.name}
@@ -82,7 +98,7 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
         id={"#{@id}_hidden_field"}
       />
 
-      <div class="space-y-4">
+      <div class="space-y-3">
         <.odyssey_toggle_button
           options={[
             %{value: "all", label: @all_label},
@@ -95,29 +111,79 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
           disabled={@disabled}
         />
 
-        <div
-          :if={@apply_to_mode == "specific"}
-          class="space-y-2 pl-4 max-h-64 overflow-y-auto"
-          phx-update="ignore"
-          id={"#{@id}_checkboxes"}
-        >
-          <div :for={product <- @products} class="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id={"#{@id}_product_#{product.id}"}
-              checked={product.id in @selected_ids}
-              data-product-id={product.id}
-              disabled={@disabled}
-              class="checkbox checkbox-sm product-picker-checkbox"
-            />
-            <div
-              class="w-3 h-3 rounded-sm flex-shrink-0"
-              style={"background-color: #{product.color}"}
-            >
+        <div :if={@apply_to_mode == "specific"} class="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+          <div class="px-3 pt-3 pb-2 border-b border-zinc-100">
+            <div class="flex items-center gap-2 rounded-md border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-600">
+              <svg
+                class="w-4 h-4 opacity-70 shrink-0"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.9 14.32a8 8 0 1 1 1.414-1.414l3.39 3.39a1 1 0 0 1-1.414 1.414l-3.39-3.39ZM14 8a6 6 0 1 0-12 0 6 6 0 0 0 12 0Z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <input
+                type="text"
+                class="flex-1 bg-transparent outline-none text-sm"
+                placeholder={@search_placeholder}
+                value={@search}
+                phx-keyup="search"
+                phx-target={@myself}
+                disabled={@disabled}
+              />
+              <span
+                :if={length(@selected_ids) > 0}
+                class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full shrink-0"
+              >
+                {length(@selected_ids)} selected
+              </span>
             </div>
-            <label for={"#{@id}_product_#{product.id}"} class="text-sm text-gray-700 cursor-pointer">
-              {product.name}
-            </label>
+          </div>
+
+          <div class="max-h-64 overflow-y-auto py-1">
+            <button
+              :for={product <- @filtered_products}
+              type="button"
+              class={[
+                "flex w-full items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors",
+                product.id in @selected_ids && "bg-blue-50",
+                product.id not in @selected_ids && "hover:bg-zinc-50",
+                @disabled && "pointer-events-none opacity-60"
+              ]}
+              phx-click="toggle_product"
+              phx-value-id={product.id}
+              phx-target={@myself}
+            >
+              <div
+                class="w-3 h-3 rounded-sm shrink-0"
+                style={"background-color: #{product.color}"}
+              />
+              <span class="flex-1 text-zinc-700">{product.name}</span>
+              <svg
+                :if={product.id in @selected_ids}
+                class="w-4 h-4 text-blue-600 shrink-0"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+
+            <p
+              :if={@filtered_products == [] && @search != ""}
+              class="px-4 py-6 text-sm text-zinc-400 text-center"
+            >
+              No products match your search.
+            </p>
           </div>
         </div>
       </div>
@@ -126,21 +192,47 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   end
 
   @impl true
-  def handle_event("toggle_apply_to", %{"value" => mode}, socket) do
+  def handle_event("toggle_apply_to", %{"value" => "all"}, socket) do
+    socket =
+      socket
+      |> assign(:apply_to_mode, "all")
+      |> assign(:selected_ids, [])
+      |> assign(:search, "")
+      |> assign(:filtered_products, socket.assigns.products)
+      |> push_event("trigger-input", %{field_id: "#{socket.assigns.id}_hidden_field"})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("toggle_apply_to", %{"value" => "specific"}, socket) do
+    socket =
+      socket
+      |> assign(:apply_to_mode, "specific")
+      |> assign(:search, "")
+      |> assign(:filtered_products, socket.assigns.products)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("toggle_product", %{"id" => id}, socket) do
     selected_ids =
-      case mode do
-        "all" -> []
-        "specific" -> socket.assigns.selected_ids
-      end
+      if id in socket.assigns.selected_ids,
+        do: Enum.reject(socket.assigns.selected_ids, &(&1 == id)),
+        else: [id | socket.assigns.selected_ids] |> Enum.reverse()
 
     socket =
       socket
-      |> assign(:apply_to_mode, mode)
       |> assign(:selected_ids, selected_ids)
-      |> push_event("update-product-selection", %{
-        field_id: "#{socket.assigns.id}_hidden_field",
-        value: encode_selected_products(selected_ids)
-      })
+      |> push_event("trigger-input", %{field_id: "#{socket.assigns.id}_hidden_field"})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("search", %{"value" => value}, socket) do
+    socket =
+      socket
+      |> assign(:search, value)
+      |> assign(:filtered_products, filter_products(socket.assigns.products, value))
 
     {:noreply, socket}
   end
@@ -169,12 +261,12 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   """
   attr :field, :any, required: true, doc: "a Phoenix.HTML.FormField struct"
   attr :id, :string, doc: "component id, defaults to form_field_product_picker"
-
   attr :products, :list, required: true, doc: "list of %{id: string, name: string, color: string} maps"
   attr :selected_ids, :list, doc: "list of pre-selected product IDs (auto-extracted from field value when omitted)"
   attr :all_label, :string, default: "All Products", doc: "label for the 'all' toggle option"
   attr :specific_label, :string, default: "Specific Products", doc: "label for the 'specific' toggle option"
   attr :label, :string, required: false, doc: "label for the toggle button"
+  attr :search_placeholder, :string, default: "Search...", doc: "placeholder text for the search input"
   attr :disabled, :boolean, default: false, doc: "whether the picker is disabled"
 
   def odyssey_product_picker(assigns) do

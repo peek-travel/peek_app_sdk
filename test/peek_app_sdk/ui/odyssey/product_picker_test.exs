@@ -32,7 +32,7 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       refute html =~ "Kayak Tour"
     end
 
-    test "renders with selected_ids in specific mode" do
+    test "renders product list with checkmarks when in specific mode" do
       form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
 
       products = [
@@ -59,6 +59,94 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPickerTest do
       assert html =~ ~r/value="p1"/
       assert html =~ "#FF5733"
       assert html =~ "#33FF57"
+    end
+
+    test "shows selected count badge when items are selected" do
+      form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
+
+      products = [
+        %{id: "p1", name: "Tour A", color: "#111"},
+        %{id: "p2", name: "Tour B", color: "#222"}
+      ]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker
+              field={@form[:whitelisted_products]}
+              products={@products}
+              selected_ids={["p1", "p2"]}
+            />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      assert html =~ "2 selected"
+    end
+
+    test "does not show selected count badge when no items are selected" do
+      form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
+
+      products = [%{id: "p1", name: "Tour A", color: "#111"}]
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker
+              field={@form[:whitelisted_products]}
+              products={@products}
+              selected_ids={[]}
+            />
+            """
+          end,
+          %{form: form, products: products}
+        )
+
+      refute html =~ "selected"
+    end
+
+    test "renders search input when in specific mode" do
+      form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker
+              field={@form[:whitelisted_products]}
+              products={[]}
+              selected_ids={["p1"]}
+            />
+            """
+          end,
+          %{form: form}
+        )
+
+      assert html =~ ~r/placeholder="Search\.\.\."/
+    end
+
+    test "renders search input with custom placeholder" do
+      form = to_form(%{"whitelisted_products" => nil}, as: :campaign)
+
+      html =
+        render_component(
+          fn assigns ->
+            ~H"""
+            <.odyssey_product_picker
+              field={@form[:whitelisted_products]}
+              products={[]}
+              selected_ids={["p1"]}
+              search_placeholder="Find a product..."
+            />
+            """
+          end,
+          %{form: form}
+        )
+
+      assert html =~ ~r/placeholder="Find a product\.\.\."/
     end
 
     test "renders with custom toggle labels" do
