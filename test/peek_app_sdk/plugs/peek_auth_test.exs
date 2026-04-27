@@ -27,6 +27,8 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       assert conn.assigns.peek_install_id == install_id
       assert conn.assigns.peek_install_token == token
       assert conn.assigns.peek_config_id == nil
+      assert is_map(conn.assigns.peek_verified_claims)
+      assert conn.assigns.peek_verified_claims["sub"] == install_id
 
       # Don't test session in tests since it's not properly initialized
       # and we're now handling that gracefully in the implementation
@@ -214,6 +216,35 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       assert conn.assigns.peek_account_user.is_peek_admin == true
       assert conn.assigns.peek_account_user.name == "Legacy User"
       assert conn.assigns.peek_account_user.primary_role == nil
+      assert conn.assigns.peek_account_user.locale == nil
+    end
+
+    test "extracts locale from user JWT claims into account_user" do
+      install_id = "test_install_id"
+
+      config = PeekAppSDK.Config.get_config()
+      shared_secret_key = config.peek_app_secret
+      signer = Joken.Signer.create("HS256", shared_secret_key)
+
+      params = %{
+        "iss" => "app_registry_v2",
+        "sub" => install_id,
+        "exp" => DateTime.utc_now() |> DateTime.add(60) |> DateTime.to_unix(),
+        "user" => %{
+          "email" => "user@example.com",
+          "id" => "user123",
+          "is_admin" => false,
+          "name" => "Test User",
+          "locale" => "fr"
+        }
+      }
+
+      {:ok, token, _claims} = Token.generate_and_sign(params, signer)
+      conn = conn(:post, "/", %{"peek-auth" => token})
+
+      conn = PeekAuth.set_peek_install_id(conn, %{})
+
+      assert conn.assigns.peek_account_user.locale == "fr"
     end
 
     test "handles non-keyword list and non-map options" do

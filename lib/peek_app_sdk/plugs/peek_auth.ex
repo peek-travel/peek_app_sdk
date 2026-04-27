@@ -56,6 +56,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
         |> assign(:peek_install_id, install_id)
         |> assign(:peek_account_user, build_account_user(claims))
         |> assign(:peek_config_id, config_id)
+        |> assign(:peek_verified_claims, claims)
 
       _ ->
         conn
@@ -79,19 +80,21 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
   end
 
   defp build_account_user(%{
-         "user" => %{
-           "id" => current_user_id,
-           "email" => current_user_email,
-           "is_admin" => current_user_is_peek_admin,
-           "name" => current_user_name
-         }
+         "user" =>
+           %{
+             "id" => current_user_id,
+             "email" => current_user_email,
+             "is_admin" => current_user_is_peek_admin,
+             "name" => current_user_name
+           } = user
        }) do
     %PeekAppSDK.AccountUser{
       email: current_user_email,
       id: current_user_id,
       is_peek_admin: current_user_is_peek_admin,
       name: current_user_name,
-      primary_role: nil
+      primary_role: nil,
+      locale: user["locale"]
     }
   end
 
