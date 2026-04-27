@@ -85,14 +85,15 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
            "email" => current_user_email,
            "is_admin" => current_user_is_peek_admin,
            "name" => current_user_name
-         }
+         } = user
        }) do
     %PeekAppSDK.AccountUser{
       email: current_user_email,
       id: current_user_id,
       is_peek_admin: current_user_is_peek_admin,
       name: current_user_name,
-      primary_role: nil
+      primary_role: nil,
+      locale: user["locale"]
     }
   end
 
