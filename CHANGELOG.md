@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-04-27]
+
+### Added
+
+- `AccountUser` now includes a `locale` field (optional `String.t()`), extracted from the `"locale"` key in the JWT user claims.
+- `PeekAuth` plug now assigns `peek_verified_claims` on the conn — the full verified JWT claims map — giving LiveViews and controllers direct access to raw claim data without re-parsing the token.
+
 ## [2026-03-23]
 
 ### Added
