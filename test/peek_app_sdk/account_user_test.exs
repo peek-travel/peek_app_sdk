@@ -13,6 +13,7 @@ defmodule PeekAppSDK.AccountUserTest do
       assert hook.id == nil
       assert hook.is_peek_admin == nil
       assert hook.primary_role == nil
+      assert hook.locale == nil
     end
   end
 end

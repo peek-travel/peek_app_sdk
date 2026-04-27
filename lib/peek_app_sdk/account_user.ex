@@ -2,22 +2,16 @@ defmodule PeekAppSDK.AccountUser do
   @moduledoc """
   When iFrames are loaded, who is the logged in user?
   """
-  @fields [
-    :email,
-    :id,
-    :is_peek_admin,
-    :name,
-    :primary_role
-  ]
-  @enforce_keys @fields
-  defstruct @fields
+  @enforce_keys [:email, :id, :is_peek_admin, :name, :primary_role]
+  defstruct [:email, :id, :is_peek_admin, :name, :primary_role, locale: nil]
 
   @type t :: %__MODULE__{
           email: String.t(),
           id: String.t(),
           is_peek_admin: boolean(),
           name: String.t(),
-          primary_role: String.t()
+          primary_role: String.t() | nil,
+          locale: String.t() | nil
         }
 
   @doc """
