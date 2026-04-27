@@ -27,6 +27,8 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       assert conn.assigns.peek_install_id == install_id
       assert conn.assigns.peek_install_token == token
       assert conn.assigns.peek_config_id == nil
+      assert is_map(conn.assigns.peek_verified_claims)
+      assert conn.assigns.peek_verified_claims["sub"] == install_id
 
       # Don't test session in tests since it's not properly initialized
       # and we're now handling that gracefully in the implementation

@@ -56,6 +56,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
         |> assign(:peek_install_id, install_id)
         |> assign(:peek_account_user, build_account_user(claims))
         |> assign(:peek_config_id, config_id)
+        |> assign(:peek_verified_claims, claims)
 
       _ ->
         conn
