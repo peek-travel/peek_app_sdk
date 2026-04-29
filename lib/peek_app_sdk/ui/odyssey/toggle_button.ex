@@ -51,6 +51,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
   attr(:tooltip, :string, required: false, doc: "optional tooltip text to display next to the label")
   attr(:tooltip_location, :string, default: "right", doc: "tooltip position: top, bottom, left, right")
   attr(:disabled, :boolean, default: false, doc: "disable the toggle button")
+  attr(:layout, :atom, default: :inline, doc: "layout style: :inline (default) or :stacked (vertical radio-style list)")
   attr(:phx_target, :any, required: false, doc: "optional phx-target for LiveComponent integration")
   attr(:rest, :global)
 
@@ -75,31 +76,85 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
       |> assign_new(:phx_target, fn -> nil end)
       |> assign_new(:label, fn -> nil end)
       |> assign_new(:tooltip, fn -> nil end)
+      |> assign_new(:layout, fn -> :inline end)
 
     ~H"""
     <%= if @label do %>
       <fieldset class="fieldset mb-2">
         <div>
-          <span class="label mb-1 block">
-            <.odyssey_tooltip :if={@tooltip} text={@tooltip} location={@tooltip_location}>{@label}</.odyssey_tooltip>
-            <%= if is_nil(@tooltip) do %>
-              {@label}
-            <% end %>
+          <span class="label mb-1 flex items-center gap-1">
+            {@label}
+            <.odyssey_tooltip :if={@tooltip} text={@tooltip} location={@tooltip_location} />
           </span>
           <.do_odyssey_toggle_button {assigns} />
         </div>
       </fieldset>
     <% else %>
-      <div :if={@tooltip} class="flex items-center gap-2">
+      <div :if={@tooltip && @layout == :inline} class="flex items-center gap-2">
         <.do_odyssey_toggle_button {assigns} />
         <.odyssey_tooltip text={@tooltip} location={@tooltip_location} />
       </div>
-      <.do_odyssey_toggle_button :if={is_nil(@tooltip)} {assigns} />
+      <.do_odyssey_toggle_button :if={is_nil(@tooltip) || @layout == :stacked} {assigns} />
     <% end %>
     """
   end
 
   # Private function component for the button group to avoid duplication
+  defp do_odyssey_toggle_button(%{layout: :stacked} = assigns) do
+    assigns = assign_new(assigns, :disabled, fn -> false end)
+
+    ~H"""
+    <div class="flex flex-col space-y-4" role="group">
+      <button
+        :for={option <- @options}
+        type="button"
+        disabled={@disabled}
+        value={to_string(option_value(option))}
+        phx-click={
+          if @disabled || to_string(@selected) == to_string(option_value(option)),
+            do: nil,
+            else: @on_change
+        }
+        phx-target={@phx_target}
+        class={[
+          "flex items-start gap-4 text-left w-full",
+          @disabled && "opacity-50 cursor-not-allowed",
+          !@disabled && to_string(@selected) != to_string(option_value(option)) && "cursor-pointer"
+        ]}
+        {@rest}
+      >
+        <%= if to_string(@selected) == to_string(option_value(option)) do %>
+          <svg class="mt-0.5 shrink-0" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="27" height="27" rx="13.5" fill="#F2F3FA" />
+            <rect x="0.5" y="0.5" width="27" height="27" rx="13.5" stroke="#DADCE7" />
+            <path
+              d="M14.0058 22C12.9047 22 11.8681 21.7917 10.8958 21.375C9.92361 20.9583 9.07292 20.3854 8.34375 19.6562C7.61458 18.9271 7.04167 18.0767 6.625 17.105C6.20833 16.1334 6 15.0952 6 13.9905C6 12.8857 6.20833 11.8507 6.625 10.8854C7.04167 9.92014 7.61458 9.07292 8.34375 8.34375C9.07292 7.61458 9.92332 7.04167 10.895 6.625C11.8666 6.20833 12.9048 6 14.0095 6C15.1143 6 16.1493 6.20833 17.1146 6.625C18.0799 7.04167 18.9271 7.61458 19.6562 8.34375C20.3854 9.07292 20.9583 9.92169 21.375 10.8901C21.7917 11.8585 22 12.8932 22 13.9943C22 15.0953 21.7917 16.1319 21.375 17.1042C20.9583 18.0764 20.3854 18.9271 19.6562 19.6562C18.9271 20.3854 18.0783 20.9583 17.1099 21.375C16.1415 21.7917 15.1068 22 14.0058 22Z"
+              fill="#3957EA"
+            />
+          </svg>
+        <% else %>
+          <svg class="mt-0.5 shrink-0" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.5" y="0.5" width="27" height="27" rx="13.5" fill="#F2F3FA" />
+            <rect x="0.5" y="0.5" width="27" height="27" rx="13.5" stroke="#DADCE7" />
+          </svg>
+        <% end %>
+        <div class="flex flex-col ody-neutral-300">
+          <span class={[
+            "ody-p1",
+            to_string(@selected) == to_string(option_value(option)) && "text-gray-900",
+            to_string(@selected) != to_string(option_value(option)) && "text-gray-700"
+          ]}>
+            {option_text(option)}
+          </span>
+          <span :if={option_description(option)} class="ody-p2 mt-0.5">
+            {option_description(option)}
+          </span>
+        </div>
+      </button>
+    </div>
+    """
+  end
+
   defp do_odyssey_toggle_button(assigns) do
     assigns = assign_new(assigns, :disabled, fn -> false end)
 
@@ -148,4 +203,7 @@ defmodule PeekAppSDK.UI.Odyssey.ToggleButton do
 
   def option_icon(%{icon: icon}), do: icon
   def option_icon(_option), do: nil
+
+  def option_description(%{description: description}), do: description
+  def option_description(_option), do: nil
 end

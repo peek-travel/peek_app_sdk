@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-04-29]
+
+### Added
+
+- `odyssey_toggle_button` now accepts a `layout` attr (`:inline` default, `:stacked` for vertical radio-style list). In stacked mode, options render as a full-width vertical list — each row has a radio circle SVG (filled blue when selected, outlined when not) with the option name to the right and an optional description beneath it. Options support a `description` key for stacked mode.
+- Added `.ody-neutral-{0,50,100,200,250,300,350,400}` CSS helper classes for applying Odyssey neutral palette colors to text.
+- Added complete set of `.ody-*` CSS classes covering H1–H3, P1–P3, Mobile Footer, and link variants across regular/medium/bold weights.
+
 ## [2026-04-27]
 
 ### Added

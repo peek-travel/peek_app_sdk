@@ -32,6 +32,7 @@ defmodule DemoWeb.OdysseyShowcaseLive do
       |> assign(:status_selection, "Active")
       |> assign(:size_selection, "Medium")
       |> assign(:channel_selection, :email)
+      |> assign(:stacked_selection, :pre_tax)
       |> assign(:standalone_select_item, nil)
       |> assign(:form_data, form_data)
       |> assign(:form, to_form(form_data, as: "form"))
@@ -94,6 +95,11 @@ defmodule DemoWeb.OdysseyShowcaseLive do
   def handle_event("change_channel", %{"value" => option}, socket) do
     socket = assign(socket, :channel_selection, option)
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("change_commission_type", %{"value" => option}, socket) do
+    {:noreply, assign(socket, :stacked_selection, option)}
   end
 
   @impl true
@@ -325,6 +331,22 @@ defmodule DemoWeb.OdysseyShowcaseLive do
                 on_change="change_frequency"
                 tooltip="Select how often you want to receive reports"
               />
+            </div>
+
+            <div>
+              <h3 class="text-lg font-medium mb-2">Stacked Layout</h3>
+              <.odyssey_toggle_button
+                layout={:stacked}
+                options={[
+                  %{label: "Pre Tax Percentage Commission", value: :pre_tax, description: "Commission calculated before taxes are applied"},
+                  %{label: "After Tax Percentage Commission", value: :after_tax, description: "Commission calculated after taxes are applied"},
+                  %{label: "Flat Rate Commission", value: :flat_rate, description: "Fixed dollar amount per booking"},
+                  %{label: "Wholesale Pricing", value: :wholesale}
+                ]}
+                selected={@stacked_selection}
+                on_change="change_commission_type"
+              />
+              <p class="text-sm text-gray-600 mt-4">Selected: <strong>{inspect(@stacked_selection)}</strong></p>
             </div>
           </div>
         </section>
