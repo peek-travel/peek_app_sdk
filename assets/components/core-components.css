@@ -68,8 +68,20 @@
   /* Override DaisyUI's disabled background colors */
 
   /* For default values we have default colors. Note: ghost and link has not yet been implemented */
-  .btn[disabled]:not(.btn-link, .btn-ghost, .btn-secondary, .btn-tertiary, .btn-danger),
-  .btn.disabled:not(.btn-link, .btn-ghost, .btn-secondary, .btn-tertiary, .btn-danger) {
+  .btn[disabled]:not(
+      .btn-link,
+      .btn-ghost,
+      .btn-secondary,
+      .btn-tertiary,
+      .btn-danger
+    ),
+  .btn.disabled:not(
+      .btn-link,
+      .btn-ghost,
+      .btn-secondary,
+      .btn-tertiary,
+      .btn-danger
+    ) {
     @apply bg-interaction-300 hover:bg-interaction-300;
   }
 
@@ -171,24 +183,24 @@ table.table.table-zebra td {
   }
 
   /* Checkbox fieldset styling - only for labels containing checkboxes */
-  .fieldset label:has(input[type='checkbox']) {
+  .fieldset label:has(input[type="checkbox"]) {
     @apply inline-flex items-center w-fit text-neutrals-300 hover:text-neutrals-400 focus:text-neutrals-400;
   }
 
-  .fieldset label:has(input[type='checkbox']) input[type='checkbox'] {
+  .fieldset label:has(input[type="checkbox"]) input[type="checkbox"] {
     @apply flex-shrink-0;
   }
 
-  .fieldset label:has(input[type='checkbox']) span.label {
+  .fieldset label:has(input[type="checkbox"]) span.label {
     @apply text-base;
     position: relative;
     padding-left: 1.5rem; /* Space for checkbox */
   }
 
   .fieldset
-    label:has(input[type='checkbox'])
+    label:has(input[type="checkbox"])
     span.label
-    input[type='checkbox'] {
+    input[type="checkbox"] {
     position: absolute;
     left: 0;
     top: 50%;
@@ -248,4 +260,323 @@ table.table.table-zebra td {
 .toast .alert span.hero-information-circle,
 .toast .alert span.hero-exclamation-circle {
   display: none !important;
+}
+
+/* Odyssey Neutral Text Colors */
+
+.ody-neutral-0 {
+  color: #ffffff;
+}
+.ody-neutral-50 {
+  color: #fafaff;
+}
+.ody-neutral-100 {
+  color: #f2f3fa;
+}
+.ody-neutral-200 {
+  color: #dadce7;
+}
+.ody-neutral-250 {
+  color: #9ca1b9;
+}
+.ody-neutral-300 {
+  color: #656a81;
+}
+.ody-neutral-350 {
+  color: #414159;
+}
+.ody-neutral-400 {
+  color: #202024;
+}
+
+/* Odyssey Text Styles */
+
+.ody-p1 {
+  font-family: "IBM Plex Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+.ody-p1-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+}
+
+.ody-p1-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 24px */
+}
+
+.ody-h3-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%; /* 25px */
+}
+
+/* Typography/H1/Regular */
+.ody-h1 {
+  font-family: "IBM Plex Sans";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+/* Typography/H1/Medium */
+.ody-h1-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%;
+}
+
+/* Typography/H1/Bold */
+.ody-h1-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+/* Typography/H2/Regular */
+.ody-h2 {
+  font-family: "IBM Plex Sans";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+/* Typography/H2/Medium */
+.ody-h2-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%;
+}
+
+/* Typography/H2/Bold */
+.ody-h2-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+/* Typography/H3/Regular */
+.ody-h3 {
+  font-family: "IBM Plex Sans";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+/* Typography/H3/Bold */
+.ody-h3-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+/* Typography/P2 Small/Regular */
+.ody-p2 {
+  font-family: "IBM Plex Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+/* Typography/P2 Small/Medium */
+.ody-p2-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+/* Typography/P2 Small/Bold */
+.ody-p2-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+}
+
+/* Typography/P3 X-Small/Regular */
+.ody-p3 {
+  font-family: "IBM Plex Sans";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+/* Typography/P3 X-Small/Medium */
+.ody-p3-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%;
+}
+
+/* Typography/P3 X-Small/Bold */
+.ody-p3-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+/* Typography/Mobile Footer/Regular */
+.ody-mobile-footer {
+  font-family: "IBM Plex Sans";
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+/* Typography/Mobile Footer/Medium */
+.ody-mobile-footer-medium {
+  font-family: "IBM Plex Sans";
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%;
+}
+
+/* Typography/Mobile Footer/Bold */
+.ody-mobile-footer-bold {
+  font-family: "IBM Plex Sans";
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+/* Typography/P1 Base/Regular Link */
+.ody-p1-link {
+  font-family: "IBM Plex Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+/* Typography/P1 Base/Medium Link */
+.ody-p1-medium-link {
+  font-family: "IBM Plex Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+/* Typography/P1 Base/Bold Link */
+.ody-p1-bold-link {
+  font-family: "IBM Plex Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+/* Typography/P2 Small/Regular Link */
+.ody-p2-link {
+  font-family: "IBM Plex Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+/* Typography/P2 Small/Medium Link */
+.ody-p2-medium-link {
+  font-family: "IBM Plex Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+/* Typography/P2 Small/Bold Link */
+.ody-p2-bold-link {
+  font-family: "IBM Plex Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+
+/* Typography/P3 X-Small/Link */
+.ody-p3-link {
+  font-family: "IBM Plex Sans";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
 }

@@ -168,7 +168,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
       assert html =~ "<fieldset"
       assert html =~ "class=\"fieldset mb-2\""
-      assert html =~ ~r/<span class="label mb-1 block">.*Time Unit.*<\/span>/s
+      assert html =~ ~r/<span class="label mb-1 flex items-center gap-1">.*Time Unit.*<\/span>/s
       assert html =~ "class=\"inline-flex rounded-lg\""
     end
 
@@ -188,7 +188,7 @@ defmodule PeekAppSDK.UI.OdysseyTest do
 
       assert html =~ "<fieldset"
       assert html =~ "class=\"fieldset mb-2\""
-      assert html =~ ~r/<span class="label mb-1 block">.*Communication Channel.*<\/span>/s
+      assert html =~ ~r/<span class="label mb-1 flex items-center gap-1">.*Communication Channel.*<\/span>/s
       assert html =~ "Email"
       assert html =~ "Text Message"
       # Should have hidden input for form integration
