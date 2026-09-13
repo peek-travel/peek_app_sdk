@@ -21,7 +21,6 @@ defmodule PeekAppSDK.UI.Odyssey.ProductPicker do
   """
 
   use Phoenix.LiveComponent
-  use Phoenix.Component
 
   import PeekAppSDK.UI.Odyssey.ToggleButton, only: [odyssey_toggle_button: 1]
 
