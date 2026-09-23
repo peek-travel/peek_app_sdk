@@ -93,4 +93,48 @@ defmodule PeekAppSDK do
           {:ok, map()} | {:error, list()} | {:error, integer()}
   defdelegate query_platform(install_id, method, url, body),
     to: PeekAppSDK.Client
+
+  @doc """
+  Updates the configuration status for an app installation.
+
+  ## Examples
+
+      iex> PeekAppSDK.update_configuration_status("install_id", "configured")
+      :ok
+  """
+  @spec update_configuration_status(String.t(), String.t(), String.t() | nil, atom() | nil) ::
+          :ok | {:error, {integer(), any()}}
+  defdelegate update_configuration_status(install_id, status, notes \\ nil, config_id \\ nil),
+    to: PeekAppSDK.InstallationsApi
+
+  @doc """
+  Syncs a customizations payload to the platform that owns the given install.
+
+  Makes an authenticated `POST /installations-api/:app_id/customizations` call.
+  The platform's response body is returned unchanged, success or error.
+
+  ## Examples
+
+      iex> PeekAppSDK.customize_installation("install_id", %{"foo" => "bar"})
+      {:ok, %{"foo" => "bar"}}
+  """
+  @spec customize_installation(String.t(), map(), atom() | nil) ::
+          {:ok, any()} | {:error, {integer(), any()}}
+  defdelegate customize_installation(install_id, payload, config_id \\ nil),
+    to: PeekAppSDK.InstallationsApi
+
+  @doc """
+  Fetches the customizations currently persisted for the given install.
+
+  Makes an authenticated `GET /installations-api/:app_id/customizations` call.
+
+  ## Examples
+
+      iex> PeekAppSDK.get_customizations("install_id")
+      {:ok, %{customizations: %{"some_extendable_slug@v1" => %{"foo" => "bar"}}}}
+  """
+  @spec get_customizations(String.t(), atom() | nil) ::
+          {:ok, any()} | {:error, {integer(), any()}}
+  defdelegate get_customizations(install_id, config_id \\ nil),
+    to: PeekAppSDK.InstallationsApi
 end

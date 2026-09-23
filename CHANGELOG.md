@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-09-23]
+
+### Added
+
+- `PeekAppSDK.customize_installation/3` — makes an authenticated `POST /installations-api/:app_id/customizations` call to sync a customizations payload to the platform that owns an install. Returns `{:ok, body}` on 2xx, `{:error, {status, body}}` otherwise; the platform's response body is passed through unchanged. Implemented in the new `PeekAppSDK.InstallationsApi` module.
+- `PeekAppSDK.get_customizations/2` — makes an authenticated `GET /installations-api/:app_id/customizations` call to read back the customizations currently persisted for an install. Same `{:ok, body}` / `{:error, {status, body}}` shape as `customize_installation/3`.
+
+### Fixed
+
+- `PeekAppSDK.update_configuration_status/4` was hitting a stale `/registry/installations/:app_id/:install_id/configuration_status` URL that no longer exists. Moved out of `PeekAppSDK.Metrics.Client` into `PeekAppSDK.InstallationsApi` and pointed at the current `PUT /installations-api/:app_id/configuration_status/:install_id` route. The top-level `PeekAppSDK.update_configuration_status/4` delegate is unchanged.
+
 ## [2026-04-29]
 
 ### Added
