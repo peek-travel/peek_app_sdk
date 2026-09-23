@@ -32,6 +32,31 @@ defmodule PeekAppSDKTest do
     end
   end
 
+  describe "update_configuration_status/4" do
+    test "delegates to InstallationsApi.update_configuration_status/4" do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      assert :ok = PeekAppSDK.update_configuration_status("install_id", "configured")
+    end
+  end
+
+  describe "customize_installation/3" do
+    test "delegates to InstallationsApi.customize_installation/3" do
+      response_body = %{"synced" => true}
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: response_body}}
+      end)
+
+      assert {:ok, ^response_body} =
+               PeekAppSDK.customize_installation("install_id", %{"foo" => "bar"})
+    end
+  end
+
   describe "config management" do
     test "get_config/1 returns configuration for default" do
       config = PeekAppSDK.get_config()
