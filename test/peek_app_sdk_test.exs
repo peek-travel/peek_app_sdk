@@ -57,6 +57,19 @@ defmodule PeekAppSDKTest do
     end
   end
 
+  describe "get_customizations/2" do
+    test "delegates to InstallationsApi.get_customizations/2" do
+      response_body = %{customizations: %{"some_slug@v1" => %{"foo" => "bar"}}}
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 200, body: response_body}}
+      end)
+
+      assert {:ok, ^response_body} = PeekAppSDK.get_customizations("install_id")
+    end
+  end
+
   describe "config management" do
     test "get_config/1 returns configuration for default" do
       config = PeekAppSDK.get_config()

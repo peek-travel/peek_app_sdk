@@ -49,6 +49,23 @@ defmodule PeekAppSDK.InstallationsApi do
     end
   end
 
+  @doc """
+  Fetches the customizations currently persisted for the given install.
+
+  ## Examples
+
+      iex> PeekAppSDK.InstallationsApi.get_customizations("install_id")
+      {:ok, %{customizations: %{"some_extendable_slug@v1" => %{"foo" => "bar"}}}}
+  """
+  @spec get_customizations(String.t(), atom() | nil) ::
+          {:ok, any()} | {:error, {integer(), any()}}
+  def get_customizations(install_id, config_id \\ nil) do
+    case request(:get, "customizations", install_id, %{}, config_id) do
+      {:ok, %Tesla.Env{status: status, body: body}} when status in 200..299 -> {:ok, body}
+      {:ok, %Tesla.Env{status: status, body: body}} -> {:error, {status, body}}
+    end
+  end
+
   defp request(method, path, install_id, body, config_id) do
     config = Config.get_config(config_id)
 

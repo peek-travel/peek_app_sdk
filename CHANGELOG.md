@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `PeekAppSDK.customize_installation/3` — makes an authenticated `POST /installations-api/:app_id/customizations` call to sync a customizations payload to the platform that owns an install. Returns `{:ok, body}` on 2xx, `{:error, {status, body}}` otherwise; the platform's response body is passed through unchanged. Implemented in the new `PeekAppSDK.InstallationsApi` module.
+- `PeekAppSDK.get_customizations/2` — makes an authenticated `GET /installations-api/:app_id/customizations` call to read back the customizations currently persisted for an install. Same `{:ok, body}` / `{:error, {status, body}}` shape as `customize_installation/3`.
 
 ### Fixed
 

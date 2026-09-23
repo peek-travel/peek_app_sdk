@@ -122,4 +122,19 @@ defmodule PeekAppSDK do
           {:ok, any()} | {:error, {integer(), any()}}
   defdelegate customize_installation(install_id, payload, config_id \\ nil),
     to: PeekAppSDK.InstallationsApi
+
+  @doc """
+  Fetches the customizations currently persisted for the given install.
+
+  Makes an authenticated `GET /installations-api/:app_id/customizations` call.
+
+  ## Examples
+
+      iex> PeekAppSDK.get_customizations("install_id")
+      {:ok, %{customizations: %{"some_extendable_slug@v1" => %{"foo" => "bar"}}}}
+  """
+  @spec get_customizations(String.t(), atom() | nil) ::
+          {:ok, any()} | {:error, {integer(), any()}}
+  defdelegate get_customizations(install_id, config_id \\ nil),
+    to: PeekAppSDK.InstallationsApi
 end

@@ -158,4 +158,56 @@ defmodule PeekAppSDK.InstallationsApiTest do
                InstallationsApi.customize_installation(install_id, payload, config_id)
     end
   end
+
+  describe "get_customizations/2" do
+    test "successfully fetches the persisted customizations" do
+      install_id = "test_install_123"
+      response_body = %{customizations: %{"some_slug@v1" => %{"foo" => "bar"}}}
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :get
+
+        assert env.url ==
+                 "https://apps.example.peekapis.com/installations-api/test_app_id/customizations"
+
+        assert Enum.any?(env.headers, fn {k, v} ->
+                 k == "X-Peek-Auth" && String.starts_with?(v, "Bearer ")
+               end)
+
+        {:ok, %Tesla.Env{status: 200, body: response_body}}
+      end)
+
+      assert {:ok, ^response_body} = InstallationsApi.get_customizations(install_id)
+    end
+
+    test "returns the platform's error body unchanged on non-2xx status" do
+      install_id = "test_install_456"
+      error_body = %{"error" => "Installation not found"}
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 404, body: error_body}}
+      end)
+
+      assert {:error, {404, ^error_body}} =
+               InstallationsApi.get_customizations(install_id)
+    end
+
+    test "uses custom config_id when provided" do
+      install_id = "test_install_custom"
+      config_id = :project_name
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        assert env.method == :get
+        assert String.contains?(env.url, "project_name_app_id")
+
+        {:ok, %Tesla.Env{status: 200, body: %{customizations: %{}}}}
+      end)
+
+      assert {:ok, %{customizations: %{}}} =
+               InstallationsApi.get_customizations(install_id, config_id)
+    end
+  end
 end
