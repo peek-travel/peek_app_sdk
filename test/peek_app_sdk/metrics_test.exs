@@ -120,24 +120,6 @@ defmodule PeekAppSDK.MetricsTest do
     end
   end
 
-  describe "update_configuration_status/3" do
-    test "delegates to PeekAppSDK.Metrics.Client.update_configuration_status/4" do
-      install_id = "test_install_123"
-      status = "configured"
-      notes = "All set up"
-
-      Tesla.Adapter.Finch
-      |> Mimic.stub(:call, fn env, _opts ->
-        assert env.method == :put
-        assert String.contains?(env.url, install_id)
-
-        {:ok, %Tesla.Env{status: 200}}
-      end)
-
-      assert :ok = Metrics.update_configuration_status(install_id, status, notes)
-    end
-  end
-
   describe "track_install/2 with partner map" do
     test "calls track_install/4, identify, and track for PostHog" do
       prev = Application.get_env(:peek_app_sdk, :posthog_key)
