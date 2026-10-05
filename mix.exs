@@ -65,7 +65,7 @@ defmodule PeekAppSDK.MixProject do
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
 
       # Test dependencies
-      {:mimic, "~> 1.7", only: :test},
+      {:mimic, "~> 2.4", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
       {:bypass, "~> 2.1", only: :test},
 
