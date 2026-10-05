@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-lcov
           path: cover/lcov.info
@@ -59,12 +59,12 @@ jobs:
     needs: test
     steps:
       - name: Download coverage artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: coverage-lcov
           path: cover
       - name: Verify coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v2
+        uses: VeryGoodOpenSource/very_good_coverage@v3
         with:
           path: cover/lcov.info
           min_coverage: 100
