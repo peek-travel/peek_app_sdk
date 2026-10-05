@@ -9,7 +9,7 @@ defmodule PeekAppSDK.MixProject do
       name: "Peek SDK",
       source_url: "https://github.com/peek-travel/peek_app_sdk",
       version: @version,
-      elixir: "~> 1.19",
+      elixir: "~> 1.20",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
