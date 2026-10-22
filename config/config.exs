@@ -9,7 +9,7 @@ import Config
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.17.11",
+  version: "0.28.2",
   odyssey_hooks: [
     args: ~w(js/odyssey.js --bundle --target=es2022 --format=cjs --minify --outfile=../priv/static/odyssey_hooks.min.js),
     cd: Path.expand("../assets", __DIR__),
