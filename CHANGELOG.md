@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-10-22]
+
+### Fixed
+
+- Rebuilt the committed `priv/static/odyssey_hooks.min.js`, which had not been rebuilt since the hooks were renamed and was out of date with `assets/js/odyssey.js`. The default export now includes `OdysseySelect` and `OdysseyProductPicker` next to `OdysseyActivityPicker`. **Breaking for named imports from the bundle:** `Hooks` is now `OdysseyHooks` and `addEventListeners` is now `addOdysseyGlobalEvents`, matching the source. Default imports (`import PeekAppSDKHooks from "peek_app_sdk"`) and imports of `assets/js/odyssey.js` are unaffected.
+- Rebuilt `priv/static/odyssey_web_components.min.js` with esbuild 0.28.2. No code change, only minifier output.
+
+### Changed
+
+- CI fails when the committed JS bundles don't match a fresh `mix assets.build`.
+
 ## [2026-09-23]
 
 ### Added
