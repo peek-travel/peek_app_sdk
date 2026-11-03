@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `PeekAppSDK.query_platform/4` now only sends requests to the configured `peek_api_base_url` host (same scheme, host and port). For any other URL it sends no request and returns `{:error, :invalid_host}`. **Breaking** for callers that passed a URL on another host.
-- Response JSON keys are decoded to atoms only when the atom already exists (for example `data`, `errors`, `message`, or a key your code matches on). Other keys stay strings.
+- `PeekAppSDK.query_platform/4` now only sends requests to the configured `peek_api_base_url` host (same scheme, host and port, no user info). For any other URL it sends no request and returns `{:error, :invalid_host}`. **Breaking** for callers that passed a URL on another host.
+- Response JSON keys are decoded to atoms only when the atom already exists (for example `data`, `errors`, `message`, or a key your code matches on). Other keys stay strings. This applies to every response decoded by `PeekAppSDK.Client.client/0`: `query_peek_pro/4`, `query_platform/4`, `update_configuration_status/4`, `customize_installation/3` and `get_customizations/2`. Nested keys follow the same rule.
 - Error logs for unexpected responses from `query_peek_pro/4` and `query_platform/4` now contain the status and the URL (without query string) only.
 
 ## [2026-10-22]

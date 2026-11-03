@@ -339,6 +339,8 @@ defmodule PeekAppSDK.ClientTest do
             "https://evil.example.org/?https://apps.example.peekapis.com/",
             "ftp://apps.example.peekapis.com/api/resource",
             " https://apps.example.peekapis.com/api/resource",
+            "https://user@apps.example.peekapis.com/api/resource",
+            "https://evil.example.org\\@apps.example.peekapis.com/api/resource",
             "/api/resource",
             "not a url"
           ] do

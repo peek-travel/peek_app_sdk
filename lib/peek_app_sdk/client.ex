@@ -99,7 +99,7 @@ defmodule PeekAppSDK.Client do
   Queries a platform API and returns the raw response body.
 
   The `url` must have the same scheme, host and port as the configured
-  `peek_api_base_url`. For any other URL no request is sent and
+  `peek_api_base_url`, and no user info. For any other URL no request is sent and
   `{:error, :invalid_host}` is returned.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
@@ -146,7 +146,7 @@ defmodule PeekAppSDK.Client do
 
   defp origin(url) do
     case URI.parse(url) do
-      %URI{scheme: scheme, host: host, port: port}
+      %URI{scheme: scheme, host: host, port: port, userinfo: nil}
       when scheme in ["http", "https"] and is_binary(host) and host != "" ->
         {scheme, String.downcase(host), port}
 
