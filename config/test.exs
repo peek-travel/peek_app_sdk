@@ -20,7 +20,15 @@ config :peek_app_sdk,
       peek_app_id: "client_only_app_id",
       peek_app_secret: "client_only_app_secret",
       client_secret_token: "client_only_secret"
-    ]
+    ],
+    # Incomplete app configs: get_config/1 must raise for these
+    no_app_id_app: [peek_app_secret: "no_app_id_app_secret"],
+    no_app_secret_app: [peek_app_id: "no_app_secret_app_id"],
+    nil_app_secret_app: [peek_app_id: "nil_app_secret_app_id", peek_app_secret: nil],
+    empty_app_id_app: [peek_app_id: "", peek_app_secret: "empty_app_id_app_secret"],
+    blank_app_secret_app: [peek_app_id: "blank_app_secret_app_id", peek_app_secret: "  "],
+    integer_app_secret_app: [peek_app_id: "integer_app_secret_app_id", peek_app_secret: 1234],
+    nil_entry_app: nil
   ]
 
 # Configure Tesla adapter for tests

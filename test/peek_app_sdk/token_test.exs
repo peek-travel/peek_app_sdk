@@ -22,6 +22,13 @@ defmodule PeekAppSDK.TokenTest do
       assert {:error, :unauthorized} = Token.verify_peek_auth("invalid_token")
     end
 
+    test "raises for an unknown config_id and does not accept a default-config token" do
+      token = Token.new_for_app_installation!("test_install_id")
+
+      assert_raise ArgumentError, fn -> Token.verify_peek_auth(token, :non_existent) end
+      assert_raise ArgumentError, fn -> Token.verify_peek_auth(token, :no_app_secret_app) end
+    end
+
     test "returns error for expired token" do
       install_id = "test_install_id"
       config = PeekAppSDK.Config.get_config()
@@ -90,6 +97,12 @@ defmodule PeekAppSDK.TokenTest do
   end
 
   describe "verify_client_request/2" do
+    test "raises for an unknown config_id and does not accept a default-config token" do
+      token = Token.new_for_app_installation_client("test_install_id")
+
+      assert_raise ArgumentError, fn -> Token.verify_client_request(token, :non_existent) end
+    end
+
     test "returns error for invalid token" do
       assert {:error, :unauthorized} = Token.verify_client_request("invalid_token")
     end

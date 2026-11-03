@@ -41,6 +41,9 @@ defmodule PeekAppSDK do
   Gets the configuration for the given identifier.
   If no identifier is provided, returns the default configuration.
 
+  Raises `ArgumentError` when an atom identifier has no entry under `:apps`,
+  or when that entry has no `:peek_app_id` or no `:peek_app_secret`.
+
   ## Examples
 
   Using an application identifier:
