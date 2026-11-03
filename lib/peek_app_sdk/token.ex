@@ -5,24 +5,36 @@ defmodule PeekAppSDK.Token do
   alias PeekAppSDK.AccountUser
   alias PeekAppSDK.Config
 
-  def token_config, do: default_claims(default_exp: 60 * 60, skip: [:iss])
+  @default_exp 60 * 60
+
+  # Joken validates only the claims present in a token, so require `exp`.
+  add_hook(Joken.Hooks.RequiredClaims, ["exp"])
+
+  def token_config do
+    default_claims(default_exp: @default_exp, skip: [:iss])
+    # Joken compares terms, so check that `exp` is a number before the time check.
+    |> add_claim("exp", fn -> current_time() + @default_exp end, &(is_number(&1) and &1 > current_time()))
+  end
 
   @doc """
   Verifies a peek authentication token.
+
+  The token must have a numeric `exp` claim. A token without one is rejected.
 
   ## Examples
 
   Using the default configuration:
 
       iex> PeekAppSDK.Token.verify_peek_auth(token)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
 
   Using a specific application's configuration:
 
       iex> PeekAppSDK.Token.verify_peek_auth(token, :project_name)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
   """
-  @spec verify_peek_auth(String.t(), atom() | nil) :: {:ok, String.t()} | {:error, :unauthorized}
+  @spec verify_peek_auth(String.t(), atom() | nil) ::
+          {:ok, String.t(), map()} | {:error, :unauthorized}
   def verify_peek_auth(token, config_id \\ nil) do
     config = Config.get_config(config_id)
     shared_secret_key = config.peek_app_secret
@@ -45,20 +57,22 @@ defmodule PeekAppSDK.Token do
   @doc """
   Verifies a client request token using the client_secret_token.
 
+  The token must have a numeric `exp` claim. A token without one is rejected.
+
   ## Examples
 
   Using the default configuration:
 
       iex> PeekAppSDK.Token.verify_client_request(token)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
 
   Using a specific application's configuration:
 
       iex> PeekAppSDK.Token.verify_client_request(token, :project_name)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
   """
   @spec verify_client_request(String.t(), atom() | nil) ::
-          {:ok, String.t()} | {:error, :unauthorized}
+          {:ok, String.t(), map()} | {:error, :unauthorized}
   def verify_client_request(token, config_id \\ nil) do
     config = Config.get_config(config_id)
     client_secret_key = config.client_secret_token
