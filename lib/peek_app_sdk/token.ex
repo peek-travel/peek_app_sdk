@@ -5,13 +5,15 @@ defmodule PeekAppSDK.Token do
   alias PeekAppSDK.AccountUser
   alias PeekAppSDK.Config
 
+  @default_exp 60 * 60
+
   # Joken validates only the claims present in a token, so require `exp`.
   add_hook(Joken.Hooks.RequiredClaims, ["exp"])
 
   def token_config do
-    default_claims(default_exp: 60 * 60, skip: [:iss])
+    default_claims(default_exp: @default_exp, skip: [:iss])
     # Joken compares terms, so check that `exp` is a number before the time check.
-    |> add_claim("exp", fn -> current_time() + 60 * 60 end, &(is_number(&1) and &1 > current_time()))
+    |> add_claim("exp", fn -> current_time() + @default_exp end, &(is_number(&1) and &1 > current_time()))
   end
 
   @doc """
