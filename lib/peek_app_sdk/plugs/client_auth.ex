@@ -6,18 +6,16 @@ defmodule PeekAppSDK.Plugs.ClientAuth do
 
   ## Options
 
-  * `:config_id` - The configuration identifier to use for token verification. Defaults to nil (use default config).
+  * `:config_id` - The configuration identifier to use for token verification: an atom key under `config :peek_app_sdk, :apps`. Defaults to nil (use default config).
+    Raises `ArgumentError` when that app config is missing or incomplete (see `PeekAppSDK.Config.get_config/1`).
 
   ## Examples
 
       # Using default configuration
       plug :set_peek_install_id_from_client
 
-      # Using a specific configuration with a string identifier (legacy approach)
-      plug :set_peek_install_id_from_client, config_id: "my_app"
-
-      # Using a specific configuration with a tuple identifier (recommended approach)
-      plug :set_peek_install_id_from_client, config_id: {:project, :project_name}
+      # Using the configuration of an app under `config :peek_app_sdk, :apps`
+      plug :set_peek_install_id_from_client, config_id: :project_name
   """
   def set_peek_install_id_from_client(conn, opts) do
     case conn.body_params do
@@ -78,18 +76,15 @@ defmodule PeekAppSDK.Plugs.ClientAuth do
 
   ## Options
 
-  * `:config_id` - The configuration identifier to use. Defaults to nil (use default config).
+  * `:config_id` - The configuration identifier to use: an atom key under `config :peek_app_sdk, :apps`. Defaults to nil (use default config).
 
   ## Examples
 
       # Using default configuration
       live_session :some_scope, on_mount: {PeekAppSDK.Plugs.ClientAuth, :set_install_id_for_live_view}
 
-      # Using a specific configuration with a string identifier (legacy approach)
-      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.ClientAuth, :set_install_id_for_live_view, [config_id: "my_app"]}]
-
-      # Using a specific configuration with a tuple identifier (recommended approach)
-      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.ClientAuth, :set_install_id_for_live_view, [config_id: {:project, :project_name}]}]
+      # Using the configuration of an app under `config :peek_app_sdk, :apps`
+      live_session :some_scope, on_mount: [{PeekAppSDK.Plugs.ClientAuth, :set_install_id_for_live_view, [config_id: :project_name]}]
   """
   def on_mount(:set_install_id_for_live_view, _params, session, socket) do
     socket =

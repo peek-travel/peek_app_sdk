@@ -39,6 +39,10 @@ defmodule PeekAppSDK.Config do
   Gets the configuration for the given identifier.
   If no identifier is provided, returns the default configuration from :peek_app_sdk.
 
+  An atom identifier must have a keyword list entry under `:apps` with a
+  non-blank string `:peek_app_id` and `:peek_app_secret`. Otherwise this function raises `ArgumentError`. It never
+  falls back to the default configuration for an atom identifier.
+
   ## Examples
 
   Using an app identifier:
@@ -82,24 +86,45 @@ defmodule PeekAppSDK.Config do
   end
 
   def get_config(identifier) when is_atom(identifier) do
-    # Get configuration from the centralized apps config
     apps = Application.get_env(:peek_app_sdk, :apps, [])
-    app_config = Keyword.get(apps, identifier)
 
-    if app_config && Keyword.has_key?(app_config, :peek_app_id) &&
-         Keyword.has_key?(app_config, :peek_app_secret) do
-      %{
-        peek_app_secret: Keyword.get(app_config, :peek_app_secret),
-        peek_app_id: Keyword.get(app_config, :peek_app_id),
-        peek_api_base_url: Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
-        peek_api_key: Keyword.get(app_config, :peek_api_key),
-        client_secret_token: Keyword.get(app_config, :client_secret_token)
-      }
-    else
-      # Fall back to default configuration if the app is not configured
-      get_config(nil)
+    case Keyword.fetch(apps, identifier) do
+      {:ok, app_config} when is_list(app_config) ->
+        validate_app_config!(identifier, app_config)
+
+        %{
+          peek_app_secret: Keyword.get(app_config, :peek_app_secret),
+          peek_app_id: Keyword.get(app_config, :peek_app_id),
+          peek_api_base_url: Application.get_env(:peek_app_sdk, :peek_api_base_url, @default_peek_api_base_url),
+          peek_api_key: Keyword.get(app_config, :peek_api_key),
+          client_secret_token: Keyword.get(app_config, :client_secret_token)
+        }
+
+      {:ok, other} ->
+        raise ArgumentError,
+              "app config #{inspect(identifier)} in config :peek_app_sdk, :apps must be a keyword list, got: #{inspect(other)}"
+
+      :error ->
+        raise ArgumentError,
+              "no app config for #{inspect(identifier)} in config :peek_app_sdk, :apps"
     end
   end
+
+  @required_app_keys [:peek_app_id, :peek_app_secret]
+
+  defp validate_app_config!(identifier, app_config) do
+    case Enum.reject(@required_app_keys, &present_string?(Keyword.get(app_config, &1))) do
+      [] ->
+        :ok
+
+      missing ->
+        raise ArgumentError,
+              "app config #{inspect(identifier)} in config :peek_app_sdk, :apps is missing #{inspect(missing)}"
+    end
+  end
+
+  defp present_string?(value) when is_binary(value), do: String.trim(value) != ""
+  defp present_string?(_value), do: false
 
   # Migration helper functions
   @doc """

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-03]
+
+### Changed
+
+- **Breaking:** stricter config validation in `PeekAppSDK.Config.get_config/1` (and `PeekAppSDK.get_config/1`). An atom identifier that has no entry under `config :peek_app_sdk, :apps`, or whose entry has no `:peek_app_id` or no `:peek_app_secret` (or a value that is not a non-blank string), or whose entry is not a keyword list, now raises `ArgumentError`. It no longer falls back to the default configuration. `get_config()` and `get_config(nil)` are unchanged. Every function that takes a `config_id` (token helpers, plugs, API calls) now raises for such an identifier.
+- The `config_id` examples in `PeekAppSDK.Plugs.PeekAuth` and `PeekAppSDK.Plugs.ClientAuth` now show atom identifiers only. String and tuple identifiers were never supported.
+
 ## [2026-10-22]
 
 ### Fixed
