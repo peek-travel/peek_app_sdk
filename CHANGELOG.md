@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-03]
+
+### Changed
+
+- `PeekAppSDK.Token.verify_peek_auth/2` and `PeekAppSDK.Token.verify_client_request/2` now require the `exp` claim. A token with no `exp`, or with a non-numeric `exp`, returns `{:error, :unauthorized}`, so the `PeekAuth` and `ClientAuth` plugs don't set `:peek_install_id` for it. **Breaking** for callers that verify tokens without `exp`. Tokens made by `new_for_app_installation!/3` and `new_for_app_installation_client/2` already have `exp`.
+- Fixed the `@spec` and docs of both functions to match what they return: `{:ok, install_id, claims}`.
+
 ## [2026-10-22]
 
 ### Fixed

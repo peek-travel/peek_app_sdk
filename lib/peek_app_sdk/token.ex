@@ -10,25 +10,28 @@ defmodule PeekAppSDK.Token do
   @doc """
   Verifies a peek authentication token.
 
+  The token must have a numeric `exp` claim. A token without one is rejected.
+
   ## Examples
 
   Using the default configuration:
 
       iex> PeekAppSDK.Token.verify_peek_auth(token)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
 
   Using a specific application's configuration:
 
       iex> PeekAppSDK.Token.verify_peek_auth(token, :project_name)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
   """
-  @spec verify_peek_auth(String.t(), atom() | nil) :: {:ok, String.t()} | {:error, :unauthorized}
+  @spec verify_peek_auth(String.t(), atom() | nil) ::
+          {:ok, String.t(), map()} | {:error, :unauthorized}
   def verify_peek_auth(token, config_id \\ nil) do
     config = Config.get_config(config_id)
     shared_secret_key = config.peek_app_secret
     signer = Joken.Signer.create("HS256", shared_secret_key)
 
-    case verify_and_validate(token, signer) do
+    case token |> verify_and_validate(signer) |> require_exp() do
       {:ok, %{"sub" => sub} = claims} ->
         {:ok, sub, claims}
 
@@ -45,20 +48,22 @@ defmodule PeekAppSDK.Token do
   @doc """
   Verifies a client request token using the client_secret_token.
 
+  The token must have a numeric `exp` claim. A token without one is rejected.
+
   ## Examples
 
   Using the default configuration:
 
       iex> PeekAppSDK.Token.verify_client_request(token)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
 
   Using a specific application's configuration:
 
       iex> PeekAppSDK.Token.verify_client_request(token, :project_name)
-      {:ok, "install_id"}
+      {:ok, "install_id", %{"sub" => "install_id", "exp" => 1_700_000_000}}
   """
   @spec verify_client_request(String.t(), atom() | nil) ::
-          {:ok, String.t()} | {:error, :unauthorized}
+          {:ok, String.t(), map()} | {:error, :unauthorized}
   def verify_client_request(token, config_id \\ nil) do
     config = Config.get_config(config_id)
     client_secret_key = config.client_secret_token
@@ -67,7 +72,7 @@ defmodule PeekAppSDK.Token do
     if client_secret_key do
       signer = Joken.Signer.create("HS256", client_secret_key)
 
-      case verify_and_validate(token, signer) do
+      case token |> verify_and_validate(signer) |> require_exp() do
         {:ok, %{"sub" => sub} = claims} ->
           {:ok, sub, claims}
 
@@ -145,4 +150,9 @@ defmodule PeekAppSDK.Token do
     {:ok, token, _claims} = generate_and_sign(params, signer)
     token
   end
+
+  # Joken validates only the claims present in the token, so require `exp` here.
+  defp require_exp({:ok, %{"exp" => exp}} = result) when is_number(exp), do: result
+  defp require_exp({:ok, _claims}), do: {:error, :missing_or_invalid_exp}
+  defp require_exp(other), do: other
 end
