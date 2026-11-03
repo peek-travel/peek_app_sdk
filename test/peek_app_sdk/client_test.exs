@@ -321,6 +321,7 @@ defmodule PeekAppSDK.ClientTest do
       assert {:error, ^errors} = Client.query_platform(install_id, :post, url, %{})
     end
 
+    @tag :capture_log
     test "sends no request to a host other than peek_api_base_url" do
       test_pid = self()
 
@@ -337,6 +338,7 @@ defmodule PeekAppSDK.ClientTest do
             "https://apps.example.peekapis.com.example.org/api/resource",
             "https://evil.example.org/?https://apps.example.peekapis.com/",
             "ftp://apps.example.peekapis.com/api/resource",
+            " https://apps.example.peekapis.com/api/resource",
             "/api/resource",
             "not a url"
           ] do
@@ -345,6 +347,32 @@ defmodule PeekAppSDK.ClientTest do
       end
 
       refute_received {:request_sent, _}
+    end
+
+    test "logs a warning without query string when the host is rejected" do
+      log =
+        capture_log(fn ->
+          assert {:error, :invalid_host} =
+                   Client.query_platform("test_install_id", :get, "https://evil.example.org/x?token=abc", %{})
+        end)
+
+      assert log =~ "Platform request not sent: https://evil.example.org/x is not on the peek_api_base_url host"
+      refute log =~ "token=abc"
+    end
+
+    test "accepts a peek_api_base_url with spaces and a trailing slash" do
+      original = Application.get_env(:peek_app_sdk, :peek_api_base_url)
+      Application.put_env(:peek_app_sdk, :peek_api_base_url, " https://apps.example.peekapis.com/ ")
+
+      try do
+        Tesla.Adapter.Finch
+        |> Mimic.stub(:call, fn _env, _opts -> {:ok, %Tesla.Env{status: 200, body: %{ok: true}}} end)
+
+        assert {:ok, %{ok: true}} =
+                 Client.query_platform("test_install_id", :get, "https://apps.example.peekapis.com/x", %{})
+      after
+        Application.put_env(:peek_app_sdk, :peek_api_base_url, original)
+      end
     end
 
     test "sends the request to the peek_api_base_url host with any path and case" do

@@ -110,6 +110,7 @@ defmodule PeekAppSDK.Client do
     if same_origin?(url, config.peek_api_base_url) do
       do_query_platform(install_id, method, url, body_params, config.peek_api_key)
     else
+      Logger.warning("Platform request not sent: #{log_url(url)} is not on the peek_api_base_url host")
       {:error, :invalid_host}
     end
   end
@@ -136,16 +137,15 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  # The URL is checked exactly as it is sent; only the configured base URL is trimmed,
+  # as `build_backoffice_url/3` does.
   defp same_origin?(url, base_url) do
-    case {origin(url), origin(base_url)} do
-      {nil, _} -> false
-      {origin, origin} -> true
-      _ -> false
-    end
+    url_origin = origin(url)
+    url_origin != nil and url_origin == origin(String.trim(base_url))
   end
 
   defp origin(url) do
-    case URI.parse(String.trim(url)) do
+    case URI.parse(url) do
       %URI{scheme: scheme, host: host, port: port}
       when scheme in ["http", "https"] and is_binary(host) and host != "" ->
         {scheme, String.downcase(host), port}
