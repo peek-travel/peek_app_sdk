@@ -209,4 +209,65 @@ defmodule PeekAppSDK.TokenTest do
       assert {:ok, ^install_id, _claims} = Token.verify_client_request(token, :project_name)
     end
   end
+
+  describe "exp claim" do
+    # Joken.encode_and_sign/2 signs the claims as given, without the default exp.
+    defp sign(claims, secret) do
+      {:ok, token, _claims} = Joken.encode_and_sign(claims, Joken.Signer.create("HS256", secret))
+      token
+    end
+
+    defp peek_secret, do: PeekAppSDK.Config.get_config().peek_app_secret
+    defp client_secret, do: PeekAppSDK.Config.get_config().client_secret_token
+
+    defp exp_in(seconds), do: DateTime.utc_now() |> DateTime.add(seconds) |> DateTime.to_unix()
+
+    test "verify_peek_auth/2 rejects a token without exp" do
+      token = sign(%{"sub" => "test_install_id"}, peek_secret())
+
+      assert {:error, :unauthorized} = Token.verify_peek_auth(token)
+    end
+
+    test "verify_peek_auth/2 rejects a token with a non-numeric exp" do
+      token = sign(%{"sub" => "test_install_id", "exp" => "9999999999"}, peek_secret())
+
+      assert {:error, :unauthorized} = Token.verify_peek_auth(token)
+    end
+
+    test "verify_peek_auth/2 rejects an expired token" do
+      token = sign(%{"sub" => "test_install_id", "exp" => exp_in(-60)}, peek_secret())
+
+      assert {:error, :unauthorized} = Token.verify_peek_auth(token)
+    end
+
+    test "verify_peek_auth/2 accepts a token with a future exp" do
+      token = sign(%{"sub" => "test_install_id", "exp" => exp_in(60)}, peek_secret())
+
+      assert {:ok, "test_install_id", _claims} = Token.verify_peek_auth(token)
+    end
+
+    test "verify_client_request/2 rejects a token without exp" do
+      token = sign(%{"sub" => "test_install_id"}, client_secret())
+
+      assert {:error, :unauthorized} = Token.verify_client_request(token)
+    end
+
+    test "verify_client_request/2 rejects a token with a non-numeric exp" do
+      token = sign(%{"sub" => "test_install_id", "exp" => "9999999999"}, client_secret())
+
+      assert {:error, :unauthorized} = Token.verify_client_request(token)
+    end
+
+    test "verify_client_request/2 rejects an expired token" do
+      token = sign(%{"sub" => "test_install_id", "exp" => exp_in(-60)}, client_secret())
+
+      assert {:error, :unauthorized} = Token.verify_client_request(token)
+    end
+
+    test "verify_client_request/2 accepts a token with a future exp" do
+      token = sign(%{"sub" => "test_install_id", "exp" => exp_in(60)}, client_secret())
+
+      assert {:ok, "test_install_id", _claims} = Token.verify_client_request(token)
+    end
+  end
 end
