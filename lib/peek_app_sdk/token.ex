@@ -5,7 +5,14 @@ defmodule PeekAppSDK.Token do
   alias PeekAppSDK.AccountUser
   alias PeekAppSDK.Config
 
-  def token_config, do: default_claims(default_exp: 60 * 60, skip: [:iss])
+  # Joken validates only the claims present in a token, so require `exp`.
+  add_hook(Joken.Hooks.RequiredClaims, ["exp"])
+
+  def token_config do
+    default_claims(default_exp: 60 * 60, skip: [:iss])
+    # Joken compares terms, so check that `exp` is a number before the time check.
+    |> add_claim("exp", fn -> current_time() + 60 * 60 end, &(is_number(&1) and &1 > current_time()))
+  end
 
   @doc """
   Verifies a peek authentication token.
@@ -31,7 +38,7 @@ defmodule PeekAppSDK.Token do
     shared_secret_key = config.peek_app_secret
     signer = Joken.Signer.create("HS256", shared_secret_key)
 
-    case token |> verify_and_validate(signer) |> require_exp() do
+    case verify_and_validate(token, signer) do
       {:ok, %{"sub" => sub} = claims} ->
         {:ok, sub, claims}
 
@@ -72,7 +79,7 @@ defmodule PeekAppSDK.Token do
     if client_secret_key do
       signer = Joken.Signer.create("HS256", client_secret_key)
 
-      case token |> verify_and_validate(signer) |> require_exp() do
+      case verify_and_validate(token, signer) do
         {:ok, %{"sub" => sub} = claims} ->
           {:ok, sub, claims}
 
@@ -150,9 +157,4 @@ defmodule PeekAppSDK.Token do
     {:ok, token, _claims} = generate_and_sign(params, signer)
     token
   end
-
-  # Joken validates only the claims present in the token, so require `exp` here.
-  defp require_exp({:ok, %{"exp" => exp}} = result) when is_number(exp), do: result
-  defp require_exp({:ok, _claims}), do: {:error, :missing_or_invalid_exp}
-  defp require_exp(other), do: other
 end
