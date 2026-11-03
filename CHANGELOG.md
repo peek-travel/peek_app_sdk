@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `PeekAppSDK.query_platform/4` now only sends requests to the configured `peek_api_base_url` host (same scheme, host and port). For any other URL it sends no request and returns `{:error, :invalid_host}`. **Breaking** for callers that passed a URL on another host.
+- Response JSON keys are decoded to atoms only when the atom already exists (for example `data`, `errors`, `message`, or a key your code matches on). Other keys stay strings.
+- Error logs for unexpected responses from `query_peek_pro/4` and `query_platform/4` now contain the status and the URL (without query string) only.
+
 ## [2026-10-22]
 
 ### Fixed

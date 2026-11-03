@@ -164,6 +164,23 @@ defmodule PeekAppSDK.ClientTest do
       assert {:error, 400} = Client.query_peek_pro(install_id, query)
     end
 
+    test "logs the status and the URL, and no body, on an error response" do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 400, body: %{customer: "secret-body-value"}}}
+      end)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 400} = Client.query_peek_pro("test_install_id", "query Test { test }")
+        end)
+
+      assert log =~
+               "Unexpected PeekPro response when hitting https://apps.example.peekapis.com/backoffice-gql/test_app_id/test - (400)"
+
+      refute log =~ "secret-body-value"
+    end
+
     test "bubbles up errors from PeekPro when status is 200 but errors key is present" do
       install_id = "test_install_id"
       query = "query Test { test }"
@@ -227,7 +244,7 @@ defmodule PeekAppSDK.ClientTest do
   describe "query_platform/4" do
     test "successfully returns raw response body for 200 status" do
       install_id = "test_install_id"
-      url = "https://api.example.com/some/endpoint"
+      url = "https://apps.example.peekapis.com/some/endpoint"
       body_params = %{}
       response_body = %{result: "success", other_field: "value"}
 
@@ -249,7 +266,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "returns data when 200 response has data key (backwards compatible)" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.example.peekapis.com/api/resource"
       data = %{result: "success"}
 
       Tesla.Adapter.Finch
@@ -262,7 +279,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "successfully returns raw response body for 201 status" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.example.peekapis.com/api/resource"
       body_params = %{"key" => "value"}
       response_body = %{created: true, id: 123}
 
@@ -280,7 +297,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "handles error response" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.example.peekapis.com/api/resource"
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn _env, _opts ->
@@ -292,7 +309,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "bubbles up errors when status is 200 but errors key is present" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.example.peekapis.com/api/resource"
 
       errors = [%{message: "Validation failed"}]
 
@@ -302,6 +319,119 @@ defmodule PeekAppSDK.ClientTest do
       end)
 
       assert {:error, ^errors} = Client.query_platform(install_id, :post, url, %{})
+    end
+
+    test "sends no request to a host other than peek_api_base_url" do
+      test_pid = self()
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(test_pid, {:request_sent, env.url})
+        {:ok, %Tesla.Env{status: 200, body: %{}}}
+      end)
+
+      for url <- [
+            "https://api.example.com/api/resource",
+            "http://apps.example.peekapis.com/api/resource",
+            "https://apps.example.peekapis.com:8443/api/resource",
+            "https://apps.example.peekapis.com.example.org/api/resource",
+            "https://evil.example.org/?https://apps.example.peekapis.com/",
+            "ftp://apps.example.peekapis.com/api/resource",
+            "/api/resource",
+            "not a url"
+          ] do
+        assert {:error, :invalid_host} = Client.query_platform("test_install_id", :get, url, %{})
+        assert {:error, :invalid_host} = PeekAppSDK.query_platform("test_install_id", :get, url, %{})
+      end
+
+      refute_received {:request_sent, _}
+    end
+
+    test "sends the request to the peek_api_base_url host with any path and case" do
+      test_pid = self()
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(test_pid, {:request_sent, env.url, env.headers})
+        {:ok, %Tesla.Env{status: 200, body: %{ok: true}}}
+      end)
+
+      for url <- [
+            "https://apps.example.peekapis.com/api/resource",
+            "https://APPS.example.peekapis.com:443/other/path?x=1"
+          ] do
+        assert {:ok, %{ok: true}} = Client.query_platform("test_install_id", :get, url, %{})
+        assert_received {:request_sent, ^url, headers}
+        assert {"pk-api-key", "test_api_key"} in headers
+      end
+    end
+
+    test "logs the status and the URL without query string, and no body" do
+      url = "https://apps.example.peekapis.com/api/resource?email=someone@example.com#frag"
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts ->
+        {:ok, %Tesla.Env{status: 422, body: %{customer: "Jane Doe secret-body-value"}}}
+      end)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 422} = Client.query_platform("test_install_id", :post, url, %{})
+        end)
+
+      assert log =~ "Unexpected Platform response when hitting https://apps.example.peekapis.com/api/resource - (422)"
+      refute log =~ "secret-body-value"
+      refute log =~ "Jane Doe"
+      refute log =~ "email="
+      refute log =~ "frag"
+    end
+  end
+
+  describe "client/0 JSON key decoding" do
+    defp json_response(json) do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        {:ok, %Tesla.Env{env | status: 200, headers: [{"content-type", "application/json"}], body: json}}
+      end)
+    end
+
+    test "known keys come back as atom keys" do
+      json_response(~s({"data": {"test": "success"}}))
+
+      assert {:ok, %{test: "success"}} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+
+      json_response(~s({"errors": [{"message": "bad", "path": ["a"], "locations": [], "extensions": {}}]}))
+
+      assert {:error, [%{message: "bad", path: ["a"], locations: [], extensions: %{}}]} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+    end
+
+    test "known keys exist as atoms" do
+      for key <- Client.known_keys() do
+        assert Client.decode_key(Atom.to_string(key)) == key
+      end
+    end
+
+    test "unknown keys stay strings and make no new atoms" do
+      url = "https://apps.example.peekapis.com/api/resource"
+
+      # Warm up, so that module loading does not count.
+      json_response(~s({"warm_up_key_never_an_atom": 1}))
+      assert {:ok, _} = Client.query_platform("test_install_id", :get, url, %{})
+
+      keys = for i <- 1..500, do: "unknown_key_#{System.unique_integer([:positive])}_#{i}"
+      json = keys |> Map.new(&{&1, %{("nested_" <> &1) => 1}}) |> Jason.encode!()
+      json_response(json)
+
+      before = :erlang.system_info(:atom_count)
+      assert {:ok, body} = Client.query_platform("test_install_id", :get, url, %{})
+      after_count = :erlang.system_info(:atom_count)
+
+      assert after_count == before
+      assert map_size(body) == 500
+      assert Enum.all?(Map.keys(body), &is_binary/1)
+      assert body[hd(keys)] == %{("nested_" <> hd(keys)) => 1}
     end
   end
 

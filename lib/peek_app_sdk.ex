@@ -88,9 +88,13 @@ defmodule PeekAppSDK do
 
   @doc """
   Queries a platform API and returns the raw response body.
+
+  The `url` must have the same scheme, host and port as the configured
+  `peek_api_base_url`. For any other URL no request is sent and
+  `{:error, :invalid_host}` is returned.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()}
+          {:ok, map()} | {:error, list()} | {:error, integer()} | {:error, :invalid_host}
   defdelegate query_platform(install_id, method, url, body),
     to: PeekAppSDK.Client
 

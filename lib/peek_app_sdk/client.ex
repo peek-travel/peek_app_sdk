@@ -4,15 +4,33 @@ defmodule PeekAppSDK.Client do
 
   alias PeekAppSDK.Config
 
+  # Response keys that callers read as atoms. Listing them here makes sure the
+  # atoms exist once this module is loaded, so `decode_key/1` maps them to atoms.
+  @known_keys [:data, :errors, :message, :path, :locations, :extensions]
+
   @doc """
   Creates a Tesla client with the appropriate middleware configuration.
+
+  Response JSON keys are decoded to existing atoms only. A key with no
+  matching atom stays a string.
   """
   def client do
     middleware = [
-      {Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]}
+      {Tesla.Middleware.JSON, engine_opts: [keys: &decode_key/1]}
     ]
 
     Tesla.client(middleware)
+  end
+
+  @doc false
+  def known_keys, do: @known_keys
+
+  @doc false
+  @spec decode_key(String.t()) :: atom() | String.t()
+  def decode_key(key) do
+    String.to_existing_atom(key)
+  rescue
+    ArgumentError -> key
   end
 
   @doc """
@@ -71,21 +89,32 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
         {:ok, data}
 
-      {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected PeekPro response when hitting #{url} - (#{status}): #{inspect(body)}")
+      {:ok, %Tesla.Env{status: status}} ->
+        Logger.error("Unexpected PeekPro response when hitting #{log_url(url)} - (#{status})")
         {:error, status}
     end
   end
 
   @doc """
   Queries a platform API and returns the raw response body.
+
+  The `url` must have the same scheme, host and port as the configured
+  `peek_api_base_url`. For any other URL no request is sent and
+  `{:error, :invalid_host}` is returned.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()}
+          {:ok, map()} | {:error, list()} | {:error, integer()} | {:error, :invalid_host}
   def query_platform(install_id, method, url, body_params) do
     config = Config.get_config(nil)
-    peek_api_key = config.peek_api_key
 
+    if same_origin?(url, config.peek_api_base_url) do
+      do_query_platform(install_id, method, url, body_params, config.peek_api_key)
+    else
+      {:error, :invalid_host}
+    end
+  end
+
+  defp do_query_platform(install_id, method, url, body_params, peek_api_key) do
     case Tesla.request(client(),
            method: method,
            url: url,
@@ -101,11 +130,37 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: status, body: body}} when status in 200..299 ->
         {:ok, body}
 
-      {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
-
+      {:ok, %Tesla.Env{status: status}} ->
+        Logger.error("Unexpected Platform response when hitting #{log_url(url)} - (#{status})")
         {:error, status}
     end
+  end
+
+  defp same_origin?(url, base_url) do
+    case {origin(url), origin(base_url)} do
+      {nil, _} -> false
+      {origin, origin} -> true
+      _ -> false
+    end
+  end
+
+  defp origin(url) do
+    case URI.parse(String.trim(url)) do
+      %URI{scheme: scheme, host: host, port: port}
+      when scheme in ["http", "https"] and is_binary(host) and host != "" ->
+        {scheme, String.downcase(host), port}
+
+      _ ->
+        nil
+    end
+  end
+
+  # The URL for a log line: no query string, fragment or user info.
+  defp log_url(url) do
+    url
+    |> URI.parse()
+    |> Map.merge(%{query: nil, fragment: nil, userinfo: nil})
+    |> URI.to_string()
   end
 
   def operation_name(query) do
