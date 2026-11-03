@@ -246,6 +246,14 @@ defmodule PeekAppSDK.TokenTest do
       assert {:ok, "test_install_id", _claims} = Token.verify_peek_auth(token)
     end
 
+    test "verify_and_validate/2 rejects a token without exp" do
+      token = sign(%{"sub" => "test_install_id"}, peek_secret())
+      signer = Joken.Signer.create("HS256", peek_secret())
+
+      assert {:error, [message: "Invalid token", missing_claims: ["exp"]]} =
+               Token.verify_and_validate(token, signer)
+    end
+
     test "verify_client_request/2 rejects a token without exp" do
       token = sign(%{"sub" => "test_install_id"}, client_secret())
 
