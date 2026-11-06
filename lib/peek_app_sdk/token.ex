@@ -24,11 +24,7 @@ defmodule PeekAppSDK.Token do
   """
   @spec verify_peek_auth(String.t(), atom() | nil) :: {:ok, String.t()} | {:error, :unauthorized}
   def verify_peek_auth(token, config_id \\ nil) do
-    config = Config.get_config(config_id)
-    shared_secret_key = config.peek_app_secret
-    signer = Joken.Signer.create("HS256", shared_secret_key)
-
-    case verify_and_validate(token, signer) do
+    case verify_peek_auth_claims(token, config_id) do
       {:ok, %{"sub" => sub} = claims} ->
         {:ok, sub, claims}
 
@@ -40,6 +36,17 @@ defmodule PeekAppSDK.Token do
         Logger.warning("Token verification failed for config_id=#{inspect(config_id)} with unexpected result: #{inspect(other)}")
         {:error, :unauthorized}
     end
+  end
+
+  @doc false
+  # Verifies the signature and the claims of a peek authentication token and
+  # returns the raw Joken result. It writes no log.
+  @spec verify_peek_auth_claims(String.t(), atom() | nil) :: {:ok, map()} | {:error, term()}
+  def verify_peek_auth_claims(token, config_id \\ nil) do
+    config = Config.get_config(config_id)
+    signer = Joken.Signer.create("HS256", config.peek_app_secret)
+
+    verify_and_validate(token, signer)
   end
 
   @doc """

@@ -1,6 +1,8 @@
 defmodule PeekAppSDK.Plugs.PeekAuth do
   import Plug.Conn
 
+  require Logger
+
   @doc """
   Allows Peek iframe embedding by setting appropriate CSP headers.
   """
@@ -62,6 +64,89 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
         conn
     end
   end
+
+  @doc """
+  Lets a request through only when its `X-Peek-Auth` header has a valid token
+  for the `install_id` in the request body.
+
+  The plug reads the token only from the `X-Peek-Auth: Bearer <token>` header.
+  It verifies the token with the app secret, then compares the token `sub` to
+  the `install_id` in `conn.body_params`. It does not read query params, path
+  params, a `peek-auth` body param or the conn assigns.
+
+  When the request passes, the plug returns the conn with no change. Otherwise
+  it writes one warning log, sends a 401 response and halts the conn. The log
+  line does not contain the token, the `install_id` or the body.
+
+  Put the plug after `Plug.Parsers`, so that the body is parsed. When the
+  request passes, the body `install_id` is the install id of the checked token,
+  so read the install id from the body. Do not use the assigns of
+  `set_peek_install_id` on this route: that plug reads a `peek-auth` body or
+  query param before the header, so its assigns can come from another token.
+
+  ## Options
+
+  * `:config_id` - An atom key under the `:apps` config, or nil (the default) for the default config.
+
+  ## Examples
+
+      # Using default configuration
+      plug :require_signed_install_webhook
+
+      # Using a specific application's configuration
+      plug :require_signed_install_webhook, config_id: :project_name
+  """
+  def require_signed_install_webhook(conn, opts) do
+    config_id = config_id(opts)
+
+    case check_signed_install_webhook(conn, config_id) do
+      :ok ->
+        conn
+
+      {:error, reason} ->
+        Logger.warning("Signed install webhook rejected for config_id=#{inspect(config_id)}: #{reason}")
+
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(:unauthorized, "Unauthorized.")
+        |> halt()
+    end
+  end
+
+  defp check_signed_install_webhook(conn, config_id) do
+    with {:ok, token} <- header_token(conn),
+         {:ok, install_id} <- body_install_id(conn),
+         {:ok, sub} <- token_sub(token, config_id) do
+      if sub == install_id, do: :ok, else: {:error, "install mismatch"}
+    end
+  end
+
+  defp config_id(opts) when is_list(opts), do: Keyword.get(opts, :config_id)
+  defp config_id(opts) when is_map(opts), do: Map.get(opts, :config_id)
+  defp config_id(_opts), do: nil
+
+  defp header_token(conn) do
+    case get_req_header(conn, "x-peek-auth") do
+      ["Bearer " <> token] when token != "" -> {:ok, token}
+      _ -> {:error, "missing token"}
+    end
+  end
+
+  defp body_install_id(%{body_params: %{"install_id" => install_id}}) when is_binary(install_id) and install_id != "",
+    do: {:ok, install_id}
+
+  defp body_install_id(_conn), do: {:error, "missing install_id"}
+
+  defp token_sub(token, config_id) do
+    with true <- usable_secret?(PeekAppSDK.Config.get_config(config_id).peek_app_secret),
+         {:ok, %{"sub" => sub}} when is_binary(sub) <- PeekAppSDK.Token.verify_peek_auth_claims(token, config_id) do
+      {:ok, sub}
+    else
+      _ -> {:error, "invalid token"}
+    end
+  end
+
+  defp usable_secret?(secret), do: is_binary(secret) and secret != ""
 
   defp build_account_user(%{
          "current_user_email" => current_user_email,
