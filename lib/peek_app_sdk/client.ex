@@ -4,8 +4,8 @@ defmodule PeekAppSDK.Client do
 
   alias PeekAppSDK.Config
 
-  # Response keys that this SDK and its callers read as atoms. Listing them here
-  # makes sure the atoms exist once this module is loaded.
+  # Response keys that this SDK and its callers read as atoms. `known_keys/0`
+  # uses this list, so the atoms exist once this module is loaded. Keep it.
   @known_keys [:data, :errors, :message, :path, :locations, :extensions, :customizations]
 
   @doc """
@@ -36,6 +36,9 @@ defmodule PeekAppSDK.Client do
 
   @doc """
   Queries the Peek Pro API.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
 
   ## Examples
 
@@ -98,6 +101,9 @@ defmodule PeekAppSDK.Client do
 
   @doc """
   Queries a platform API and returns the raw response body.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
           {:ok, map()} | {:error, list()} | {:error, integer()}
