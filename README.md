@@ -45,6 +45,21 @@ PeekAppSDK.query_peek_pro("install_id", "query { test }", %{}, :project_name)
 
 Note that `peek_api_base_url` and `peek_api_key` are always taken from the default configuration.
 
+### Registry hosts for `query_platform/4`
+
+`PeekAppSDK.query_platform/4` sends a request only to a registry host over `https`.
+The built-in hosts are `apps.peek.com` and `stage.apps.peek.com`.
+For any other URL it sends nothing, logs the host and returns `{:error, :host_not_allowed}`.
+
+To add hosts, for example a local registry behind an ngrok tunnel, set
+`PEEK_REGISTRY_EXTRA_HOSTS` to a comma-separated list of hosts. It is empty by default.
+
+```sh
+export PEEK_REGISTRY_EXTRA_HOSTS="my-registry.ngrok.app"
+```
+
+The host must match in full, without case. A subdomain of a listed host does not match.
+
 ## Some setup tips:
 
 - `import PeekAppSDK.Plugs.PeekAuth` in router
