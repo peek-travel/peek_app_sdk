@@ -78,8 +78,11 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
   it writes one warning log, sends a 401 response and halts the conn. The log
   line does not contain the token, the `install_id` or the body.
 
-  Put the plug after `Plug.Parsers`, so that the body is parsed. To also have
-  `peek_install_id` in the assigns, add `set_peek_install_id` after it.
+  Put the plug after `Plug.Parsers`, so that the body is parsed. When the
+  request passes, the body `install_id` is the install id of the checked token,
+  so read the install id from the body. Do not use the assigns of
+  `set_peek_install_id` on this route: that plug reads a `peek-auth` body or
+  query param before the header, so its assigns can come from another token.
 
   ## Options
 
