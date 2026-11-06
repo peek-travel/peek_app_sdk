@@ -227,7 +227,7 @@ defmodule PeekAppSDK.ClientTest do
   describe "query_platform/4" do
     test "successfully returns raw response body for 200 status" do
       install_id = "test_install_id"
-      url = "https://api.example.com/some/endpoint"
+      url = "https://apps.peek.com/some/endpoint"
       body_params = %{}
       response_body = %{result: "success", other_field: "value"}
 
@@ -249,7 +249,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "returns data when 200 response has data key (backwards compatible)" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
       data = %{result: "success"}
 
       Tesla.Adapter.Finch
@@ -262,7 +262,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "successfully returns raw response body for 201 status" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
       body_params = %{"key" => "value"}
       response_body = %{created: true, id: 123}
 
@@ -280,7 +280,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "handles error response" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn _env, _opts ->
@@ -292,7 +292,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "bubbles up errors when status is 200 but errors key is present" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
 
       errors = [%{message: "Validation failed"}]
 
@@ -302,6 +302,113 @@ defmodule PeekAppSDK.ClientTest do
       end)
 
       assert {:error, ^errors} = Client.query_platform(install_id, :post, url, %{})
+    end
+  end
+
+  describe "query_platform/4 host check" do
+    setup do
+      previous = System.get_env("PEEK_REGISTRY_EXTRA_HOSTS")
+      System.delete_env("PEEK_REGISTRY_EXTRA_HOSTS")
+
+      on_exit(fn ->
+        if previous,
+          do: System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", previous),
+          else: System.delete_env("PEEK_REGISTRY_EXTRA_HOSTS")
+      end)
+    end
+
+    defp expect_request(url) do
+      test_pid = self()
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(test_pid, {:requested, env.url, env.headers})
+        {:ok, %Tesla.Env{status: 200, body: %{ok: true}}}
+      end)
+
+      assert {:ok, %{ok: true}} = Client.query_platform("test_install_id", :get, url, %{})
+      assert_received {:requested, ^url, headers}
+      assert {"pk-api-key", "test_api_key"} in headers
+      assert Enum.any?(headers, fn {k, _v} -> k == "X-Peek-Auth" end)
+    end
+
+    defp refute_request(url) do
+      test_pid = self()
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(test_pid, {:requested, env.url, env.headers})
+        {:ok, %Tesla.Env{status: 200, body: %{ok: true}}}
+      end)
+
+      log =
+        capture_log(fn ->
+          assert {:error, :host_not_allowed} =
+                   Client.query_platform("test_install_id", :get, url, %{})
+        end)
+
+      refute_received {:requested, _, _}
+      log
+    end
+
+    test "sends the request to apps.peek.com" do
+      expect_request("https://apps.peek.com/installations-api/app/endpoint")
+    end
+
+    test "sends the request to stage.apps.peek.com" do
+      expect_request("https://stage.apps.peek.com/installations-api/app/endpoint")
+    end
+
+    test "matches the host without case" do
+      expect_request("https://Apps.PEEK.com/endpoint")
+    end
+
+    test "accepts an explicit port on a registry host" do
+      expect_request("https://apps.peek.com:443/endpoint")
+    end
+
+    test "sends the request to a host in PEEK_REGISTRY_EXTRA_HOSTS" do
+      System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", " first.example.ngrok.app , Local.Example.ngrok.app,")
+      expect_request("https://first.example.ngrok.app/endpoint")
+      expect_request("https://local.example.ngrok.app/endpoint")
+    end
+
+    test "sends no request to an unknown host and logs the host" do
+      log = refute_request("https://other.example.com/endpoint?token=abc")
+      assert log =~ "other.example.com"
+      refute log =~ "token=abc"
+    end
+
+    test "sends no request over http to a registry host" do
+      refute_request("http://apps.peek.com/endpoint")
+    end
+
+    test "sends no request to a host that ends with a registry host" do
+      refute_request("https://apps.peek.com.example.org/endpoint")
+    end
+
+    test "sends no request to a subdomain of a registry host" do
+      refute_request("https://sub.apps.peek.com/endpoint")
+    end
+
+    test "sends no request when the registry host is only in the user info" do
+      refute_request("https://apps.peek.com@other.example.com/endpoint")
+    end
+
+    test "sends no request to an http host in PEEK_REGISTRY_EXTRA_HOSTS" do
+      System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", "local.example.ngrok.app")
+      refute_request("http://local.example.ngrok.app/endpoint")
+    end
+
+    test "sends no request for a relative URL or a URL that is not a string" do
+      refute_request("/installations-api/app/endpoint")
+      refute_request(nil)
+    end
+
+    test "registry_hosts/0 lists only the built-in hosts when the env var is empty" do
+      assert Client.registry_hosts() == ["apps.peek.com", "stage.apps.peek.com"]
+      System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", " , ")
+      assert Client.registry_hosts() == ["apps.peek.com", "stage.apps.peek.com"]
     end
   end
 

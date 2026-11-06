@@ -77,12 +77,34 @@ defmodule PeekAppSDK.Client do
     end
   end
 
+  @registry_hosts ["apps.peek.com", "stage.apps.peek.com"]
+  @extra_hosts_env "PEEK_REGISTRY_EXTRA_HOSTS"
+
   @doc """
   Queries a platform API and returns the raw response body.
+
+  The request is sent only when `url` uses `https` and its host is a registry
+  host: `apps.peek.com`, `stage.apps.peek.com`, or a host listed in the
+  comma-separated `PEEK_REGISTRY_EXTRA_HOSTS` environment variable. The host
+  must match in full (case-insensitive); subdomains do not match.
+
+  For any other URL, no request is sent, a warning with the host is logged,
+  and `{:error, :host_not_allowed}` is returned.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()}
+          {:ok, map()} | {:error, list()} | {:error, integer()} | {:error, :host_not_allowed}
   def query_platform(install_id, method, url, body_params) do
+    case registry_url?(url) do
+      {:ok, _host} ->
+        do_query_platform(install_id, method, url, body_params)
+
+      {:error, host} ->
+        Logger.warning("query_platform: host not allowed: #{inspect(host)}")
+        {:error, :host_not_allowed}
+    end
+  end
+
+  defp do_query_platform(install_id, method, url, body_params) do
     config = Config.get_config(nil)
     peek_api_key = config.peek_api_key
 
@@ -107,6 +129,33 @@ defmodule PeekAppSDK.Client do
         {:error, status}
     end
   end
+
+  @doc """
+  Returns the hosts that `query_platform/4` sends requests to: the built-in
+  registry hosts and the hosts in `PEEK_REGISTRY_EXTRA_HOSTS`, in lower case.
+  """
+  @spec registry_hosts() :: [String.t()]
+  def registry_hosts do
+    extra =
+      (System.get_env(@extra_hosts_env) || "")
+      |> String.split(",")
+      |> Enum.map(&(&1 |> String.trim() |> String.downcase()))
+      |> Enum.reject(&(&1 == ""))
+
+    Enum.uniq(@registry_hosts ++ extra)
+  end
+
+  defp registry_url?(url) when is_binary(url) do
+    case URI.parse(url) do
+      %URI{scheme: "https", host: host} when is_binary(host) and host != "" ->
+        if String.downcase(host) in registry_hosts(), do: {:ok, host}, else: {:error, host}
+
+      %URI{host: host} ->
+        {:error, host}
+    end
+  end
+
+  defp registry_url?(_url), do: {:error, nil}
 
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/

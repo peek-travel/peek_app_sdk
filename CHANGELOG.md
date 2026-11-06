@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-06]
+
+### Changed
+
+- **Breaking:** `PeekAppSDK.query_platform/4` sends the request only when the URL uses `https` and its host is `apps.peek.com` or `stage.apps.peek.com`. For any other URL it sends no request, logs a warning with the host and returns `{:error, :host_not_allowed}`. The host must match in full, without case.
+
+### Added
+
+- `PEEK_REGISTRY_EXTRA_HOSTS` environment variable: a comma-separated list of extra hosts for `query_platform/4`, for example a local registry behind ngrok. It is empty by default.
+- `PeekAppSDK.Client.registry_hosts/0` returns the hosts that `query_platform/4` accepts.
+
+### Upgrading
+
+- An app that calls `query_platform/4` with a URL on a registry host needs no change.
+- An app that calls it with another host must add that host to `PEEK_REGISTRY_EXTRA_HOSTS`, or handle `{:error, :host_not_allowed}`.
+
 ## [2026-10-22]
 
 ### Fixed

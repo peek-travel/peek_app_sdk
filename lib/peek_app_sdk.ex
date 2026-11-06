@@ -88,9 +88,13 @@ defmodule PeekAppSDK do
 
   @doc """
   Queries a platform API and returns the raw response body.
+
+  Sends the request only to a registry host over `https`. Other URLs return
+  `{:error, :host_not_allowed}` and send nothing. See
+  `PeekAppSDK.Client.query_platform/4`.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()}
+          {:ok, map()} | {:error, list()} | {:error, integer()} | {:error, :host_not_allowed}
   defdelegate query_platform(install_id, method, url, body),
     to: PeekAppSDK.Client
 
