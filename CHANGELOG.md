@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-06]
+
+### Changed
+
+- `PeekAppSDK.Client.query_peek_pro/4` and `PeekAppSDK.Client.query_platform/4` now log a short error line for a response that they do not accept: the service, the HTTP method, the URL path and the status code (for example `Unexpected Platform response: PUT /api/resource returned status 404`). The line no longer includes the response body, the host or the query string. The return values do not change. If you parse these log lines, update the pattern.
+
 ## [2026-10-22]
 
 ### Fixed
