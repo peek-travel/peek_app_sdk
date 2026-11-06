@@ -55,8 +55,8 @@ Note that `peek_api_base_url` and `peek_api_key` are always taken from the defau
 - `plug :require_signed_install_webhook` can be used on the route that gets the
   install webhook. It reads the token only from the `X-Peek-Auth: Bearer <token>`
   header and lets the request through only when the token `sub` is equal to the
-  `install_id` in the request body. Otherwise it returns 401 and halts. It takes
-  the same `config_id` option as `set_peek_install_id`:
+  `install_id` in the request body. Otherwise it returns 401 and halts. Its
+  `config_id` option is an atom key under the `:apps` config:
 
   ```elixir
   pipeline :install_webhook do

@@ -83,7 +83,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
 
   ## Options
 
-  * `:config_id` - The configuration identifier to use for token verification. Defaults to nil (use default config).
+  * `:config_id` - An atom key under the `:apps` config, or nil (the default) for the default config.
 
   ## Examples
 
@@ -104,6 +104,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
         Logger.warning("Signed install webhook rejected for config_id=#{inspect(config_id)}: #{reason}")
 
         conn
+        |> put_resp_content_type("text/plain")
         |> send_resp(:unauthorized, "Unauthorized.")
         |> halt()
     end
@@ -134,13 +135,15 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
   defp body_install_id(_conn), do: {:error, "missing install_id"}
 
   defp token_sub(token, config_id) do
-    with true <- is_binary(PeekAppSDK.Config.get_config(config_id).peek_app_secret),
+    with true <- usable_secret?(PeekAppSDK.Config.get_config(config_id).peek_app_secret),
          {:ok, %{"sub" => sub}} when is_binary(sub) <- PeekAppSDK.Token.verify_peek_auth_claims(token, config_id) do
       {:ok, sub}
     else
       _ -> {:error, "invalid token"}
     end
   end
+
+  defp usable_secret?(secret), do: is_binary(secret) and secret != ""
 
   defp build_account_user(%{
          "current_user_email" => current_user_email,
