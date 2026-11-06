@@ -305,6 +305,85 @@ defmodule PeekAppSDK.ClientTest do
     end
   end
 
+  describe "error logging" do
+    @response_body %{error: "response-body-marker", detail: "more response text"}
+
+    defp stub_status_and_capture_headers(status) do
+      test_pid = self()
+
+      Mimic.stub(Tesla.Adapter.Finch, :call, fn env, _opts ->
+        send(test_pid, {:request_headers, env.headers})
+        {:ok, %Tesla.Env{status: status, body: @response_body}}
+      end)
+    end
+
+    defp assert_log_has_no_secrets(log) do
+      assert_received {:request_headers, headers}
+      assert headers != []
+
+      for {_name, value} <- headers do
+        refute log =~ value
+      end
+
+      refute log =~ "Bearer"
+      refute log =~ "test_api_key"
+      refute log =~ "response-body-marker"
+      refute log =~ "more response text"
+    end
+
+    test "query_peek_pro logs the method, the path and the status only" do
+      stub_status_and_capture_headers(500)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 500} =
+                   Client.query_peek_pro("test_install_id", "query BodyMarker { secretField }", %{
+                     "variable" => "request-body-marker"
+                   })
+        end)
+
+      assert log =~ "POST /backoffice-gql/test_app_id/body_marker returned status 500"
+      refute log =~ "secretField"
+      refute log =~ "request-body-marker"
+      refute log =~ "https://"
+      assert_log_has_no_secrets(log)
+    end
+
+    test "query_platform logs the method, the path and the status only" do
+      stub_status_and_capture_headers(404)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 404} =
+                   Client.query_platform(
+                     "test_install_id",
+                     :put,
+                     "https://api.example.com/api/resource?token=query-marker",
+                     %{name: "request-body-marker"}
+                   )
+        end)
+
+      assert log =~ "PUT /api/resource returned status 404"
+      refute log =~ "query-marker"
+      refute log =~ "request-body-marker"
+      refute log =~ "api.example.com"
+      assert_log_has_no_secrets(log)
+    end
+
+    test "query_platform logs / as the path when the URL has no path" do
+      stub_status_and_capture_headers(503)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 503} =
+                   Client.query_platform("test_install_id", :get, "https://api.example.com", %{})
+        end)
+
+      assert log =~ "GET / returned status 503"
+      assert_log_has_no_secrets(log)
+    end
+  end
+
   describe "operation_name/1" do
     test "extracts operation name from query" do
       query = "query TestOperation { test }"
