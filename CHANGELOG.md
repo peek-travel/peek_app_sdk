@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `PeekAppSDK.Plugs.PeekAuth.require_signed_install_webhook/2` — a function plug for the install webhook route. It reads the token only from the `X-Peek-Auth: Bearer <token>` header, verifies it with the app secret of the `:config_id` option, and compares the token `sub` to the `install_id` in the request body. When the header is missing, the token does not verify, or `sub` is not the body `install_id`, it sends a 401 `Unauthorized.` response, halts the conn and writes one warning log line (with no token and no request body). A request that passes is not changed. To use it, add `plug :require_signed_install_webhook` (after `Plug.Parsers`) to the install webhook route. Apps that do not add it see no change.
+- `PeekAppSDK.Plugs.PeekAuth.require_signed_install_webhook/2` — a function plug for the install webhook route. It reads the token only from the `X-Peek-Auth: Bearer <token>` header, verifies it with the app secret of the `:config_id` option, and compares the token `sub` to the `install_id` in the request body. When the header is missing, the token does not verify, or `sub` is not the body `install_id`, it sends a 401 `Unauthorized.` (`text/plain`) response, halts the conn and writes one warning log line (with no token and no request body). A request that passes is not changed. To use it, add `plug :require_signed_install_webhook` (after `Plug.Parsers`) to the install webhook route. Apps that do not add it see no change.
 
 ### Changed
 
