@@ -4,19 +4,41 @@ defmodule PeekAppSDK.Client do
 
   alias PeekAppSDK.Config
 
+  # Response keys that this SDK and its callers read as atoms. `known_keys/0`
+  # uses this list, so the atoms exist once this module is loaded. Keep it.
+  @known_keys [:data, :errors, :message, :path, :locations, :extensions, :customizations]
+
   @doc """
   Creates a Tesla client with the appropriate middleware configuration.
+
+  Response JSON keys are decoded to atoms only when the atom already exists.
+  A key with no existing atom stays a string.
   """
   def client do
     middleware = [
-      {Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]}
+      {Tesla.Middleware.JSON, engine_opts: [keys: &decode_key/1]}
     ]
 
     Tesla.client(middleware)
   end
 
+  @doc false
+  @spec known_keys() :: [atom()]
+  def known_keys, do: @known_keys
+
+  @doc false
+  @spec decode_key(String.t()) :: atom() | String.t()
+  def decode_key(key) do
+    String.to_existing_atom(key)
+  rescue
+    ArgumentError -> key
+  end
+
   @doc """
   Queries the Peek Pro API.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
 
   ## Examples
 
@@ -79,6 +101,9 @@ defmodule PeekAppSDK.Client do
 
   @doc """
   Queries a platform API and returns the raw response body.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
           {:ok, map()} | {:error, list()} | {:error, integer()}

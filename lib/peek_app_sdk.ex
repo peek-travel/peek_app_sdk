@@ -69,6 +69,9 @@ defmodule PeekAppSDK do
   @doc """
   Queries the Peek Pro API.
 
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
+
   ## Examples
 
   Using the default configuration:
@@ -88,6 +91,9 @@ defmodule PeekAppSDK do
 
   @doc """
   Queries a platform API and returns the raw response body.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
           {:ok, map()} | {:error, list()} | {:error, integer()}
