@@ -49,6 +49,25 @@ defmodule PeekAppSDK.TokenTest do
     end
   end
 
+  describe "verify_peek_auth_claims/2" do
+    import ExUnit.CaptureLog
+
+    test "returns the claims of a valid token" do
+      token = Token.new_for_app_installation!("test_install_id", nil, :project_name)
+
+      assert {:ok, %{"sub" => "test_install_id"}} = Token.verify_peek_auth_claims(token, :project_name)
+    end
+
+    test "returns the Joken error for an invalid token and writes no warning" do
+      log =
+        capture_log([level: :warning], fn ->
+          assert {:error, :signature_error} = Token.verify_peek_auth_claims("invalid_token")
+        end)
+
+      assert log == ""
+    end
+  end
+
   describe "new_for_app_installation!/2" do
     test "generates a valid token with default config" do
       install_id = "test_install_id"
