@@ -305,6 +305,62 @@ defmodule PeekAppSDK.ClientTest do
     end
   end
 
+  describe "client/0 JSON key decoding" do
+    defp json_response(json) do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        {:ok, %Tesla.Env{env | status: 200, headers: [{"content-type", "application/json"}], body: json}}
+      end)
+    end
+
+    test "returns known keys as atom keys" do
+      json_response(~s({"data": {"test": "success"}}))
+
+      assert {:ok, %{test: "success"}} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+
+      json_response(~s({"errors": [{"message": "bad", "path": ["a"], "locations": [], "extensions": {}}]}))
+
+      assert {:error, [%{message: "bad", path: ["a"], locations: [], extensions: %{}}]} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+    end
+
+    test "decodes each known key to its atom" do
+      for key <- [:data, :errors, :message, :path, :locations, :extensions, :customizations] do
+        assert key in Client.known_keys()
+        assert Client.decode_key(Atom.to_string(key)) == key
+      end
+    end
+
+    test "returns unknown keys as strings and creates no atoms" do
+      url = "https://api.example.com/api/resource"
+
+      # First call loads the modules on this path, so it is not counted.
+      json_response(~s({"first_call_key_without_atom": 1}))
+      assert {:ok, _} = Client.query_platform("test_install_id", :get, url, %{})
+
+      keys = for i <- 1..500, do: "unknown_key_#{System.unique_integer([:positive])}_#{i}"
+      json = keys |> Map.new(&{&1, %{("nested_" <> &1) => 1}}) |> Jason.encode!()
+      json_response(json)
+
+      before_count = :erlang.system_info(:atom_count)
+      assert {:ok, body} = Client.query_platform("test_install_id", :get, url, %{})
+      after_count = :erlang.system_info(:atom_count)
+
+      assert after_count == before_count
+      assert map_size(body) == 500
+      assert Enum.all?(Map.keys(body), &is_binary/1)
+      assert body[hd(keys)] == %{("nested_" <> hd(keys)) => 1}
+    end
+
+    test "returns a mix of atom and string keys in one response" do
+      json_response(~s({"data": {"test": "success", "other_key_without_atom": 2}}))
+
+      assert {:ok, %{"other_key_without_atom" => 2, test: "success"}} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+    end
+  end
+
   describe "operation_name/1" do
     test "extracts operation name from query" do
       query = "query TestOperation { test }"
