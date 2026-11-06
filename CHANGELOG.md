@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-06]
+
+### Changed
+
+- Response JSON keys are decoded to atoms only when the atom already exists. Other keys stay strings. This applies to every response decoded by `PeekAppSDK.Client.client/0`: `query_peek_pro/4`, `query_platform/4`, `update_configuration_status/4`, `customize_installation/3` and `get_customizations/2`, nested keys included.
+- The keys `data`, `errors`, `message`, `path`, `locations`, `extensions` and `customizations` always decode to atoms.
+- **Breaking:** a key that no loaded module uses as an atom now comes back as a string, for example `%{"some_key" => 1}` instead of `%{some_key: 1}`. Code that reads a key as an atom (`body.some_key`, `%{some_key: v}`) has that atom once its module is loaded. To update: read keys through code that names them as atoms, or accept string keys (for example `body[:some_key] || body["some_key"]`). Code that calls `Atom.to_string/1` on every key must handle string keys.
+
 ## [2026-10-22]
 
 ### Fixed

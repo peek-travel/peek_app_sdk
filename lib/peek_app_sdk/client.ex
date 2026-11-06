@@ -4,15 +4,34 @@ defmodule PeekAppSDK.Client do
 
   alias PeekAppSDK.Config
 
+  # Response keys that this SDK and its callers read as atoms. Listing them here
+  # makes sure the atoms exist once this module is loaded.
+  @known_keys [:data, :errors, :message, :path, :locations, :extensions, :customizations]
+
   @doc """
   Creates a Tesla client with the appropriate middleware configuration.
+
+  Response JSON keys are decoded to atoms only when the atom already exists.
+  A key with no existing atom stays a string.
   """
   def client do
     middleware = [
-      {Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]}
+      {Tesla.Middleware.JSON, engine_opts: [keys: &decode_key/1]}
     ]
 
     Tesla.client(middleware)
+  end
+
+  @doc false
+  @spec known_keys() :: [atom()]
+  def known_keys, do: @known_keys
+
+  @doc false
+  @spec decode_key(String.t()) :: atom() | String.t()
+  def decode_key(key) do
+    String.to_existing_atom(key)
+  rescue
+    ArgumentError -> key
   end
 
   @doc """
