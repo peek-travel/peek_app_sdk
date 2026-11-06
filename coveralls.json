@@ -6,5 +6,6 @@
     "lib/peek_app_sdk/ui/*",
     "demo/*"
   ],
-  "print_summary": true
+  "print_summary": true,
+  "minimum_coverage": 100
 }
