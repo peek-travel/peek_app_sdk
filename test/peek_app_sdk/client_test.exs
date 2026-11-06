@@ -326,8 +326,9 @@ defmodule PeekAppSDK.ClientTest do
     end
 
     test "decodes each known key to its atom" do
-      for key <- [:data, :errors, :message, :path, :locations, :extensions, :customizations] do
-        assert key in Client.known_keys()
+      assert Client.known_keys() == [:data, :errors, :message, :path, :locations, :extensions, :customizations]
+
+      for key <- Client.known_keys() do
         assert Client.decode_key(Atom.to_string(key)) == key
       end
     end
@@ -347,7 +348,9 @@ defmodule PeekAppSDK.ClientTest do
       assert {:ok, body} = Client.query_platform("test_install_id", :get, url, %{})
       after_count = :erlang.system_info(:atom_count)
 
-      assert after_count == before_count
+      # 500 keys and 500 nested keys would make 1000 atoms with String.to_atom/1.
+      # A small margin allows for atoms that other processes make at the same time.
+      assert after_count - before_count < 10
       assert map_size(body) == 500
       assert Enum.all?(Map.keys(body), &is_binary/1)
       assert body[hd(keys)] == %{("nested_" <> hd(keys)) => 1}
