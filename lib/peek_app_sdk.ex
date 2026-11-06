@@ -94,7 +94,7 @@ defmodule PeekAppSDK do
   `PeekAppSDK.Client.query_platform/4`.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()} | {:error, :host_not_allowed}
+          {:ok, map()} | {:error, list() | integer() | :host_not_allowed | term()}
   defdelegate query_platform(install_id, method, url, body),
     to: PeekAppSDK.Client
 

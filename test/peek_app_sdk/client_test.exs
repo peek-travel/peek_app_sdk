@@ -367,6 +367,22 @@ defmodule PeekAppSDK.ClientTest do
       expect_request("https://apps.peek.com:443/endpoint")
     end
 
+    test "accepts another port on a registry host" do
+      expect_request("https://apps.peek.com:8443/endpoint")
+    end
+
+    test "sends no request to a registry host with a trailing dot" do
+      refute_request("https://apps.peek.com./endpoint")
+    end
+
+    test "returns the transport error when the request fails" do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts -> {:error, :econnrefused} end)
+
+      assert {:error, :econnrefused} =
+               Client.query_platform("test_install_id", :get, "https://apps.peek.com/endpoint", %{})
+    end
+
     test "sends the request to a host in PEEK_REGISTRY_EXTRA_HOSTS" do
       System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", " first.example.ngrok.app , Local.Example.ngrok.app,")
       expect_request("https://first.example.ngrok.app/endpoint")

@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `PEEK_REGISTRY_EXTRA_HOSTS` environment variable: a comma-separated list of extra hosts for `query_platform/4`, for example a local registry behind ngrok. It is empty by default.
 - `PeekAppSDK.Client.registry_hosts/0` returns the hosts that `query_platform/4` accepts.
 
+### Fixed
+
+- `PeekAppSDK.query_platform/4` returns `{:error, reason}` when the HTTP request fails (for example `{:error, :econnrefused}`). Before, it raised a `CaseClauseError`.
+
 ### Upgrading
 
 - An app that calls `query_platform/4` with a URL on a registry host needs no change.

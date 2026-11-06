@@ -92,10 +92,10 @@ defmodule PeekAppSDK.Client do
   and `{:error, :host_not_allowed}` is returned.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()} | {:error, :host_not_allowed}
+          {:ok, map()} | {:error, list() | integer() | :host_not_allowed | term()}
   def query_platform(install_id, method, url, body_params) do
-    case registry_url?(url) do
-      {:ok, _host} ->
+    case check_registry_host(url) do
+      :ok ->
         do_query_platform(install_id, method, url, body_params)
 
       {:error, host} ->
@@ -127,6 +127,9 @@ defmodule PeekAppSDK.Client do
         Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
 
         {:error, status}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -145,17 +148,17 @@ defmodule PeekAppSDK.Client do
     Enum.uniq(@registry_hosts ++ extra)
   end
 
-  defp registry_url?(url) when is_binary(url) do
+  defp check_registry_host(url) when is_binary(url) do
     case URI.parse(url) do
       %URI{scheme: "https", host: host} when is_binary(host) and host != "" ->
-        if String.downcase(host) in registry_hosts(), do: {:ok, host}, else: {:error, host}
+        if String.downcase(host) in registry_hosts(), do: :ok, else: {:error, host}
 
       %URI{host: host} ->
         {:error, host}
     end
   end
 
-  defp registry_url?(_url), do: {:error, nil}
+  defp check_registry_host(_url), do: {:error, nil}
 
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/
