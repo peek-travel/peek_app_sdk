@@ -168,7 +168,7 @@ defmodule PeekAppSDK.Plugs.PeekAuthWebhookTest do
 
     test "rejects a token for another install" do
       token = Token.new_for_app_installation!("another_install")
-      assert_rejected(webhook(%{"install_id" => @install_id}, bearer(token)), "install mismatch")
+      assert_rejected(webhook(%{"install_id" => @install_id}, bearer(token)), "install_id mismatch")
     end
 
     test "rejects a body with no install_id" do
@@ -210,7 +210,7 @@ defmodule PeekAppSDK.Plugs.PeekAuthWebhookTest do
 
       conn = assign(webhook(%{"install_id" => @install_id}, bearer(token)), :peek_install_id, @install_id)
 
-      result = assert_rejected(conn, "install mismatch")
+      result = assert_rejected(conn, "install_id mismatch")
       assert result.assigns.peek_install_id == @install_id
     end
   end

@@ -116,7 +116,7 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
     with {:ok, token} <- header_token(conn),
          {:ok, install_id} <- body_install_id(conn),
          {:ok, sub} <- token_sub(token, config_id) do
-      if sub == install_id, do: :ok, else: {:error, "install mismatch"}
+      if sub == install_id, do: :ok, else: {:error, "install_id mismatch"}
     end
   end
 
