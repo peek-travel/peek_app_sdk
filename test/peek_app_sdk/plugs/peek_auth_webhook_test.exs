@@ -126,6 +126,15 @@ defmodule PeekAppSDK.Plugs.PeekAuthWebhookTest do
       assert_rejected(conn, "missing token")
     end
 
+    test "raises for a config_id that has no app config" do
+      token = Token.new_for_app_installation!(@install_id)
+      conn = webhook(%{"install_id" => @install_id}, bearer(token))
+
+      assert_raise ArgumentError, ~r/no app config for :unknown_app/, fn ->
+        PeekAuth.require_signed_install_webhook(conn, config_id: :unknown_app)
+      end
+    end
+
     test "rejects a token that is not a JWT" do
       assert_rejected(webhook(%{"install_id" => @install_id}, bearer("invalid_token")), "invalid token")
     end

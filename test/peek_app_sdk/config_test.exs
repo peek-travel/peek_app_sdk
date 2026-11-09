@@ -75,15 +75,53 @@ defmodule PeekAppSDK.ConfigTest do
       assert config.client_secret_token == "client_only_secret"
     end
 
-    test "returns the default configuration for non-existent atom identifier" do
-      config = Config.get_config(:non_existent)
-      assert is_map(config)
-      assert Map.has_key?(config, :peek_app_secret)
-      assert Map.has_key?(config, :peek_app_id)
-      assert Map.has_key?(config, :client_secret_token)
-      assert config.peek_app_secret == "test_secret"
-      assert config.peek_app_id == "test_app_id"
-      assert config.client_secret_token == "test_client_secret"
+    test "raises ArgumentError for an atom identifier that is not in :apps" do
+      assert_raise ArgumentError, ~r/no app config for :non_existent/, fn ->
+        Config.get_config(:non_existent)
+      end
+    end
+
+    test "raises ArgumentError for an app config with no peek_app_id" do
+      assert_raise ArgumentError, ~r/:no_app_id_app .* is missing \[:peek_app_id\]/, fn ->
+        Config.get_config(:no_app_id_app)
+      end
+    end
+
+    test "raises ArgumentError for an app config with no peek_app_secret" do
+      assert_raise ArgumentError, ~r/:no_app_secret_app .* is missing \[:peek_app_secret\]/, fn ->
+        Config.get_config(:no_app_secret_app)
+      end
+    end
+
+    test "raises ArgumentError for an app config with a nil peek_app_secret" do
+      assert_raise ArgumentError, ~r/:nil_app_secret_app .* is missing \[:peek_app_secret\]/, fn ->
+        Config.get_config(:nil_app_secret_app)
+      end
+    end
+
+    test "raises ArgumentError for an app config with an empty peek_app_id" do
+      assert_raise ArgumentError, ~r/:empty_app_id_app .* is missing \[:peek_app_id\]/, fn ->
+        Config.get_config(:empty_app_id_app)
+      end
+    end
+
+    test "raises ArgumentError for an app config with a blank or non-string peek_app_secret" do
+      for app <- [:blank_app_secret_app, :integer_app_secret_app] do
+        assert_raise ArgumentError, ~r/is missing \[:peek_app_secret\]/, fn ->
+          Config.get_config(app)
+        end
+      end
+    end
+
+    test "raises ArgumentError for an app config that is not a keyword list" do
+      assert_raise ArgumentError, ~r/:nil_entry_app .* must be a keyword list, got: nil/, fn ->
+        Config.get_config(:nil_entry_app)
+      end
+    end
+
+    test "returns the default configuration for a nil identifier" do
+      assert Config.get_config(nil) == Config.get_config()
+      assert Config.get_config(nil).peek_app_secret == "test_secret"
     end
   end
 end
