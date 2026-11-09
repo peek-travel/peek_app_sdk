@@ -80,9 +80,10 @@ defmodule PeekAppSDK.Client do
     operation_name = operation_name(gql_query)
 
     url = build_backoffice_url(config, peek_app_id, operation_name)
+    method = :post
 
     case Tesla.request(client(),
-           method: :post,
+           method: method,
            url: url,
            body: body_params,
            headers: headers(install_id, config_id, peek_api_key)
@@ -93,8 +94,8 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
         {:ok, data}
 
-      {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected PeekPro response when hitting #{url} - (#{status}): #{inspect(body)}")
+      {:ok, %Tesla.Env{status: status}} ->
+        log_unexpected_status("PeekPro", method, url, status)
         {:error, status}
     end
   end
@@ -126,11 +127,19 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: status, body: body}} when status in 200..299 ->
         {:ok, body}
 
-      {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
-
+      {:ok, %Tesla.Env{status: status}} ->
+        log_unexpected_status("Platform", method, url, status)
         {:error, status}
     end
+  end
+
+  # Logs only the method, the URL path and the status. The query string,
+  # the request and response bodies and the headers are not logged.
+  defp log_unexpected_status(service, method, url, status) do
+    method = method |> to_string() |> String.upcase()
+    path = URI.parse(url).path || "/"
+
+    Logger.error("Unexpected #{service} response: #{method} #{path} returned status #{status}")
   end
 
   def operation_name(query) do
