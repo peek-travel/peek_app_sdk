@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-09]
+
+### Added
+
+- `PEEK_REGISTRY_EXTRA_HOSTS` environment variable: a comma-separated list of extra hosts for `query_platform/4`, for example a local registry behind ngrok. It is empty by default.
+- `PeekAppSDK.Client.registry_hosts/0` returns the hosts that `query_platform/4` accepts.
+- `PeekAppSDK.Plugs.PeekAuth.require_signed_install_webhook/2` — a function plug for the install webhook route. It reads the token only from the `X-Peek-Auth: Bearer <token>` header, verifies it with the app secret of the `:config_id` option, and compares the token `sub` to the `install_id` in the request body. When the header is missing, the token does not verify, or `sub` is not the body `install_id`, it sends a 401 `Unauthorized.` (`text/plain`) response, halts the conn and writes one warning log line (with no token and no request body). A request that passes is not changed. To use it, add `plug :require_signed_install_webhook` (after `Plug.Parsers`) to the install webhook route. Apps that do not add it see no change.
+
+### Changed
+
+- `PeekAppSDK.Token.verify_peek_auth/2` and `PeekAppSDK.Token.verify_client_request/2` now require the `exp` claim, and so do `PeekAppSDK.Token.verify_and_validate/2` and `validate/1`. A token with no `exp`, or with a non-numeric `exp`, is rejected: the two verify functions return `{:error, :unauthorized}`, and the `PeekAuth` and `ClientAuth` plugs don't set `:peek_install_id` for it. **Breaking** for callers that verify tokens without `exp`. Tokens made by `new_for_app_installation!/3` and `new_for_app_installation_client/2` already have `exp`.
+- Fixed the `@spec` and docs of both functions to match what they return: `{:ok, install_id, claims}`.
+- Response JSON keys are decoded to atoms only when the atom already exists. Other keys stay strings. This applies to every response decoded by `PeekAppSDK.Client.client/0`: `query_peek_pro/4`, `query_platform/4`, `update_configuration_status/4`, `customize_installation/3` and `get_customizations/2`, nested keys included.
+- The keys `data`, `errors`, `message`, `path`, `locations`, `extensions` and `customizations` always decode to atoms.
+- **Breaking:** a key that no loaded module uses as an atom now comes back as a string, for example `%{"some_key" => 1}` instead of `%{some_key: 1}`. Code that reads a key as an atom (`body.some_key`, `%{some_key: v}`) has that atom once its module is loaded. To update: read keys through code that names them as atoms, or accept string keys (for example `body[:some_key] || body["some_key"]`). Code that calls `Atom.to_string/1` on every key must handle string keys. A map can now have atom keys and string keys together: convert the keys first before you pass it to a function that needs one key type, such as `Ecto.Changeset.cast/4`.
+- `PeekAppSDK.Client.query_peek_pro/4` and `PeekAppSDK.Client.query_platform/4` now log a short error line for a response that they do not accept: the service, the HTTP method, the URL path and the status code (for example `Unexpected Platform response: PUT /api/resource returned status 404`). The line no longer includes the response body, the host or the query string. The return values do not change. If you parse these log lines, update the pattern.
+- **Breaking:** `PeekAppSDK.query_platform/4` sends the request only when the URL uses `https` and its host is `apps.peek.com` or `stage.apps.peek.com`. For any other URL it sends no request, logs a warning with the host and returns `{:error, :host_not_allowed}`. The host must match in full, without case.
+- `mix coveralls` fails below 100% coverage (`minimum_coverage` in `coveralls.json`).
+
+### Fixed
+
+- `PeekAppSDK.query_platform/4` returns `{:error, reason}` when the HTTP request fails (for example `{:error, :econnrefused}`). Before, it raised a `CaseClauseError`.
+
+### Upgrading
+
+- An app that calls `query_platform/4` with a URL on a registry host needs no change.
+- An app that calls it with another host must add that host to `PEEK_REGISTRY_EXTRA_HOSTS`, or handle `{:error, :host_not_allowed}`.
+
 ## [2026-11-03]
 
 ### Changed
