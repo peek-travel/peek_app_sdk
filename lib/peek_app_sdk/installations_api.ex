@@ -3,6 +3,9 @@ defmodule PeekAppSDK.InstallationsApi do
   Client for the app-registry `/installations-api/:app_id` routes — endpoints an
   installed app calls directly about its own install (not proxied through an
   `ExtendableInstall`).
+
+  Response bodies are decoded by `PeekAppSDK.Client.client/0`: a JSON key is an
+  atom only when that atom already exists, otherwise it stays a string.
   """
 
   alias PeekAppSDK.Client
