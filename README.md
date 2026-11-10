@@ -67,6 +67,18 @@ The host must match in full, without case. A subdomain of a listed host does not
   request. This will set a `peek_install_id` prop in the `assigns` of the `conn`
 - `live_session :some_live_view_session_scope, on_mount: {PeekAppSDK.Plugs.PeekAuth, :set_install_id_for_live_view}` will set the
   `peek_install_id` on the Socket for live view usage.
+- `plug :require_signed_install_webhook` can be used on the route that gets the
+  install webhook. It reads the token only from the `X-Peek-Auth: Bearer <token>`
+  header and lets the request through only when the token `sub` is equal to the
+  `install_id` in the request body. Otherwise it returns 401 and halts. Its
+  `config_id` option is an atom key under the `:apps` config:
+
+  ```elixir
+  pipeline :install_webhook do
+    plug :accepts, ["json"]
+    plug :require_signed_install_webhook, config_id: :project_name
+  end
+  ```
 
 ## Tailwind CSS Configuration
 
