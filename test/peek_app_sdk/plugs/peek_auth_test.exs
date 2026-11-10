@@ -127,6 +127,21 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
       refute Map.has_key?(conn.assigns, :peek_install_token)
     end
 
+    test "does nothing with a token without exp" do
+      signer = Joken.Signer.create("HS256", PeekAppSDK.Config.get_config().peek_app_secret)
+      {:ok, token, _claims} = Joken.encode_and_sign(%{"sub" => "test_install_id"}, signer)
+
+      conn =
+        conn(:get, "/")
+        |> put_req_header("x-peek-auth", "Bearer #{token}")
+
+      conn = PeekAuth.set_peek_install_id(conn, %{})
+
+      refute conn.halted
+      refute Map.has_key?(conn.assigns, :peek_install_id)
+      refute Map.has_key?(conn.assigns, :peek_install_token)
+    end
+
     test "does nothing without token" do
       conn = conn(:get, "/")
 
