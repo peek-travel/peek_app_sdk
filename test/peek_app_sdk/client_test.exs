@@ -227,7 +227,7 @@ defmodule PeekAppSDK.ClientTest do
   describe "query_platform/4" do
     test "successfully returns raw response body for 200 status" do
       install_id = "test_install_id"
-      url = "https://api.example.com/some/endpoint"
+      url = "https://apps.peek.com/some/endpoint"
       body_params = %{}
       response_body = %{result: "success", other_field: "value"}
 
@@ -249,7 +249,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "returns data when 200 response has data key (backwards compatible)" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
       data = %{result: "success"}
 
       Tesla.Adapter.Finch
@@ -262,7 +262,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "successfully returns raw response body for 201 status" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
       body_params = %{"key" => "value"}
       response_body = %{created: true, id: 123}
 
@@ -280,7 +280,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "handles error response" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
 
       Tesla.Adapter.Finch
       |> Mimic.stub(:call, fn _env, _opts ->
@@ -292,7 +292,7 @@ defmodule PeekAppSDK.ClientTest do
 
     test "bubbles up errors when status is 200 but errors key is present" do
       install_id = "test_install_id"
-      url = "https://api.example.com/api/resource"
+      url = "https://apps.peek.com/api/resource"
 
       errors = [%{message: "Validation failed"}]
 
@@ -302,6 +302,267 @@ defmodule PeekAppSDK.ClientTest do
       end)
 
       assert {:error, ^errors} = Client.query_platform(install_id, :post, url, %{})
+    end
+  end
+
+  describe "client/0 JSON key decoding" do
+    defp json_response(json) do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        {:ok, %Tesla.Env{env | status: 200, headers: [{"content-type", "application/json"}], body: json}}
+      end)
+    end
+
+    test "returns known keys as atom keys" do
+      json_response(~s({"data": {"test": "success"}}))
+
+      assert {:ok, %{test: "success"}} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+
+      json_response(~s({"errors": [{"message": "bad", "path": ["a"], "locations": [], "extensions": {}}]}))
+
+      assert {:error, [%{message: "bad", path: ["a"], locations: [], extensions: %{}}]} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+    end
+
+    test "decodes each known key to its atom" do
+      assert Client.known_keys() == [:data, :errors, :message, :path, :locations, :extensions, :customizations]
+
+      for key <- Client.known_keys() do
+        assert Client.decode_key(Atom.to_string(key)) == key
+      end
+    end
+
+    test "returns unknown keys as strings and creates no atoms" do
+      url = "https://apps.peek.com/api/resource"
+
+      # First call loads the modules on this path, so it is not counted.
+      json_response(~s({"first_call_key_without_atom": 1}))
+      assert {:ok, _} = Client.query_platform("test_install_id", :get, url, %{})
+
+      keys = for i <- 1..500, do: "unknown_key_#{System.unique_integer([:positive])}_#{i}"
+      json = keys |> Map.new(&{&1, %{("nested_" <> &1) => 1}}) |> Jason.encode!()
+      json_response(json)
+
+      before_count = :erlang.system_info(:atom_count)
+      assert {:ok, body} = Client.query_platform("test_install_id", :get, url, %{})
+      after_count = :erlang.system_info(:atom_count)
+
+      # 500 keys and 500 nested keys would make 1000 atoms with String.to_atom/1.
+      # A small margin allows for atoms that other processes make at the same time.
+      assert after_count - before_count < 10
+      assert map_size(body) == 500
+      assert Enum.all?(Map.keys(body), &is_binary/1)
+      assert body[hd(keys)] == %{("nested_" <> hd(keys)) => 1}
+    end
+
+    test "returns a mix of atom and string keys in one response" do
+      json_response(~s({"data": {"test": "success", "other_key_without_atom": 2}}))
+
+      assert {:ok, %{"other_key_without_atom" => 2, test: "success"}} =
+               Client.query_peek_pro("test_install_id", "query Test { test }")
+    end
+  end
+
+  describe "error logging" do
+    @response_body %{error: "response-body-marker", detail: "more response text"}
+
+    defp stub_status_and_capture_headers(status) do
+      test_pid = self()
+
+      Mimic.stub(Tesla.Adapter.Finch, :call, fn env, _opts ->
+        send(test_pid, {:request_headers, env.headers})
+        {:ok, %Tesla.Env{status: status, body: @response_body}}
+      end)
+    end
+
+    defp assert_log_has_no_secrets(log) do
+      assert_received {:request_headers, headers}
+      assert headers != []
+
+      for {_name, value} <- headers do
+        refute log =~ value
+      end
+
+      refute log =~ "Bearer"
+      refute log =~ "test_api_key"
+      refute log =~ "response-body-marker"
+      refute log =~ "more response text"
+    end
+
+    test "query_peek_pro logs the method, the path and the status only" do
+      stub_status_and_capture_headers(500)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 500} =
+                   Client.query_peek_pro("test_install_id", "query BodyMarker { secretField }", %{
+                     "variable" => "request-body-marker"
+                   })
+        end)
+
+      assert log =~ "POST /backoffice-gql/test_app_id/body_marker returned status 500"
+      refute log =~ "secretField"
+      refute log =~ "request-body-marker"
+      refute log =~ "https://"
+      assert_log_has_no_secrets(log)
+    end
+
+    test "query_platform logs the method, the path and the status only" do
+      stub_status_and_capture_headers(404)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 404} =
+                   Client.query_platform(
+                     "test_install_id",
+                     :put,
+                     "https://apps.peek.com/api/resource?token=query-marker",
+                     %{name: "request-body-marker"}
+                   )
+        end)
+
+      assert log =~ "PUT /api/resource returned status 404"
+      refute log =~ "query-marker"
+      refute log =~ "request-body-marker"
+      refute log =~ "apps.peek.com"
+      assert_log_has_no_secrets(log)
+    end
+
+    test "query_platform logs / as the path when the URL has no path" do
+      stub_status_and_capture_headers(503)
+
+      log =
+        capture_log(fn ->
+          assert {:error, 503} =
+                   Client.query_platform("test_install_id", :get, "https://apps.peek.com", %{})
+        end)
+
+      assert log =~ "GET / returned status 503"
+      assert_log_has_no_secrets(log)
+    end
+  end
+
+  describe "query_platform/4 host check" do
+    setup do
+      previous = System.get_env("PEEK_REGISTRY_EXTRA_HOSTS")
+      System.delete_env("PEEK_REGISTRY_EXTRA_HOSTS")
+
+      on_exit(fn ->
+        if previous,
+          do: System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", previous),
+          else: System.delete_env("PEEK_REGISTRY_EXTRA_HOSTS")
+      end)
+    end
+
+    defp expect_request(url) do
+      test_pid = self()
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(test_pid, {:requested, env.url, env.headers})
+        {:ok, %Tesla.Env{status: 200, body: %{ok: true}}}
+      end)
+
+      assert {:ok, %{ok: true}} = Client.query_platform("test_install_id", :get, url, %{})
+      assert_received {:requested, ^url, headers}
+      assert {"pk-api-key", "test_api_key"} in headers
+      assert Enum.any?(headers, fn {k, _v} -> k == "X-Peek-Auth" end)
+    end
+
+    defp refute_request(url) do
+      test_pid = self()
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(test_pid, {:requested, env.url, env.headers})
+        {:ok, %Tesla.Env{status: 200, body: %{ok: true}}}
+      end)
+
+      log =
+        capture_log(fn ->
+          assert {:error, :host_not_allowed} =
+                   Client.query_platform("test_install_id", :get, url, %{})
+        end)
+
+      refute_received {:requested, _, _}
+      log
+    end
+
+    test "sends the request to apps.peek.com" do
+      expect_request("https://apps.peek.com/installations-api/app/endpoint")
+    end
+
+    test "sends the request to stage.apps.peek.com" do
+      expect_request("https://stage.apps.peek.com/installations-api/app/endpoint")
+    end
+
+    test "matches the host without case" do
+      expect_request("https://Apps.PEEK.com/endpoint")
+    end
+
+    test "accepts an explicit port on a registry host" do
+      expect_request("https://apps.peek.com:443/endpoint")
+    end
+
+    test "accepts another port on a registry host" do
+      expect_request("https://apps.peek.com:8443/endpoint")
+    end
+
+    test "sends no request to a registry host with a trailing dot" do
+      refute_request("https://apps.peek.com./endpoint")
+    end
+
+    test "returns the transport error when the request fails" do
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn _env, _opts -> {:error, :econnrefused} end)
+
+      assert {:error, :econnrefused} =
+               Client.query_platform("test_install_id", :get, "https://apps.peek.com/endpoint", %{})
+    end
+
+    test "sends the request to a host in PEEK_REGISTRY_EXTRA_HOSTS" do
+      System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", " first.example.ngrok.app , Local.Example.ngrok.app,")
+      expect_request("https://first.example.ngrok.app/endpoint")
+      expect_request("https://local.example.ngrok.app/endpoint")
+    end
+
+    test "sends no request to an unknown host and logs the host" do
+      log = refute_request("https://other.example.com/endpoint?token=abc")
+      assert log =~ "other.example.com"
+      refute log =~ "token=abc"
+    end
+
+    test "sends no request over http to a registry host" do
+      refute_request("http://apps.peek.com/endpoint")
+    end
+
+    test "sends no request to a host that ends with a registry host" do
+      refute_request("https://apps.peek.com.example.org/endpoint")
+    end
+
+    test "sends no request to a subdomain of a registry host" do
+      refute_request("https://sub.apps.peek.com/endpoint")
+    end
+
+    test "sends no request when the registry host is only in the user info" do
+      refute_request("https://apps.peek.com@other.example.com/endpoint")
+    end
+
+    test "sends no request to an http host in PEEK_REGISTRY_EXTRA_HOSTS" do
+      System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", "local.example.ngrok.app")
+      refute_request("http://local.example.ngrok.app/endpoint")
+    end
+
+    test "sends no request for a relative URL or a URL that is not a string" do
+      refute_request("/installations-api/app/endpoint")
+      refute_request(nil)
+    end
+
+    test "registry_hosts/0 lists only the built-in hosts when the env var is empty" do
+      assert Client.registry_hosts() == ["apps.peek.com", "stage.apps.peek.com"]
+      System.put_env("PEEK_REGISTRY_EXTRA_HOSTS", " , ")
+      assert Client.registry_hosts() == ["apps.peek.com", "stage.apps.peek.com"]
     end
   end
 

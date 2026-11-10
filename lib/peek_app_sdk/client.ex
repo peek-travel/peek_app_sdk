@@ -4,19 +4,41 @@ defmodule PeekAppSDK.Client do
 
   alias PeekAppSDK.Config
 
+  # Response keys that this SDK and its callers read as atoms. `known_keys/0`
+  # uses this list, so the atoms exist once this module is loaded. Keep it.
+  @known_keys [:data, :errors, :message, :path, :locations, :extensions, :customizations]
+
   @doc """
   Creates a Tesla client with the appropriate middleware configuration.
+
+  Response JSON keys are decoded to atoms only when the atom already exists.
+  A key with no existing atom stays a string.
   """
   def client do
     middleware = [
-      {Tesla.Middleware.JSON, engine_opts: [keys: &String.to_atom/1]}
+      {Tesla.Middleware.JSON, engine_opts: [keys: &decode_key/1]}
     ]
 
     Tesla.client(middleware)
   end
 
+  @doc false
+  @spec known_keys() :: [atom()]
+  def known_keys, do: @known_keys
+
+  @doc false
+  @spec decode_key(String.t()) :: atom() | String.t()
+  def decode_key(key) do
+    String.to_existing_atom(key)
+  rescue
+    ArgumentError -> key
+  end
+
   @doc """
   Queries the Peek Pro API.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
 
   ## Examples
 
@@ -58,9 +80,10 @@ defmodule PeekAppSDK.Client do
     operation_name = operation_name(gql_query)
 
     url = build_backoffice_url(config, peek_app_id, operation_name)
+    method = :post
 
     case Tesla.request(client(),
-           method: :post,
+           method: method,
            url: url,
            body: body_params,
            headers: headers(install_id, config_id, peek_api_key)
@@ -71,18 +94,43 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: 200, body: %{data: data}}} ->
         {:ok, data}
 
-      {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected PeekPro response when hitting #{url} - (#{status}): #{inspect(body)}")
+      {:ok, %Tesla.Env{status: status}} ->
+        log_unexpected_status("PeekPro", method, url, status)
         {:error, status}
     end
   end
 
+  @registry_hosts ["apps.peek.com", "stage.apps.peek.com"]
+  @extra_hosts_env "PEEK_REGISTRY_EXTRA_HOSTS"
+
   @doc """
   Queries a platform API and returns the raw response body.
+
+  Response keys are decoded as described in `PeekAppSDK.Client.client/0`: a key
+  is an atom when that atom already exists, otherwise a string.
+
+  The request is sent only when `url` uses `https` and its host is a registry
+  host: `apps.peek.com`, `stage.apps.peek.com`, or a host listed in the
+  comma-separated `PEEK_REGISTRY_EXTRA_HOSTS` environment variable. The host
+  must match in full (case-insensitive); subdomains do not match.
+
+  For any other URL, no request is sent, a warning with the host is logged,
+  and `{:error, :host_not_allowed}` is returned.
   """
   @spec query_platform(String.t(), atom(), String.t(), map()) ::
-          {:ok, map()} | {:error, list()} | {:error, integer()}
+          {:ok, map()} | {:error, list() | integer() | :host_not_allowed | term()}
   def query_platform(install_id, method, url, body_params) do
+    case check_registry_host(url) do
+      :ok ->
+        do_query_platform(install_id, method, url, body_params)
+
+      {:error, host} ->
+        Logger.warning("query_platform: host not allowed: #{inspect(host)}")
+        {:error, :host_not_allowed}
+    end
+  end
+
+  defp do_query_platform(install_id, method, url, body_params) do
     config = Config.get_config(nil)
     peek_api_key = config.peek_api_key
 
@@ -101,12 +149,50 @@ defmodule PeekAppSDK.Client do
       {:ok, %Tesla.Env{status: status, body: body}} when status in 200..299 ->
         {:ok, body}
 
-      {:ok, %Tesla.Env{status: status, body: body}} ->
-        Logger.error("Unexpected Platform response when hitting #{url} - (#{status}): #{inspect(body)}")
-
+      {:ok, %Tesla.Env{status: status}} ->
+        log_unexpected_status("Platform", method, url, status)
         {:error, status}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
+
+  # Logs only the method, the URL path and the status. The query string,
+  # the request and response bodies and the headers are not logged.
+  defp log_unexpected_status(service, method, url, status) do
+    method = method |> to_string() |> String.upcase()
+    path = URI.parse(url).path || "/"
+
+    Logger.error("Unexpected #{service} response: #{method} #{path} returned status #{status}")
+  end
+
+  @doc """
+  Returns the hosts that `query_platform/4` sends requests to: the built-in
+  registry hosts and the hosts in `PEEK_REGISTRY_EXTRA_HOSTS`, in lower case.
+  """
+  @spec registry_hosts() :: [String.t()]
+  def registry_hosts do
+    extra =
+      (System.get_env(@extra_hosts_env) || "")
+      |> String.split(",")
+      |> Enum.map(&(&1 |> String.trim() |> String.downcase()))
+      |> Enum.reject(&(&1 == ""))
+
+    Enum.uniq(@registry_hosts ++ extra)
+  end
+
+  defp check_registry_host(url) when is_binary(url) do
+    case URI.parse(url) do
+      %URI{scheme: "https", host: host} when is_binary(host) and host != "" ->
+        if String.downcase(host) in registry_hosts(), do: :ok, else: {:error, host}
+
+      %URI{host: host} ->
+        {:error, host}
+    end
+  end
+
+  defp check_registry_host(_url), do: {:error, nil}
 
   def operation_name(query) do
     regex = ~r/\b(query|mutation|subscription)\s+(\w+)/
