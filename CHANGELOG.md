@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2026-11-12]
+
+### Added
+
+- `config :peek_app_sdk, :extra_frame_ancestors` — a list of origins that `PeekAppSDK.Plugs.PeekAuth.allow_peek_iframe/2` adds to `frame-ancestors`. Each origin must be `https://<host>` with an optional port, or `http://localhost` / `http://127.0.0.1` with an optional port. Another value raises `ArgumentError`, when the SDK starts and on each request. It is empty by default.
+- `PeekAppSDK.Plugs.PeekAuth.peek_frame_ancestors/0` returns the Peek origins that the plug always allows.
+- `PeekAppSDK.Plugs.PeekAuth.frame_ancestors/0` returns all the origins that the plug allows after `'self'`.
+
+### Changed
+
+- **Breaking:** limit frame-ancestors to Peek origins. `allow_peek_iframe/2` now sets `content-security-policy: frame-ancestors 'self' https://*.peek.com https://*.peeklabs.com`, plus the `:extra_frame_ancestors` origins. Before, it set `frame-ancestors 'self' *`.
+
+### Upgrading
+
+- An app that a page on `*.peek.com` or `*.peeklabs.com` puts in an iframe needs no change.
+- An app that a page on another origin puts in an iframe must add that origin to `:extra_frame_ancestors`.
+
 ## [2026-11-09]
 
 ### Added

@@ -60,6 +60,27 @@ export PEEK_REGISTRY_EXTRA_HOSTS="my-registry.ngrok.app"
 
 The host must match in full, without case. A subdomain of a listed host does not match.
 
+### Iframe origins for `allow_peek_iframe/2`
+
+`plug :allow_peek_iframe` sets `content-security-policy: frame-ancestors` to
+`'self'`, the Peek origins and the origins that you add. The Peek origins are
+`https://*.peek.com` and `https://*.peeklabs.com`.
+
+This list is not complete. Each platform environment has its own origin (its
+`app_store_url`), and new environments come. A page on another origin cannot
+put your app in an iframe. To add origins without a new SDK release, set
+`:extra_frame_ancestors`. The plug reads it on each request, so you can set it
+in `config/runtime.exs`:
+
+```elixir
+config :peek_app_sdk, :extra_frame_ancestors, ["https://partner.example.com"]
+```
+
+Each origin must be `https://<host>` with an optional port, or
+`http://localhost` / `http://127.0.0.1` with an optional port. A wildcard, a
+path or a trailing `/` raises `ArgumentError`. The SDK checks the value when
+it starts, so a bad value stops the boot of your app.
+
 ## Some setup tips:
 
 - `import PeekAppSDK.Plugs.PeekAuth` in router
