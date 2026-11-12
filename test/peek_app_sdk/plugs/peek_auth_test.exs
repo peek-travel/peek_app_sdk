@@ -8,11 +8,16 @@ defmodule PeekAppSDK.Plugs.PeekAuthTest do
   alias PeekAppSDK.Token
 
   describe "allow_peek_iframe/2" do
-    test "adds CSP header" do
-      conn = conn(:get, "/")
-      conn = PeekAuth.allow_peek_iframe(conn, %{})
+    test "allows only self and the Peek origins by default" do
+      conn = PeekAuth.allow_peek_iframe(conn(:get, "/"), %{})
 
-      assert get_resp_header(conn, "content-security-policy") == ["frame-ancestors 'self' *"]
+      assert get_resp_header(conn, "content-security-policy") == [
+               "frame-ancestors 'self' https://*.peek.com https://*.peeklabs.com"
+             ]
+    end
+
+    test "peek_frame_ancestors/0 lists the Peek origins" do
+      assert PeekAuth.peek_frame_ancestors() == ["https://*.peek.com", "https://*.peeklabs.com"]
     end
   end
 
