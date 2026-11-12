@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `config :peek_app_sdk, :extra_frame_ancestors` — a list of origins that `PeekAppSDK.Plugs.PeekAuth.allow_peek_iframe/2` adds to `frame-ancestors`. Each origin must be `https://<host>` with an optional port, or `http://localhost` / `http://127.0.0.1` with an optional port. Another value raises `ArgumentError`. It is empty by default.
+- `config :peek_app_sdk, :extra_frame_ancestors` — a list of origins that `PeekAppSDK.Plugs.PeekAuth.allow_peek_iframe/2` adds to `frame-ancestors`. Each origin must be `https://<host>` with an optional port, or `http://localhost` / `http://127.0.0.1` with an optional port. Another value raises `ArgumentError`, when the SDK starts and on each request. It is empty by default.
 - `PeekAppSDK.Plugs.PeekAuth.peek_frame_ancestors/0` returns the Peek origins that the plug always allows.
+- `PeekAppSDK.Plugs.PeekAuth.frame_ancestors/0` returns all the origins that the plug allows after `'self'`.
 
 ### Changed
 

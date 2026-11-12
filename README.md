@@ -78,7 +78,8 @@ config :peek_app_sdk, :extra_frame_ancestors, ["https://partner.example.com"]
 
 Each origin must be `https://<host>` with an optional port, or
 `http://localhost` / `http://127.0.0.1` with an optional port. A wildcard, a
-path or a trailing `/` raises `ArgumentError` on the request.
+path or a trailing `/` raises `ArgumentError`. The SDK checks the value when
+it starts, so a bad value stops the boot of your app.
 
 ## Some setup tips:
 

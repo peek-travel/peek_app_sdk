@@ -7,8 +7,8 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
 
   # An origin: `https://<host>[:port]`, or `http://localhost[:port]` and
   # `http://127.0.0.1[:port]` for local development. No `*`, path, space,
-  # quote, `,` or `;`.
-  @origin_regex ~r/\A(https:\/\/[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*|http:\/\/(localhost|127\.0\.0\.1))(:[0-9]{1,5})?\z/
+  # quote, `,` or `;`. A host label does not start or end with `-`.
+  @origin_regex ~r/\A(?:https:\/\/[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*|http:\/\/(?:localhost|127\.0\.0\.1))(?::([0-9]{1,5}))?\z/
 
   @doc """
   Lets Peek pages put the app in an iframe.
@@ -25,12 +25,22 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
 
   Each origin must be `https://<host>` with an optional port, or
   `http://localhost` / `http://127.0.0.1` with an optional port. A wildcard,
-  a path, a trailing `/` or any other value raises `ArgumentError`.
+  a path, a trailing `/` or any other value raises `ArgumentError`. The SDK
+  checks the config when it starts too, so a bad value stops the boot.
   """
   def allow_peek_iframe(conn, _params) do
-    sources = Enum.join(["'self'" | @peek_frame_ancestors ++ extra_frame_ancestors()], " ")
+    sources = Enum.join(["'self'" | frame_ancestors()], " ")
     put_resp_header(conn, "content-security-policy", "frame-ancestors " <> sources)
   end
+
+  @doc """
+  Returns the origins that `allow_peek_iframe/2` allows after `'self'`: the
+  Peek origins, then the `:extra_frame_ancestors` origins, with no duplicates.
+
+  Raises `ArgumentError` when `:extra_frame_ancestors` is not valid.
+  """
+  @spec frame_ancestors() :: [String.t()]
+  def frame_ancestors, do: Enum.uniq(@peek_frame_ancestors ++ extra_frame_ancestors())
 
   @doc """
   Returns the Peek origins that `allow_peek_iframe/2` always allows.
@@ -53,14 +63,25 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
   end
 
   defp validate_frame_ancestor!(origin) do
-    if is_binary(origin) and Regex.match?(@origin_regex, origin) do
+    if valid_origin?(origin) do
       origin
     else
       raise ArgumentError,
             "invalid origin in config :peek_app_sdk, :extra_frame_ancestors: #{inspect(origin)}. " <>
-              "Use https://<host> with an optional port, or http://localhost for local development."
+              "Use https://<host> with an optional port, or http://localhost or " <>
+              "http://127.0.0.1 for local development."
     end
   end
+
+  defp valid_origin?(origin) when is_binary(origin) do
+    case Regex.run(@origin_regex, origin) do
+      [_origin] -> true
+      [_origin, port] -> String.to_integer(port) in 1..65_535
+      nil -> false
+    end
+  end
+
+  defp valid_origin?(_origin), do: false
 
   @doc """
   Sets the peek_install_id in the connection assigns based on the token in the request.

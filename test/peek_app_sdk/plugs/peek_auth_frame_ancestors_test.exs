@@ -33,6 +33,23 @@ defmodule PeekAppSDK.Plugs.PeekAuthFrameAncestorsTest do
     assert csp_with_extra(nil) == ["frame-ancestors 'self' https://*.peek.com https://*.peeklabs.com"]
   end
 
+  test "accepts the lowest and the highest port" do
+    assert [header] = csp_with_extra(["https://a.example.com:1", "https://b.example.com:65535"])
+    assert String.ends_with?(header, " https://a.example.com:1 https://b.example.com:65535")
+  end
+
+  test "lists an origin only one time" do
+    assert csp_with_extra(["https://p.example.com", "https://p.example.com"]) == [
+             "frame-ancestors 'self' https://*.peek.com https://*.peeklabs.com https://p.example.com"
+           ]
+  end
+
+  test "frame_ancestors/0 returns the Peek origins and then the extra origins" do
+    Application.put_env(:peek_app_sdk, :extra_frame_ancestors, ["https://p-1.example.com"])
+
+    assert PeekAuth.frame_ancestors() == ["https://*.peek.com", "https://*.peeklabs.com", "https://p-1.example.com"]
+  end
+
   test "accepts http://127.0.0.1 for local development" do
     assert [header] = csp_with_extra(["http://127.0.0.1"])
     assert String.ends_with?(header, " http://127.0.0.1")
@@ -52,6 +69,12 @@ defmodule PeekAppSDK.Plugs.PeekAuthFrameAncestorsTest do
         "'unsafe-inline'",
         "http://localhost.example.com",
         "https://partner.example.com:",
+        "https://partner.example.com:0",
+        "https://partner.example.com:65536",
+        "https://partner.example.com:99999",
+        "https://-partner.example.com",
+        "https://partner-.example.com",
+        "https://partner..example.com",
         ""
       ] do
     test "raises for the invalid origin #{inspect(bad)}" do
