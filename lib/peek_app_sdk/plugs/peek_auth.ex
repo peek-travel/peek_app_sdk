@@ -3,11 +3,63 @@ defmodule PeekAppSDK.Plugs.PeekAuth do
 
   require Logger
 
+  @peek_frame_ancestors ["https://*.peek.com", "https://*.peeklabs.com"]
+
+  # An origin: `https://<host>[:port]`, or `http://localhost[:port]` and
+  # `http://127.0.0.1[:port]` for local development. No `*`, path, space,
+  # quote, `,` or `;`.
+  @origin_regex ~r/\A(https:\/\/[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*|http:\/\/(localhost|127\.0\.0\.1))(:[0-9]{1,5})?\z/
+
   @doc """
-  Allows Peek iframe embedding by setting appropriate CSP headers.
+  Lets Peek pages put the app in an iframe.
+
+  Sets the `content-security-policy` response header to
+  `frame-ancestors 'self'`, the Peek origins (`peek_frame_ancestors/0`) and the
+  origins in `config :peek_app_sdk, :extra_frame_ancestors`.
+
+  The Peek origins are not a full list: each platform environment has its own
+  origin. To add origins, set `:extra_frame_ancestors` to a list of origins.
+  The plug reads it on each request, so you can set it in `config/runtime.exs`:
+
+      config :peek_app_sdk, :extra_frame_ancestors, ["https://partner.example.com"]
+
+  Each origin must be `https://<host>` with an optional port, or
+  `http://localhost` / `http://127.0.0.1` with an optional port. A wildcard,
+  a path, a trailing `/` or any other value raises `ArgumentError`.
   """
   def allow_peek_iframe(conn, _params) do
-    put_resp_header(conn, "content-security-policy", "frame-ancestors 'self' *")
+    sources = Enum.join(["'self'" | @peek_frame_ancestors ++ extra_frame_ancestors()], " ")
+    put_resp_header(conn, "content-security-policy", "frame-ancestors " <> sources)
+  end
+
+  @doc """
+  Returns the Peek origins that `allow_peek_iframe/2` always allows.
+  """
+  @spec peek_frame_ancestors() :: [String.t()]
+  def peek_frame_ancestors, do: @peek_frame_ancestors
+
+  defp extra_frame_ancestors do
+    case Application.get_env(:peek_app_sdk, :extra_frame_ancestors) do
+      nil ->
+        []
+
+      origins when is_list(origins) ->
+        Enum.map(origins, &validate_frame_ancestor!/1)
+
+      other ->
+        raise ArgumentError,
+              "config :peek_app_sdk, :extra_frame_ancestors must be a list of origins, got: #{inspect(other)}"
+    end
+  end
+
+  defp validate_frame_ancestor!(origin) do
+    if is_binary(origin) and Regex.match?(@origin_regex, origin) do
+      origin
+    else
+      raise ArgumentError,
+            "invalid origin in config :peek_app_sdk, :extra_frame_ancestors: #{inspect(origin)}. " <>
+              "Use https://<host> with an optional port, or http://localhost for local development."
+    end
   end
 
   @doc """
