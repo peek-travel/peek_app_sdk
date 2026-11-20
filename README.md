@@ -3,6 +3,23 @@
 This is a library to help with authenticating requests to and from PeekPro when
 writing apps.
 
+## Development commands
+
+Run these from the repo root. `make help` lists them.
+
+- `make setup`: install the dependencies (`mix setup`).
+- `make deps`: get the dependencies (`mix deps.get`).
+- `make audit`: run `mix hex.audit`. It fails when a locked package has a security advisory or a retired version.
+- `make fmt`: format the code (`mix format`).
+- `make fmt-check`: fail when the code is not formatted (`mix format --check-formatted`).
+- `make lint`: run `mix credo`.
+- `make test`: run the tests (`mix test`).
+- `make coverage`: run the tests with coverage (`mix coveralls.lcov`). It fails below 100% and writes `cover/lcov.info`.
+- `make compile`: compile in the test env with warnings as errors.
+- `make assets-check`: rebuild the JS bundles (`mix assets.build`). It fails when the committed bundles are not up to date.
+- `make ci`: run the same checks as the CI workflow (`.github/workflows/test.yml`), in the same order: `deps`, `audit`, `assets-check`, `fmt-check`, `lint`, `coverage`.
+- `make all`: run `fmt`, then `ci`.
+
 ## Configuration
 
 ### Basic Configuration
