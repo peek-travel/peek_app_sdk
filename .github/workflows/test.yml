@@ -36,6 +36,10 @@ jobs:
       - name: Install dependencies
         run: mix deps.get
 
+      # Fail fast when a locked package has a security advisory or is retired
+      - name: Audit dependencies
+        run: make audit
+
       # The bundles are committed because apps load them straight from deps/;
       # fail if a source change wasn't rebuilt (run `mix assets.build`)
       - name: Check JS bundles are up to date
