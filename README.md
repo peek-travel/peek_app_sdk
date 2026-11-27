@@ -388,7 +388,7 @@ config :peek_app_sdk,
   posthog_base_url: System.get_env("POSTHOG_HOST")
 ```
 
-A `nil` value keeps the default.
+A `nil` or blank value keeps the default.
 
 ### What this enables
 

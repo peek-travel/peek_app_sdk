@@ -34,7 +34,9 @@ defmodule PeekAppSDK.Config do
           peek_api_base_url: any(),
           peek_app_id: any(),
           peek_api_key: any(),
-          peek_app_secret: any()
+          peek_app_secret: any(),
+          posthog_key: any(),
+          posthog_base_url: String.t()
         }
   @doc """
   Gets the configuration for the given identifier.
@@ -83,7 +85,7 @@ defmodule PeekAppSDK.Config do
       peek_api_key: Application.get_env(:peek_app_sdk, :peek_api_key),
       client_secret_token: Application.get_env(:peek_app_sdk, :client_secret_token),
       posthog_key: Application.get_env(:peek_app_sdk, :posthog_key),
-      posthog_base_url: Application.get_env(:peek_app_sdk, :posthog_base_url) || @default_posthog_base_url
+      posthog_base_url: posthog_base_url(Application.get_env(:peek_app_sdk, :posthog_base_url))
     }
   end
 
@@ -152,4 +154,8 @@ defmodule PeekAppSDK.Config do
       """
     end
   end
+
+  # A blank value, for example an empty environment variable, keeps the default.
+  defp posthog_base_url(url) when url in [nil, ""], do: @default_posthog_base_url
+  defp posthog_base_url(url), do: url
 end

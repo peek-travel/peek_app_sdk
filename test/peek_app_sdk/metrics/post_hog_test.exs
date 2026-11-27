@@ -243,11 +243,13 @@ defmodule PeekAppSDK.Metrics.PostHogTest do
       assert_receive {:request, "http://posthog.local/mocks/posthog/i/v0/e/"}
     end
 
-    test "uses the default when the configured base URL is nil", %{partner: partner} do
-      Application.put_env(:peek_app_sdk, :posthog_base_url, nil)
+    test "uses the default when the configured base URL is nil or blank", %{partner: partner} do
+      for url <- [nil, ""] do
+        Application.put_env(:peek_app_sdk, :posthog_base_url, url)
 
-      PostHog.track(partner, "app.install", %{})
-      assert_receive {:request, "https://us.i.posthog.com/capture"}
+        PostHog.track(partner, "app.install", %{})
+        assert_receive {:request, "https://us.i.posthog.com/capture"}
+      end
     end
   end
 end

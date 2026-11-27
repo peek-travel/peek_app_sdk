@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `posthog_base_url` config: the base URL for PostHog `capture` and `identify` calls. It is `https://us.i.posthog.com` by default, and a `nil` value keeps that default. Use it to send events to a local mock. Apps that do not set it see no change.
+- `posthog_base_url` config: the base URL for PostHog `capture` and `identify` calls. It is `https://us.i.posthog.com` by default, and a `nil` or blank value keeps that default. Use it to send events to a local mock. Apps that do not set it see no change.
 
 ## [2026-11-09]
 
