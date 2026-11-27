@@ -380,6 +380,16 @@ config :peek_app_sdk,
 
 If `posthog_key` is not configured, PostHog calls are no-ops.
 
+Events go to `https://us.i.posthog.com` by default. To send them to another
+PostHog-compatible host, for example a local mock, set `posthog_base_url`:
+
+```elixir
+config :peek_app_sdk,
+  posthog_base_url: System.get_env("POSTHOG_HOST")
+```
+
+A `nil` or blank value keeps the default.
+
 ### What this enables
 
 - Identify on install: When you call `PeekAppSDK.Metrics.track_install/2` with a partner map, the SDK will:

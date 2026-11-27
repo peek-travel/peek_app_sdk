@@ -202,4 +202,54 @@ defmodule PeekAppSDK.Metrics.PostHogTest do
                PostHog.track(partner, "test.event", %{foo: "bar"})
     end
   end
+
+  describe "posthog_base_url" do
+    setup do
+      prev_key = Application.get_env(:peek_app_sdk, :posthog_key)
+      prev_url = Application.get_env(:peek_app_sdk, :posthog_base_url)
+      Application.put_env(:peek_app_sdk, :posthog_key, "ph_test_key")
+
+      on_exit(fn ->
+        Application.put_env(:peek_app_sdk, :posthog_key, prev_key)
+        Application.put_env(:peek_app_sdk, :posthog_base_url, prev_url)
+      end)
+
+      Tesla.Adapter.Finch
+      |> Mimic.stub(:call, fn env, _opts ->
+        send(self(), {:request, env.url})
+        {:ok, %Tesla.Env{status: 200}}
+      end)
+
+      %{partner: %{name: "Partner Name", external_refid: "1234", is_test: true}}
+    end
+
+    test "sends to PostHog US by default", %{partner: partner} do
+      Application.delete_env(:peek_app_sdk, :posthog_base_url)
+
+      PostHog.track(partner, "app.install", %{})
+      assert_receive {:request, "https://us.i.posthog.com/capture"}
+
+      PostHog.identify(partner)
+      assert_receive {:request, "https://us.i.posthog.com/i/v0/e/"}
+    end
+
+    test "sends to the configured base URL", %{partner: partner} do
+      Application.put_env(:peek_app_sdk, :posthog_base_url, "http://posthog.local/mocks/posthog")
+
+      PostHog.track(partner, "app.install", %{})
+      assert_receive {:request, "http://posthog.local/mocks/posthog/capture"}
+
+      PostHog.identify(partner)
+      assert_receive {:request, "http://posthog.local/mocks/posthog/i/v0/e/"}
+    end
+
+    test "uses the default when the configured base URL is nil or blank", %{partner: partner} do
+      for url <- [nil, ""] do
+        Application.put_env(:peek_app_sdk, :posthog_base_url, url)
+
+        PostHog.track(partner, "app.install", %{})
+        assert_receive {:request, "https://us.i.posthog.com/capture"}
+      end
+    end
+  end
 end
