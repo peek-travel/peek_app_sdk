@@ -27,6 +27,7 @@ defmodule PeekAppSDK.Config do
   """
 
   @default_peek_api_base_url "https://apps.peekapis.com"
+  @default_posthog_base_url "https://us.i.posthog.com"
 
   @spec get_config() :: %{
           client_secret_token: any(),
@@ -81,7 +82,8 @@ defmodule PeekAppSDK.Config do
           @default_peek_api_base_url,
       peek_api_key: Application.get_env(:peek_app_sdk, :peek_api_key),
       client_secret_token: Application.get_env(:peek_app_sdk, :client_secret_token),
-      posthog_key: Application.get_env(:peek_app_sdk, :posthog_key)
+      posthog_key: Application.get_env(:peek_app_sdk, :posthog_key),
+      posthog_base_url: Application.get_env(:peek_app_sdk, :posthog_base_url) || @default_posthog_base_url
     }
   end
 

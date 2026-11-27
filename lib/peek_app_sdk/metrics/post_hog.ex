@@ -9,13 +9,15 @@ defmodule PeekAppSDK.Metrics.PostHog do
 
   @doc """
   Creates a Tesla client with the appropriate middleware configuration.
+
+  It sends to the `posthog_base_url` config, `https://us.i.posthog.com` by default.
   """
   def client do
     middleware = [
       Tesla.Middleware.JSON,
       {Tesla.Middleware.Headers, [{"Content-Type", "application/json"}]},
       {Tesla.Middleware.Retry, delay: 500, max_retries: 10},
-      {Tesla.Middleware.BaseUrl, "https://us.i.posthog.com"}
+      {Tesla.Middleware.BaseUrl, Config.get_config().posthog_base_url}
     ]
 
     Tesla.client(middleware)
